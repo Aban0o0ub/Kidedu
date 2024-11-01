@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:loginpage/pages/role_page.dart';
+import 'package:loginpage/views/role_page.dart';
 import 'package:loginpage/widgets/auth_prompt.dart';
 import 'package:loginpage/widgets/custom_button.dart';
 import 'package:loginpage/widgets/custom_text_field.dart';
@@ -22,6 +22,15 @@ class LoginPageState extends State<LoginPage> {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // إلغاء التركيز على الحقول عند بدء الصفحة
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).unfocus();
+    });
+  }
 
   void togglePasswordVisibility() {
     setState(() {
@@ -171,7 +180,10 @@ class LoginPageState extends State<LoginPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => const RoleSelectionPage()),
-                        );
+                        ).then((_) {
+                          // إعادة التركيز عند العودة
+                          FocusScope.of(context).unfocus();
+                        });
                       },
                     ),
                   ],

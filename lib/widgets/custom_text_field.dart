@@ -37,6 +37,27 @@ class CustomTextFieldState extends State<CustomTextField> {
     });
   }
 
+  void _handleTap(TapDownDetails details) {
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final offset = renderBox.globalToLocal(details.globalPosition);
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: widget.controller.text,
+        style: const TextStyle(fontSize: 16),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+
+    // Calculate the index of the character at the tapped position
+    int index = textPainter.getPositionForOffset(offset).offset;
+
+    // Move the cursor to the tapped position
+    widget.controller.selection = TextSelection.fromPosition(
+      TextPosition(offset: index),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -51,51 +72,53 @@ class CustomTextFieldState extends State<CustomTextField> {
               fontSize: 24,
             ),
           ),
-          TextField(
-            controller: widget.controller,
-            obscureText: widget.isPasswordField ? _obscureText : false,
-            onTap: () {
-              widget.controller.selection = TextSelection(
-                baseOffset: 0,
-                extentOffset: widget.controller.text.length,
-              );
-            },
-            decoration: InputDecoration(
-              contentPadding: widget.contentPadding,
-              prefixIcon: widget.icon != null
-                  ? Icon(
-                      widget.icon,
-                      color: const Color(0xFF9D9D9D),
-                    )
-                  : null,
-              hintText: widget.hintText,
-              hintStyle: const TextStyle(
-                color: Color(0xFF9D9D9D),
-              ),
-              enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color(0xFF02457A),
-                ),
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color(0xFF02457A),
-                  width: 2.0,
-                ),
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-              suffixIcon: widget.isPasswordField
-                  ? IconButton(
-                      icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
+          GestureDetector(
+            onTapDown: _handleTap, // Handle single tap
+            child: TextField(
+              controller: widget.controller,
+              obscureText: widget.isPasswordField ? _obscureText : false,
+              onTap: () {
+                // Do not change the selection here
+              },
+              decoration: InputDecoration(
+                contentPadding: widget.contentPadding,
+                prefixIcon: widget.icon != null
+                    ? Icon(
+                        widget.icon,
                         color: const Color(0xFF9D9D9D),
-                      ),
-                      onPressed: _toggleObscureText,
-                    )
-                  : widget.suffixIcon,
+                      )
+                    : null,
+                hintText: widget.hintText,
+                hintStyle: const TextStyle(
+                  color: Color(0xFF9D9D9D),
+                ),
+                enabledBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color(0xFF02457A),
+                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                ),
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color(0xFF02457A),
+                    width: 2.0,
+                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                ),
+                suffixIcon: widget.isPasswordField
+                    ? IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: const Color(0xFF9D9D9D),
+                        ),
+                        onPressed: _toggleObscureText,
+                      )
+                    : widget.suffixIcon,
+              ),
+              style: const TextStyle(color: Colors.black),
             ),
-            style: const TextStyle(color: Colors.white),
           ),
         ],
       ),
