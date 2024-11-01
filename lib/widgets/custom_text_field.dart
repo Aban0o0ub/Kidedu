@@ -49,10 +49,8 @@ class CustomTextFieldState extends State<CustomTextField> {
     );
     textPainter.layout();
 
-    // Calculate the index of the character at the tapped position
     int index = textPainter.getPositionForOffset(offset).offset;
 
-    // Move the cursor to the tapped position
     widget.controller.selection = TextSelection.fromPosition(
       TextPosition(offset: index),
     );
@@ -73,13 +71,11 @@ class CustomTextFieldState extends State<CustomTextField> {
             ),
           ),
           GestureDetector(
-            onTapDown: _handleTap, // Handle single tap
+            onTapDown: _handleTap,
             child: TextField(
               controller: widget.controller,
               obscureText: widget.isPasswordField ? _obscureText : false,
-              onTap: () {
-                // Do not change the selection here
-              },
+              onTap: () {},
               decoration: InputDecoration(
                 contentPadding: widget.contentPadding,
                 prefixIcon: widget.icon != null

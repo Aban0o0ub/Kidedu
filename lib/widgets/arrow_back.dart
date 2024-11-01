@@ -9,17 +9,16 @@ class ArrowBack extends StatelessWidget {
       top: 75,
       left: 20,
       child: Container(
-        padding: const EdgeInsets.all(8.0), // إضافة حواف
+        padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color:
-              const Color.fromARGB(255, 228, 228, 228), // اللون الرمادي للخلفية
-          shape: BoxShape.circle, // جعل الخلفية دائرية
+          color: const Color.fromARGB(255, 228, 228, 228),
+          shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3), // لون الظل
-              offset: const Offset(2, 2), // اتجاه الظل
-              blurRadius: 4.0, // مدى انتشار الظل
-              spreadRadius: 2.0, // مدى اتساع الظل
+              color: Colors.black.withOpacity(0.3),
+              offset: const Offset(2, 2),
+              blurRadius: 4.0,
+              spreadRadius: 2.0,
             ),
           ],
         ),

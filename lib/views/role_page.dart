@@ -11,11 +11,11 @@ class RoleSelectionPage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          const UpperStickersPhoto(), // الخلفية العلوية
+          const UpperStickersPhoto(),
           const ArrowBack(),
           Column(
             children: [
-              const SizedBox(height: 240), // مساحة لترك الصورة العلوية والنصوص
+              const SizedBox(height: 240),
               const Text(
                 'Role',
                 style: TextStyle(
@@ -33,7 +33,6 @@ class RoleSelectionPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              // Container الكبير
               Expanded(
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -43,11 +42,9 @@ class RoleSelectionPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Column(
-                    //mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Container الصغير الأول
                       Stack(
-                        clipBehavior: Clip.none, // لضمان عرض الصورة خارج الحدود
+                        clipBehavior: Clip.none,
                         alignment: Alignment.center,
                         children: [
                           Container(
@@ -74,11 +71,10 @@ class RoleSelectionPage extends StatelessWidget {
                           ),
                           Positioned(
                             right: -9,
-                            bottom:
-                                0, // لجعل قاعدة الصورة ملامسة لقاعدة الكونتينر الصغير
+                            bottom: 0,
                             child: Image.asset(
                               'assets/images/kidPhoto.png',
-                              height: 170, // تكبير حجم الصورة
+                              height: 170,
                             ),
                           ),
                         ],
@@ -86,9 +82,8 @@ class RoleSelectionPage extends StatelessWidget {
                       const SizedBox(
                         height: 15,
                       ),
-                      // Container الصغير الثاني
                       Stack(
-                        clipBehavior: Clip.none, // لضمان عرض الصورة خارج الحدود
+                        clipBehavior: Clip.none,
                         alignment: Alignment.center,
                         children: [
                           Container(
@@ -115,8 +110,7 @@ class RoleSelectionPage extends StatelessWidget {
                           ),
                           Positioned(
                             left: 0,
-                            bottom:
-                                15, // لجعل قاعدة الصورة ملامسة لقاعدة الكونتينر الصغير
+                            bottom: 15,
                             child: Image.asset(
                               'assets/images/InstructorPhoto.png',
                               height: 150, // تكبير حجم الصورة

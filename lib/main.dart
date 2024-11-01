@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:loginpage/views/login_page.dart';
-//import 'package:loginpage/pages/splash_screen.dart';
+import 'package:loginpage/views/welcome_page.dart';
 
 void main() {
   runApp(const Auth());
@@ -16,7 +15,7 @@ class Auth extends StatelessWidget {
         fontFamily: 'Alegreya',
       ),
       debugShowCheckedModeBanner: false,
-      home: const LoginPage(),
+      home: const WelcomePage(),
     );
   }
 }
