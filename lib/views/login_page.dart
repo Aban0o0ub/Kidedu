@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loginpage/views/home_page.dart';
 import 'package:loginpage/views/role_page.dart';
 import 'package:loginpage/widgets/auth_prompt.dart';
 import 'package:loginpage/widgets/custom_button.dart';
@@ -26,7 +27,7 @@ class LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    // إلغاء التركيز على الحقول عند بدء الصفحة
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).unfocus();
     });
@@ -38,7 +39,7 @@ class LoginPageState extends State<LoginPage> {
     });
   }
 
-  void _showErrorMessage(String message) {
+  void showErrorMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
@@ -49,21 +50,12 @@ class LoginPageState extends State<LoginPage> {
       return "البريد الإلكتروني مطلوب.";
     }
 
-    String emailPattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
-    RegExp regex = RegExp(emailPattern);
-    if (!regex.hasMatch(value)) {
-      return "البريد الإلكتروني غير صحيح.";
-    }
-
     return null;
   }
 
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return "كلمة المرور مطلوبة.";
-    }
-    if (value.length < 8) {
-      return "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.";
     }
     return null;
   }
@@ -130,25 +122,15 @@ class LoginPageState extends State<LoginPage> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    CustomButton(
-                      onPressed: () {
-                        String? emailError =
-                            validateEmail(_emailController.text);
-                        String? passwordError =
-                            validatePassword(_passwordController.text);
-
-                        if (emailError != null) {
-                          _showErrorMessage(
-                              emailError); // عرض رسالة الخطأ للبريد الإلكتروني
-                        } else if (passwordError != null) {
-                          _showErrorMessage(
-                              passwordError); // عرض رسالة الخطأ لكلمة المرور
-                        } else {
-                          print(
-                              "البريد الإلكتروني: ${_emailController.text}, كلمة المرور: ${_passwordController.text}");
-                        }
-                      },
-                    ),
+                    CustomButton(onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()),
+                      ).then((_) {
+                        FocusScope.of(context).unfocus();
+                      });
+                    }),
                     const SizedBox(height: 28),
                     const OrDivider(),
                     const SizedBox(height: 28),
@@ -181,7 +163,6 @@ class LoginPageState extends State<LoginPage> {
                           MaterialPageRoute(
                               builder: (context) => const RoleSelectionPage()),
                         ).then((_) {
-                          // إعادة التركيز عند العودة
                           FocusScope.of(context).unfocus();
                         });
                       },

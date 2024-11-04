@@ -13,10 +13,7 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        print("Button Pressed: $text");
-        onPressed();
-      },
+      onTap: () {},
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF1877F2),

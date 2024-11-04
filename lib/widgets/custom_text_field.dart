@@ -12,6 +12,10 @@ class CustomTextField extends StatefulWidget {
     this.suffixIcon,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 16),
     this.width = 360,
+    this.maxLines,
+    this.minLines,
+    this.keyboardType = TextInputType.text,
+    this.hasIcon = true,
   });
 
   final String label;
@@ -23,6 +27,10 @@ class CustomTextField extends StatefulWidget {
   final Widget? suffixIcon;
   final EdgeInsetsGeometry contentPadding;
   final double width;
+  final int? maxLines;
+  final int? minLines;
+  final TextInputType keyboardType;
+  final bool hasIcon;
 
   @override
   CustomTextFieldState createState() => CustomTextFieldState();
@@ -75,10 +83,16 @@ class CustomTextFieldState extends State<CustomTextField> {
             child: TextField(
               controller: widget.controller,
               obscureText: widget.isPasswordField ? _obscureText : false,
-              onTap: () {},
+              maxLines: widget.isPasswordField ? 1 : widget.maxLines,
+              minLines: widget.isPasswordField ? 1 : widget.minLines,
+              keyboardType: widget.isPasswordField
+                  ? TextInputType.visiblePassword
+                  : widget.keyboardType,
               decoration: InputDecoration(
-                contentPadding: widget.contentPadding,
-                prefixIcon: widget.icon != null
+                contentPadding: widget.hasIcon
+                    ? widget.contentPadding
+                    : const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                prefixIcon: widget.hasIcon && widget.icon != null
                     ? Icon(
                         widget.icon,
                         color: const Color(0xFF9D9D9D),
@@ -92,14 +106,14 @@ class CustomTextFieldState extends State<CustomTextField> {
                   borderSide: BorderSide(
                     color: Color(0xFF02457A),
                   ),
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
                 focusedBorder: const OutlineInputBorder(
                   borderSide: BorderSide(
                     color: Color(0xFF02457A),
                     width: 2.0,
                   ),
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
                 suffixIcon: widget.isPasswordField
                     ? IconButton(

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:loginpage/views/auth_instructor.dart';
+import 'package:loginpage/views/auth_kid.dart';
 import 'package:loginpage/widgets/arrow_back.dart';
 import 'package:loginpage/widgets/upper_stickers_photo.dart';
 
@@ -43,80 +45,100 @@ class RoleSelectionPage extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 30, horizontal: 30),
-                            margin: const EdgeInsets.symmetric(vertical: 15),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFFFD8D8),
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(25),
-                                bottomRight: Radius.circular(25),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AuthKid()),
+                          ).then((_) {
+                            FocusScope.of(context).unfocus();
+                          });
+                        },
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 30, horizontal: 30),
+                              margin: const EdgeInsets.symmetric(vertical: 15),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFFFD8D8),
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(25),
+                                  bottomRight: Radius.circular(25),
+                                ),
                               ),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                'Kid',
-                                style: TextStyle(
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF02457A),
+                              child: const Center(
+                                child: Text(
+                                  'Kid',
+                                  style: TextStyle(
+                                    fontSize: 35,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF02457A),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          Positioned(
-                            right: -9,
-                            bottom: 0,
-                            child: Image.asset(
-                              'assets/images/kidPhoto.png',
-                              height: 170,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 30, horizontal: 30),
-                            margin: const EdgeInsets.symmetric(vertical: 15),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFABE8EA),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(25),
-                                bottomLeft: Radius.circular(25),
+                            Positioned(
+                              right: -9,
+                              bottom: 0,
+                              child: Image.asset(
+                                'assets/images/kidPhoto.png',
+                                height: 170,
                               ),
                             ),
-                            child: const Center(
-                              child: Text(
-                                'Instructor',
-                                style: TextStyle(
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF02457A),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AuthInstructor()),
+                          ).then((_) {
+                            FocusScope.of(context).unfocus();
+                          });
+                        },
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 30, horizontal: 30),
+                              margin: const EdgeInsets.symmetric(vertical: 15),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFABE8EA),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(25),
+                                  bottomLeft: Radius.circular(25),
+                                ),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Instructor',
+                                  style: TextStyle(
+                                    fontSize: 35,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF02457A),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          Positioned(
-                            left: 0,
-                            bottom: 15,
-                            child: Image.asset(
-                              'assets/images/InstructorPhoto.png',
-                              height: 150, // تكبير حجم الصورة
+                            Positioned(
+                              left: 0,
+                              bottom: 15,
+                              child: Image.asset(
+                                'assets/images/InstructorPhoto.png',
+                                height: 150,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
