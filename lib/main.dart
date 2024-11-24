@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:loginpage/views/welcome_page.dart';
+import 'package:loginpage/core/injection/injection.dart';
+import 'package:loginpage/features/onBoarding/ui/welcome_page.dart';
 
 void main() {
+  initGetIt();
   runApp(const Auth());
 }
 

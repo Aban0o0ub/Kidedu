@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:loginpage/views/home_page.dart';
-import 'package:loginpage/views/role_page.dart';
-import 'package:loginpage/widgets/auth_prompt.dart';
-import 'package:loginpage/widgets/custom_button.dart';
-import 'package:loginpage/widgets/custom_text_field.dart';
-import 'package:loginpage/widgets/header_title.dart';
-import 'package:loginpage/widgets/icon_button.dart';
-import 'package:loginpage/widgets/or_divider.dart';
-import 'package:loginpage/widgets/remember_me_checkbox.dart';
-import 'package:loginpage/widgets/upper_stickers_photo.dart';
+import 'package:loginpage/features/home/ui/home_page.dart';
+import 'package:loginpage/features/sign_up/ui/role_page.dart';
+import 'package:loginpage/core/widgets/auth_prompt.dart';
+import 'package:loginpage/core/widgets/custom_button.dart';
+import 'package:loginpage/core/widgets/custom_text_field.dart';
+import 'package:loginpage/core/widgets/header_title.dart';
+import 'package:loginpage/core/widgets/icon_button.dart';
+import 'package:loginpage/core/widgets/or_divider.dart';
+import 'package:loginpage/core/widgets/remember_me_checkbox.dart';
+import 'package:loginpage/core/widgets/upper_stickers_photo.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:loginpage/widgets/arrow_back.dart';
+import 'package:loginpage/core/widgets/arrow_back.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

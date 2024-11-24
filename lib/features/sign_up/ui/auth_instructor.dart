@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:loginpage/views/home_page.dart';
-import 'package:loginpage/views/login_page.dart';
-import 'package:loginpage/widgets/arrow_back.dart';
-import 'package:loginpage/widgets/auth_prompt.dart';
-import 'package:loginpage/widgets/custom_button.dart';
-import 'package:loginpage/widgets/custom_text_field.dart';
-import 'package:loginpage/widgets/header_title.dart';
-import 'package:loginpage/widgets/icon_button.dart';
-import 'package:loginpage/widgets/or_divider.dart';
-import 'package:loginpage/widgets/upper_stickers_photo.dart';
+import 'package:loginpage/features/home/ui/home_page.dart';
+import 'package:loginpage/features/login/ui/login_page.dart';
+import 'package:loginpage/core/widgets/arrow_back.dart';
+import 'package:loginpage/core/widgets/auth_prompt.dart';
+import 'package:loginpage/core/widgets/custom_button.dart';
+import 'package:loginpage/core/widgets/custom_dropdown.dart';
+import 'package:loginpage/core/widgets/custom_text_field.dart';
+import 'package:loginpage/core/widgets/header_title.dart';
+import 'package:loginpage/core/widgets/icon_button.dart';
+import 'package:loginpage/core/widgets/or_divider.dart';
+import 'package:loginpage/core/widgets/upper_stickers_photo.dart';
 
 class AuthInstructor extends StatefulWidget {
   const AuthInstructor({super.key});
@@ -256,97 +257,6 @@ class AuthInstructorState extends State<AuthInstructor> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class CustomDropdownField extends StatelessWidget {
-  const CustomDropdownField({
-    super.key,
-    required this.label,
-    required this.hintText,
-    required this.controller,
-    required this.items,
-    required this.icon,
-    this.width = 180,
-    this.height = 56,
-  });
-
-  final String label;
-  final String hintText;
-  final TextEditingController controller;
-  final List<String> items;
-  final IconData icon;
-  final double width;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFF02457A),
-              fontSize: 24,
-            ),
-          ),
-          SizedBox(
-            height: height,
-            child: DropdownButtonFormField<String>(
-              value: controller.text.isEmpty ? null : controller.text,
-              items: items
-                  .map((String value) => DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ))
-                  .toList(),
-              onChanged: (String? newValue) {
-                controller.text = newValue ?? '';
-              },
-              decoration: InputDecoration(
-                prefixIcon: Icon(
-                  icon,
-                  color: const Color(0xFF9D9D9D),
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 15),
-                hintText: hintText,
-                hintStyle: const TextStyle(
-                  color: Color(0xFF9D9D9D),
-                ),
-                enabledBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color(0xFF02457A),
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color(0xFF02457A),
-                    width: 2.0,
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                ),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-              dropdownColor: Colors.white,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Color(0xFF02457A),
-              ),
-              isExpanded: true,
-              iconSize: 30,
-            ),
-          ),
-        ],
       ),
     );
   }
