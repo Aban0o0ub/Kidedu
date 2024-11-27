@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:loginpage/features/login/ui/login_page.dart';
+import 'package:loginpage/features/onBoarding/ui/circle_border.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -92,7 +93,6 @@ class _WelcomePageState extends State<WelcomePage> {
               const SizedBox(height: 20),
             ],
           ),
-          // زر التحكم والإطار
           Positioned(
             bottom: 40,
             left: 0,
@@ -101,12 +101,10 @@ class _WelcomePageState extends State<WelcomePage> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // رسم الإطار الديناميكي
                   CustomPaint(
                     size: const Size(100, 100),
                     painter: CircleBorderPainter(pageNumber),
                   ),
-                  // الزر الداخلي
                   InkWell(
                     onTap: () {
                       if (pageNumber < 2) {
@@ -129,7 +127,7 @@ class _WelcomePageState extends State<WelcomePage> {
                       height: 70,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: const Color(0xFF1877F2), // لون الزر
+                        color: const Color(0xFF1877F2),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.3),
@@ -156,43 +154,4 @@ class _WelcomePageState extends State<WelcomePage> {
       ),
     );
   }
-}
-
-class CircleBorderPainter extends CustomPainter {
-  final int pageNumber;
-
-  CircleBorderPainter(this.pageNumber);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = const Color(0xFF1877F2) // الأزرق الغامق
-      ..strokeWidth = 5
-      ..style = PaintingStyle.stroke;
-
-    final Paint lightPaint = Paint()
-      ..color = const Color(0xFF1877F2).withOpacity(0.3) // الأزرق الباهت
-      ..strokeWidth = 5
-      ..style = PaintingStyle.stroke;
-
-    final Rect rect = Rect.fromCircle(
-      center: Offset(size.width / 2, size.height / 2),
-      radius: size.width / 2,
-    );
-
-    double startAngle = -3.141592653589793 / 2; // البداية من الأعلى
-    double sweepAngle = (2 * 3.141592653589793) *
-        (pageNumber + 1) /
-        3; // الزاوية المخصصة للون الأزرق الغامق
-
-    // رسم الجزء الأزرق الغامق
-    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
-
-    // رسم الجزء الأزرق الباهت
-    canvas.drawArc(rect, startAngle + sweepAngle,
-        2 * 3.141592653589793 - sweepAngle, false, lightPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:loginpage/features/home/ui/home_page.dart';
-import 'package:loginpage/features/sign_up/ui/role_page.dart';
-import 'package:loginpage/core/widgets/auth_prompt.dart';
-import 'package:loginpage/core/widgets/custom_button.dart';
-import 'package:loginpage/core/widgets/custom_text_field.dart';
-import 'package:loginpage/core/widgets/header_title.dart';
-import 'package:loginpage/core/widgets/icon_button.dart';
-import 'package:loginpage/core/widgets/or_divider.dart';
-import 'package:loginpage/core/widgets/remember_me_checkbox.dart';
-import 'package:loginpage/core/widgets/upper_stickers_photo.dart';
+import 'package:loginpage/features/sign_up/ui/views/role_page.dart';
+import 'package:loginpage/features/sign_up/ui/widgets/auth_prompt.dart';
+import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
+import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
+import 'package:loginpage/features/sign_up/ui/widgets/header_title.dart';
+import 'package:loginpage/features/sign_up/ui/widgets/icon_button.dart';
+import 'package:loginpage/features/sign_up/ui/widgets/or_divider.dart';
+import 'package:loginpage/features/sign_up/ui/widgets/remember_me_checkbox.dart';
+import 'package:loginpage/features/sign_up/ui/widgets/upper_stickers_photo.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -47,15 +47,18 @@ class LoginPageState extends State<LoginPage> {
 
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return "البريد الإلكتروني مطلوب.";
+      return 'Email is required';
+    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+      return 'Please enter a valid email';
     }
-
     return null;
   }
 
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return "كلمة المرور مطلوبة.";
+      return 'Password is required';
+    } else if (value.length < 6) {
+      return 'Password must be at least 6 characters';
     }
     return null;
   }

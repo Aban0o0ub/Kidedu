@@ -40,3 +40,41 @@ class Kid {
   factory Kid.fromJson(Map<String, dynamic> json) => _$KidFromJson(json);
   Map<String, dynamic> toJson() => _$KidToJson(this);
 }
+
+@JsonSerializable()
+class Instructor {
+  @JsonKey(name: '_id')
+  String? id;
+  @JsonKey(name: 'Name')
+  String? name;
+  @JsonKey(name: 'Email')
+  String? email;
+  @JsonKey(name: 'Password')
+  String? password;
+  @JsonKey(name: 'Governorate')
+  String? governorate;
+  @JsonKey(name: 'PhoneNumber')
+  String? phoneNumber;
+  @JsonKey(name: 'Bio')
+  String? bio;
+  String? createdAt;
+  String? updatedAt;
+  @JsonKey(name: '__v')
+  int? v;
+
+  Instructor(
+      {this.id,
+      this.name,
+      this.email,
+      this.password,
+      this.bio,
+      this.governorate,
+      this.phoneNumber,
+      this.createdAt,
+      this.updatedAt,
+      this.v});
+
+  factory Instructor.fromJson(Map<String, dynamic> json) =>
+      _$InstructorFromJson(json);
+  Map<String, dynamic> toJson() => _$InstructorToJson(this);
+}

@@ -10,6 +10,7 @@ class CustomDropdownField extends StatelessWidget {
     required this.icon,
     this.width = 180,
     this.height = 56,
+    this.validator,
   });
 
   final String label;
@@ -19,6 +20,7 @@ class CustomDropdownField extends StatelessWidget {
   final IconData icon;
   final double width;
   final double height;
+  final String? Function(String?)? validator;
 
   @override
   Widget build(BuildContext context) {

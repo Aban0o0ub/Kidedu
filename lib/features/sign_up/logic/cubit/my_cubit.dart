@@ -9,9 +9,29 @@ class MyCubit extends Cubit<MyState> {
   final MyRepo myRepo;
   MyCubit(this.myRepo) : super(MyInitial());
 
-  void emitGetAllKids() {
-    myRepo.getAllKids().then((kidslist) {
-      emit(GetAllKids(kidslist));
-    });
+  // void emitGetAllKids() {
+  //   myRepo.getAllKids().then((kidslist) {
+  //     emit(GetAllKids(kidslist));
+  //   });
+  // }
+
+  void emitCreateNewKid(Kid newkid) async {
+    try {
+      emit(MyLoading());
+      await myRepo.createNewKid(newkid);
+      emit(CreateNewKidSuccess(newkid));
+    } catch (e) {
+      emit(MyFailure(e.toString()));
+    }
+  }
+
+  void emitCreateNewInstructor(Instructor newinstructor) async {
+    try {
+      emit(MyLoading());
+      await myRepo.createNewInstructor(newinstructor);
+      emit(CreateNewInstructorSuccess(newinstructor));
+    } catch (e) {
+      emit(MyFailure(e.toString()));
+    }
   }
 }

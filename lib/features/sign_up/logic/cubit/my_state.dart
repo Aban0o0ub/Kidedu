@@ -5,8 +5,29 @@ sealed class MyState {}
 
 final class MyInitial extends MyState {}
 
-class GetAllKids extends MyState {
-  final List<Kid> allKidsList;
+final class MyLoading extends MyState {}
 
-  GetAllKids(this.allKidsList);
+//in case of success
+class CreateNewKidSuccess extends MyState {
+  final Kid newkid;
+
+  CreateNewKidSuccess(this.newkid);
 }
+
+class CreateNewInstructorSuccess extends MyState {
+  final Instructor newinstructor;
+
+  CreateNewInstructorSuccess(this.newinstructor);
+}
+
+class MyFailure extends MyState {
+  final String error;
+
+  MyFailure(this.error);
+}
+// class GetAllKids extends MyState {
+//   final List<Kid> allKidsList;
+
+//   GetAllKids(this.allKidsList);
+// }
+
