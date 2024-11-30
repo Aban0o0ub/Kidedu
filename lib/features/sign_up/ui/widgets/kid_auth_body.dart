@@ -9,55 +9,39 @@ import 'package:loginpage/features/sign_up/ui/widgets/icon_button.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/or_divider.dart';
 
 class KidAuthBody extends StatefulWidget {
-  const KidAuthBody({super.key});
+  final TextEditingController nameController;
+  final TextEditingController ageController;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final TextEditingController confirmPasswordController;
+  final TextEditingController phoneNumberController;
+  final TextEditingController governmentController;
+  final bool obscurePassword;
+  final Function togglePasswordVisibility;
+  final String? Function(String?) validateEmail;
+  final String? Function(String?) validatePassword;
+
+  const KidAuthBody({
+    super.key,
+    required this.nameController,
+    required this.ageController,
+    required this.emailController,
+    required this.passwordController,
+    required this.confirmPasswordController,
+    required this.phoneNumberController,
+    required this.governmentController,
+    required this.obscurePassword,
+    required this.togglePasswordVisibility,
+    required this.validateEmail,
+    required this.validatePassword,
+  });
 
   @override
   KidAuthBodyState createState() => KidAuthBodyState();
 }
 
 class KidAuthBodyState extends State<KidAuthBody> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _governmentController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
-  bool _obscurePassword = true;
   String? _selectedGender;
-
-  String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email';
-    }
-
-    return null;
-  }
-
-  String? validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your password';
-    }
-    return null;
-  }
-
-  void togglePasswordVisibility() {
-    setState(() {
-      _obscurePassword = !_obscurePassword;
-    });
-  }
-
-  void showErrorMessage(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  void _selectGender(String value) {
-    setState(() {
-      _selectedGender = value;
-    });
-  }
 
   final List<String> egyptianGovernorates = [
     'Alexandria',
@@ -89,6 +73,12 @@ class KidAuthBodyState extends State<KidAuthBody> {
     'Suez'
   ];
 
+  void _selectGender(String value) {
+    setState(() {
+      _selectedGender = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -106,14 +96,14 @@ class KidAuthBodyState extends State<KidAuthBody> {
                   CustomTextField(
                     label: 'Name',
                     hintText: 'Enter your name',
-                    controller: _nameController,
+                    controller: widget.nameController,
                     icon: Icons.person,
                     width: 180,
                   ),
                   CustomDropdownField(
                     label: 'Government',
                     hintText: 'Select item',
-                    controller: _governmentController,
+                    controller: widget.governmentController,
                     items: egyptianGovernorates,
                     icon: Icons.location_city,
                     width: 180,
@@ -127,23 +117,26 @@ class KidAuthBodyState extends State<KidAuthBody> {
                 label: "Email",
                 icon: Icons.email,
                 hintText: "Your Email",
-                controller: _emailController,
+                controller: widget.emailController,
+                validator: widget.validateEmail,
               ),
               const SizedBox(height: 8),
               CustomTextField(
                 width: double.infinity,
                 label: "Password",
                 icon: Icons.lock,
-                isPasswordField: _obscurePassword,
+                isPasswordField: widget.obscurePassword,
                 hintText: "Enter your password",
-                controller: _passwordController,
-                validator: validatePassword,
+                controller: widget.passwordController,
+                validator: widget.validatePassword,
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                    widget.obscurePassword
+                        ? Icons.visibility
+                        : Icons.visibility_off,
                     color: Colors.grey,
                   ),
-                  onPressed: togglePasswordVisibility,
+                  onPressed: () => widget.togglePasswordVisibility(),
                 ),
               ),
               const SizedBox(height: 8),
@@ -152,15 +145,17 @@ class KidAuthBodyState extends State<KidAuthBody> {
                 label: "Confirm Password",
                 icon: Icons.lock,
                 hintText: "Re-enter your password",
-                controller: _confirmPasswordController,
-                isPasswordField: _obscurePassword,
-                validator: validatePassword,
+                controller: widget.confirmPasswordController,
+                isPasswordField: widget.obscurePassword,
+                validator: widget.validatePassword,
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                    widget.obscurePassword
+                        ? Icons.visibility
+                        : Icons.visibility_off,
                     color: Colors.grey,
                   ),
-                  onPressed: togglePasswordVisibility,
+                  onPressed: () => widget.togglePasswordVisibility(),
                 ),
               ),
               const SizedBox(height: 8),
@@ -169,7 +164,7 @@ class KidAuthBodyState extends State<KidAuthBody> {
                 label: "Phone Number",
                 icon: Icons.phone,
                 hintText: "Enter your phone number",
-                controller: _phoneNumberController,
+                controller: widget.phoneNumberController,
                 keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 8),
@@ -179,7 +174,7 @@ class KidAuthBodyState extends State<KidAuthBody> {
                 label: "Age",
                 hintText: "between 0 and 15",
                 keyboardType: TextInputType.number,
-                controller: _ageController,
+                controller: widget.ageController,
               ),
               const SizedBox(height: 15),
               Column(

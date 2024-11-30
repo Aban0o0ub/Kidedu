@@ -11,14 +11,10 @@ class MyRepo {
   // }
 
   Future<Kid> createNewKid(Kid newkid) async {
-    var response = await webServices.createNewKid(newkid);
-    print(response);
-    return response;
+    return await webServices.createNewKid(newkid);
   }
 
   Future<Instructor> createNewInstructor(Instructor newinstructor) async {
-    var response = await webServices.createNewInstructor(newinstructor);
-    print(response);
-    return response;
+    return await webServices.createNewInstructor(newinstructor);
   }
 }

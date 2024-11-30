@@ -7,10 +7,41 @@ class AuthKid extends StatefulWidget {
   const AuthKid({super.key});
 
   @override
-  AuthKidState createState() => AuthKidState();
+  State<AuthKid> createState() => _AuthKidState();
 }
 
-class AuthKidState extends State<AuthKid> {
+class _AuthKidState extends State<AuthKid> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _governmentController = TextEditingController();
+
+  bool _obscurePassword = true;
+
+  void togglePasswordVisibility() {
+    setState(() {
+      _obscurePassword = !_obscurePassword;
+    });
+  }
+
+  String? validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    }
+    return null;
+  }
+
+  String? validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your password';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,14 +50,24 @@ class AuthKidState extends State<AuthKid> {
         onTap: () {
           FocusScope.of(context).unfocus();
         },
-        child: const SingleChildScrollView(
-          child: Stack(
-            children: [
-              UpperStickersPhoto(),
-              ArrowBack(),
-              KidAuthBody(),
-            ],
-          ),
+        child: Stack(
+          children: [
+            const UpperStickersPhoto(),
+            const ArrowBack(),
+            KidAuthBody(
+              governmentController: _governmentController,
+              phoneNumberController: _phoneNumberController,
+              nameController: _nameController,
+              ageController: _ageController,
+              emailController: _emailController,
+              passwordController: _passwordController,
+              confirmPasswordController: _confirmPasswordController,
+              obscurePassword: _obscurePassword,
+              togglePasswordVisibility: togglePasswordVisibility,
+              validateEmail: validateEmail,
+              validatePassword: validatePassword,
+            ),
+          ],
         ),
       ),
     );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/core/widgets/arrow_back.dart';
+import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/Instructor_auth_body.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/upper_stickers_photo.dart';
 
@@ -84,19 +86,31 @@ class AuthInstructorState extends State<AuthInstructor> {
             children: [
               const UpperStickersPhoto(),
               const ArrowBack(),
-              InstructorAuthBody(
-                nameController: _nameController,
-                governmentController: _governmentController,
-                emailController: _emailController,
-                passwordController: _passwordController,
-                confirmPasswordController: _confirmPasswordController,
-                phoneNumberController: _phoneNumberController,
-                bioController: _bioController,
-                obscurePassword: _obscurePassword,
-                togglePasswordVisibility: togglePasswordVisibility,
-                egyptianGovernorates: egyptianGovernorates,
-                validateEmail: validateEmail,
-                validatePassword: validatePassword,
+              BlocBuilder<MyCubit, MyState>(
+                builder: (context, state) {
+                  if (state is MyLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is CreateNewInstructorSuccess) {
+                    return InstructorAuthBody(
+                      nameController: _nameController,
+                      governmentController: _governmentController,
+                      emailController: _emailController,
+                      passwordController: _passwordController,
+                      confirmPasswordController: _confirmPasswordController,
+                      phoneNumberController: _phoneNumberController,
+                      bioController: _bioController,
+                      obscurePassword: _obscurePassword,
+                      togglePasswordVisibility: togglePasswordVisibility,
+                      egyptianGovernorates: egyptianGovernorates,
+                      validateEmail: validateEmail,
+                      validatePassword: validatePassword,
+                    );
+                  } else if (state is MyFailure) {
+                    return Center(child: Text('Error: ${state.error}'));
+                  } else {
+                    return Container();
+                  }
+                },
               ),
             ],
           ),
