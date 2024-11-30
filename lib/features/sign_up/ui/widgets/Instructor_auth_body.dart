@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/features/home/ui/home_page.dart';
 import 'package:loginpage/features/login/ui/login_page.dart';
+import 'package:loginpage/features/sign_up/data/models/kid.dart';
+import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/auth_prompt.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_dropdown.dart';
@@ -24,6 +27,7 @@ class InstructorAuthBody extends StatelessWidget {
   final String? Function(String?) validatePassword;
 
   const InstructorAuthBody({
+    super.key,
     required this.nameController,
     required this.governmentController,
     required this.emailController,
@@ -36,7 +40,6 @@ class InstructorAuthBody extends StatelessWidget {
     required this.egyptianGovernorates,
     required this.validateEmail,
     required this.validatePassword,
-    super.key,
   });
 
   @override
@@ -131,16 +134,34 @@ class InstructorAuthBody extends StatelessWidget {
                 hasIcon: false,
               ),
               const SizedBox(height: 24),
-              CustomButton(
-                text: 'Sign Up',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
-                  ).then((_) {
-                    FocusScope.of(context).unfocus();
-                  });
+              BlocListener<MyCubit, MyState>(
+                listener: (context, state) {
+                  if (state is CreateNewInstructorSuccess) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    );
+                  } else if (state is MyFailure) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(state.error)),
+                    );
+                  }
                 },
+                child: CustomButton(
+                  text: 'Sign Up',
+                  onPressed: () {
+                    context.read<MyCubit>().emitCreateNewInstructor(
+                          Instructor(
+                            name: nameController.text,
+                            email: emailController.text,
+                            password: passwordController.text,
+                            phoneNumber: phoneNumberController.text,
+                            bio: bioController.text,
+                            governorate: governmentController.text,
+                          ),
+                        );
+                  },
+                ),
               ),
               const SizedBox(height: 28),
               const OrDivider(),
@@ -178,9 +199,11 @@ class InstructorAuthBody extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const LoginPage()),
-                  ).then((_) {
-                    FocusScope.of(context).unfocus();
-                  });
+                  ).then(
+                    (_) {
+                      FocusScope.of(context).unfocus();
+                    },
+                  );
                 },
               ),
               const SizedBox(height: 55),

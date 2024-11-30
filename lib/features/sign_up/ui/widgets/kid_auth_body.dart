@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/features/home/ui/home_page.dart';
 import 'package:loginpage/features/login/ui/login_page.dart';
+import 'package:loginpage/features/sign_up/data/models/kid.dart';
+import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
+import 'package:loginpage/features/sign_up/ui/widgets/auth_prompt.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_dropdown.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
@@ -244,16 +248,36 @@ class KidAuthBodyState extends State<KidAuthBody> {
                 ],
               ),
               const SizedBox(height: 20),
-              CustomButton(
-                text: 'Sign Up',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
-                  ).then((_) {
-                    FocusScope.of(context).unfocus();
-                  });
+              BlocListener<MyCubit, MyState>(
+                listener: (context, state) {
+                  if (state is CreateNewKidSuccess) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    );
+                  } else if (state is MyFailure) {
+                    // هنا إذا كانت حالة الفشل
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(state.error)),
+                    );
+                  }
                 },
+                child: CustomButton(
+                  text: 'Sign Up',
+                  onPressed: () {
+                    context.read<MyCubit>().emitCreateNewKid(
+                          Kid(
+                            age: int.tryParse(widget.ageController.text),
+                            name: widget.nameController.text,
+                            email: widget.emailController.text,
+                            password: widget.passwordController.text,
+                            phoneNumber: widget.phoneNumberController.text,
+                            gender: _selectedGender ?? '',
+                            governorate: widget.governmentController.text,
+                          ),
+                        );
+                  },
+                ),
               ),
               const SizedBox(height: 28),
               const OrDivider(),
@@ -284,30 +308,15 @@ class KidAuthBodyState extends State<KidAuthBody> {
                 ],
               ),
               const SizedBox(height: 28),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Already have an account? ',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginPage()),
-                      );
-                    },
-                    child: const Text(
-                      'Sign In',
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF02457A),
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
+              AuthPrompt(
+                questionText: "Have an account?",
+                actionText: "Login",
+                onActionPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  );
+                },
               ),
               const SizedBox(height: 55),
             ],

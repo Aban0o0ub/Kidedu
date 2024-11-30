@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loginpage/core/injection/injection.dart';
 import 'package:loginpage/core/widgets/arrow_back.dart';
 import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/Instructor_auth_body.dart';
@@ -75,44 +76,35 @@ class AuthInstructorState extends State<AuthInstructor> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: SingleChildScrollView(
-          child: Stack(
-            children: [
-              const UpperStickersPhoto(),
-              const ArrowBack(),
-              BlocBuilder<MyCubit, MyState>(
-                builder: (context, state) {
-                  if (state is MyLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (state is CreateNewInstructorSuccess) {
-                    return InstructorAuthBody(
-                      nameController: _nameController,
-                      governmentController: _governmentController,
-                      emailController: _emailController,
-                      passwordController: _passwordController,
-                      confirmPasswordController: _confirmPasswordController,
-                      phoneNumberController: _phoneNumberController,
-                      bioController: _bioController,
-                      obscurePassword: _obscurePassword,
-                      togglePasswordVisibility: togglePasswordVisibility,
-                      egyptianGovernorates: egyptianGovernorates,
-                      validateEmail: validateEmail,
-                      validatePassword: validatePassword,
-                    );
-                  } else if (state is MyFailure) {
-                    return Center(child: Text('Error: ${state.error}'));
-                  } else {
-                    return Container();
-                  }
-                },
-              ),
-            ],
+    return BlocProvider(
+      create: (context) => getIt<MyCubit>(),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+            child: Stack(
+              children: [
+                const UpperStickersPhoto(),
+                const ArrowBack(),
+                InstructorAuthBody(
+                  nameController: _nameController,
+                  governmentController: _governmentController,
+                  emailController: _emailController,
+                  passwordController: _passwordController,
+                  confirmPasswordController: _confirmPasswordController,
+                  phoneNumberController: _phoneNumberController,
+                  bioController: _bioController,
+                  obscurePassword: _obscurePassword,
+                  togglePasswordVisibility: togglePasswordVisibility,
+                  egyptianGovernorates: egyptianGovernorates,
+                  validateEmail: validateEmail,
+                  validatePassword: validatePassword,
+                )
+              ],
+            ),
           ),
         ),
       ),
