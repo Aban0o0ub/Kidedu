@@ -16,6 +16,7 @@ class CustomTextField extends StatefulWidget {
     this.minLines,
     this.keyboardType = TextInputType.text,
     this.hasIcon = true,
+    String? errorText,
   });
 
   final String label;

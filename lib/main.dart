@@ -4,11 +4,12 @@ import 'package:loginpage/features/onBoarding/ui/welcome_page.dart';
 
 void main() {
   initGetIt();
-  runApp(const Auth());
+  initGetItForLogin();
+  runApp(const KidEdu());
 }
 
-class Auth extends StatelessWidget {
-  const Auth({super.key});
+class KidEdu extends StatelessWidget {
+  const KidEdu({super.key});
 
   @override
   Widget build(BuildContext context) {

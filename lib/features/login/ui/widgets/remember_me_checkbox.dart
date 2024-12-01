@@ -28,7 +28,16 @@ class RememberMeCheckbox extends StatelessWidget {
           ],
         ),
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => const ForgetPassword(),
+            //   ),
+            // ).then((_) {
+            //   FocusScope.of(context).unfocus();
+            // });
+          },
           child: const Text(
             'Forget Password?',
             style: TextStyle(

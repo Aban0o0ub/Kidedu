@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:loginpage/core/networking/web_services.dart';
+import 'package:loginpage/features/login/data/repo/my_repo.dart';
+import 'package:loginpage/features/login/logic/cubit/my_cubit.dart';
 import 'package:loginpage/features/sign_up/data/repo/my_repo.dart';
 import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
 
@@ -11,6 +13,11 @@ void initGetIt() {
   getIt.registerLazySingleton<MyRepo>(() => MyRepo(getIt()));
   getIt.registerLazySingleton<WebServices>(
       () => WebServices(createAndSetupDio()));
+}
+
+void initGetItForLogin() {
+  getIt.registerLazySingleton<LoginCubit>(() => LoginCubit(getIt()));
+  getIt.registerLazySingleton<LoginRepo>(() => LoginRepo(getIt()));
 }
 
 Dio createAndSetupDio() {

@@ -11,6 +11,7 @@ class CustomDropdownField extends StatelessWidget {
     this.width = 180,
     this.height = 56,
     this.validator,
+    String? errorText,
   });
 
   final String label;

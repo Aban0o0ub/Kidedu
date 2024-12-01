@@ -4,7 +4,7 @@ import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:retrofit/retrofit.dart';
 part 'web_services.g.dart';
 
-@RestApi(baseUrl: 'http://localhost:3000/api/')
+@RestApi(baseUrl: 'http://192.168.1.3:3000/api/')
 abstract class WebServices {
   factory WebServices(Dio dio, {String? baseUrl}) = _WebServices;
 

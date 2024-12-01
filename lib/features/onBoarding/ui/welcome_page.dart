@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:loginpage/features/login/ui/login_page.dart';
+import 'package:loginpage/features/login/ui/views/login_page.dart';
 import 'package:loginpage/features/onBoarding/ui/circle_border.dart';
 
 class WelcomePage extends StatefulWidget {

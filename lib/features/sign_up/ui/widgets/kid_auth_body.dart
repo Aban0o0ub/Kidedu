@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/features/home/ui/home_page.dart';
-import 'package:loginpage/features/login/ui/login_page.dart';
+import 'package:loginpage/features/login/ui/views/login_page.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/auth_prompt.dart';
@@ -256,7 +256,6 @@ class KidAuthBodyState extends State<KidAuthBody> {
                       MaterialPageRoute(builder: (context) => const HomePage()),
                     );
                   } else if (state is MyFailure) {
-                    // هنا إذا كانت حالة الفشل
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(state.error)),
                     );

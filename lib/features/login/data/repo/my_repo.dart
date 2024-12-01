@@ -1,10 +1,10 @@
 import 'package:loginpage/core/networking/web_services.dart';
 import 'package:loginpage/features/login/data/models/user.dart';
 
-class MyRepo {
+class LoginRepo {
   final WebServices webServices;
 
-  MyRepo(this.webServices);
+  LoginRepo(this.webServices);
 
   Future<User> loginUserKid(User loginkid) async {
     return await webServices.loginUserKid(loginkid);
