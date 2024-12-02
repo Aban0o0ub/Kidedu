@@ -11,13 +11,10 @@ final getIt = GetIt.instance;
 void initGetIt() {
   getIt.registerLazySingleton<MyCubit>(() => MyCubit(getIt()));
   getIt.registerLazySingleton<MyRepo>(() => MyRepo(getIt()));
-  getIt.registerLazySingleton<WebServices>(
-      () => WebServices(createAndSetupDio()));
-}
-
-void initGetItForLogin() {
   getIt.registerLazySingleton<LoginCubit>(() => LoginCubit(getIt()));
   getIt.registerLazySingleton<LoginRepo>(() => LoginRepo(getIt()));
+  getIt.registerLazySingleton<WebServices>(
+      () => WebServices(createAndSetupDio()));
 }
 
 Dio createAndSetupDio() {
