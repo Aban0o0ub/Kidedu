@@ -5,10 +5,12 @@ class CustomButton extends StatelessWidget {
     super.key,
     required this.onPressed,
     this.text = 'LogIn',
+    this.width = 200,
   });
 
   final VoidCallback onPressed;
   final String text;
+  final double? width;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,7 @@ class CustomButton extends StatelessWidget {
             ),
           ],
         ),
-        width: 200,
+        width: width,
         height: 55,
         child: Center(
           child: Text(

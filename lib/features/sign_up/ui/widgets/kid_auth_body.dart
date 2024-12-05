@@ -11,6 +11,7 @@ import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/header_title.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/icon_button.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/or_divider.dart';
+import 'package:loginpage/features/sign_up/ui/widgets/select_gender.dart';
 
 class KidAuthBody extends StatefulWidget {
   final TextEditingController nameController;
@@ -76,12 +77,6 @@ class KidAuthBodyState extends State<KidAuthBody> {
     'South Sinai',
     'Suez'
   ];
-
-  void _selectGender(String value) {
-    setState(() {
-      _selectedGender = value;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -181,72 +176,7 @@ class KidAuthBodyState extends State<KidAuthBody> {
                 controller: widget.ageController,
               ),
               const SizedBox(height: 15),
-              Column(
-                children: [
-                  const Text(
-                    "Gender",
-                    style: TextStyle(
-                      color: Color(0xFF02457A),
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () => _selectGender('Female'),
-                        child: Column(
-                          children: [
-                            Image.asset(
-                              'assets/images/femaleicon.png',
-                              width: 50,
-                              height: 50,
-                            ),
-                            Row(
-                              children: [
-                                Radio<String>(
-                                  value: 'Female',
-                                  groupValue: _selectedGender,
-                                  onChanged: (value) => _selectGender(value!),
-                                ),
-                                const Text("Female",
-                                    style: TextStyle(fontSize: 16)),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 30),
-                      GestureDetector(
-                        onTap: () => _selectGender('Male'),
-                        child: Column(
-                          children: [
-                            Image.asset(
-                              'assets/images/maleicon.png',
-                              width: 50,
-                              height: 50,
-                            ),
-                            Row(
-                              children: [
-                                Radio<String>(
-                                  value: 'Male',
-                                  groupValue: _selectedGender,
-                                  onChanged: (value) => _selectGender(value!),
-                                ),
-                                const Text("Male",
-                                    style: TextStyle(fontSize: 16)),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+              const SelectGender(),
               const SizedBox(height: 20),
               BlocListener<MyCubit, MyState>(
                 listener: (context, state) {

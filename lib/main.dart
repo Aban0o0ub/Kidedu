@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:loginpage/core/injection/injection.dart';
-import 'package:loginpage/features/login/logic/cubit/my_cubit.dart';
-import 'package:loginpage/features/onBoarding/ui/welcome_page.dart';
+//import 'package:flutter_bloc/flutter_bloc.dart';
+//import 'package:loginpage/core/injection/injection.dart';
+import 'package:loginpage/features/kid_profile/ui/views/kid_profile_page.dart';
+//import 'package:loginpage/features/kid_profile/ui/views/kid_profile_page.dart';
+//import 'package:loginpage/features/sign_up/ui/views/auth_kid.dart';
+//import 'package:loginpage/features/login/logic/cubit/my_cubit.dart';
+//import 'package:loginpage/features/onBoarding/ui/welcome_page.dart';
 
+// void main() {
+//   initGetIt();
+//   runApp(
+//     MultiBlocProvider(
+//       providers: [
+//         BlocProvider<LoginCubit>(
+//           create: (context) => getIt<LoginCubit>(),
+//         ),
+//       ],
+//       child: const KidEdu(),
+//     ),
+//   );
+// }
 void main() {
-  initGetIt();
-  runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider<LoginCubit>(
-          create: (context) => getIt<LoginCubit>(),
-        ),
-      ],
-      child: const KidEdu(),
-    ),
-  );
+  runApp(const KidEdu());
 }
 
 class KidEdu extends StatelessWidget {
@@ -28,7 +34,7 @@ class KidEdu extends StatelessWidget {
         fontFamily: 'Alegreya',
       ),
       debugShowCheckedModeBanner: false,
-      home: const WelcomePage(),
+      home: const KidProfilePage(),
     );
   }
 }
