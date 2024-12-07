@@ -28,16 +28,13 @@ class KidProfilePage extends StatelessWidget {
                         backgroundImage:
                             AssetImage('assets/images/kidprofile.jpeg'),
                       ),
-                      GestureDetector(
-                        //onTap: () {},
-                        child: CircleAvatar(
-                          radius: 16,
-                          backgroundColor: Colors.grey.withOpacity(0.3),
-                          child: const Icon(
-                            Icons.camera_alt,
-                            size: 18,
-                            color: Colors.black,
-                          ),
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundColor: Colors.grey.withOpacity(0.3),
+                        child: const Icon(
+                          Icons.camera_alt,
+                          size: 18,
+                          color: Colors.black,
                         ),
                       ),
                     ],
@@ -64,8 +61,7 @@ class KidProfilePage extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const EditProfile()),
+                        MaterialPageRoute(builder: (context) => EditProfile()),
                       );
                     },
                   ),

@@ -7,7 +7,7 @@ part of 'kid.dart';
 // **************************************************************************
 
 Kid _$KidFromJson(Map<String, dynamic> json) => Kid(
-      id: json['_id'] as String?,
+      id: (json['_id'] as num?)?.toInt(),
       name: json['Name'] as String?,
       email: json['Email'] as String?,
       password: json['Password'] as String?,
@@ -18,6 +18,7 @@ Kid _$KidFromJson(Map<String, dynamic> json) => Kid(
       createdAt: json['createdAt'] as String?,
       updatedAt: json['updatedAt'] as String?,
       v: (json['__v'] as num?)?.toInt(),
+      image: json['Image'] as String?,
     );
 
 Map<String, dynamic> _$KidToJson(Kid instance) => <String, dynamic>{
@@ -32,10 +33,11 @@ Map<String, dynamic> _$KidToJson(Kid instance) => <String, dynamic>{
       'createdAt': instance.createdAt,
       'updatedAt': instance.updatedAt,
       '__v': instance.v,
+      'Image': instance.image,
     };
 
 Instructor _$InstructorFromJson(Map<String, dynamic> json) => Instructor(
-      id: json['_id'] as String?,
+      id: (json['_id'] as num?)?.toInt(),
       name: json['Name'] as String?,
       email: json['Email'] as String?,
       password: json['Password'] as String?,
@@ -45,6 +47,9 @@ Instructor _$InstructorFromJson(Map<String, dynamic> json) => Instructor(
       createdAt: json['createdAt'] as String?,
       updatedAt: json['updatedAt'] as String?,
       v: (json['__v'] as num?)?.toInt(),
+      image: json['Image'] as String?,
+      title: json['Title'] as String?,
+      experience: json['Experience'] as String?,
     );
 
 Map<String, dynamic> _$InstructorToJson(Instructor instance) =>
@@ -59,4 +64,7 @@ Map<String, dynamic> _$InstructorToJson(Instructor instance) =>
       'createdAt': instance.createdAt,
       'updatedAt': instance.updatedAt,
       '__v': instance.v,
+      'Image': instance.image,
+      'Title': instance.title,
+      'Experience': instance.experience,
     };

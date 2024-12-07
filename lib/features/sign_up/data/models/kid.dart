@@ -4,7 +4,7 @@ part 'kid.g.dart';
 @JsonSerializable()
 class Kid {
   @JsonKey(name: '_id')
-  String? id;
+  int? id;
   @JsonKey(name: 'Name')
   String? name;
   @JsonKey(name: 'Email')
@@ -23,6 +23,8 @@ class Kid {
   String? updatedAt;
   @JsonKey(name: '__v')
   int? v;
+  @JsonKey(name: 'Image')
+  String? image;
 
   Kid(
       {this.id,
@@ -35,7 +37,8 @@ class Kid {
       this.phoneNumber,
       this.createdAt,
       this.updatedAt,
-      this.v});
+      this.v,
+      this.image});
 
   factory Kid.fromJson(Map<String, dynamic> json) => _$KidFromJson(json);
   Map<String, dynamic> toJson() => _$KidToJson(this);
@@ -44,7 +47,7 @@ class Kid {
 @JsonSerializable()
 class Instructor {
   @JsonKey(name: '_id')
-  String? id;
+  int? id;
   @JsonKey(name: 'Name')
   String? name;
   @JsonKey(name: 'Email')
@@ -61,6 +64,12 @@ class Instructor {
   String? updatedAt;
   @JsonKey(name: '__v')
   int? v;
+  @JsonKey(name: 'Image')
+  String? image;
+  @JsonKey(name: 'Title')
+  String? title;
+  @JsonKey(name: 'Experience')
+  String? experience;
 
   Instructor(
       {this.id,
@@ -72,7 +81,10 @@ class Instructor {
       this.phoneNumber,
       this.createdAt,
       this.updatedAt,
-      this.v});
+      this.v,
+      this.image,
+      this.title,
+      this.experience});
 
   factory Instructor.fromJson(Map<String, dynamic> json) =>
       _$InstructorFromJson(json);

@@ -22,4 +22,18 @@ abstract class WebServices {
 
   @POST('user_instructor/login')
   Future<User> loginUserInstructor(@Body() User logininstructor);
+
+  @GET('user_kid/{kidId}')
+  Future<Kid> getKidById(@Path('_id') int kidId);
+
+  @POST('user_kid/{kidId}')
+  Future<Kid> updateKidProfile(
+      @Path('_id') int kidId, @Body() Map<String, dynamic> kidData);
+
+  @GET('user_instructor/{instructorId}')
+  Future<Instructor> getInstructorById(@Path('_id') int instructorId);
+
+  @POST('user_instructor/{instructorId}')
+  Future<Instructor> updateInstructorProfile(@Path('_id') int instructorId,
+      @Body() Map<String, dynamic> instructorData);
 }
