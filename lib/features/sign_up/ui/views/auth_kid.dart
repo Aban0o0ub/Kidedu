@@ -22,7 +22,7 @@ class _AuthKidState extends State<AuthKid> {
       TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _governmentController = TextEditingController();
-
+  TextEditingController _selectedGenderController = TextEditingController();
   bool _obscurePassword = true;
 
   void togglePasswordVisibility() {
@@ -72,6 +72,11 @@ class _AuthKidState extends State<AuthKid> {
                   togglePasswordVisibility: togglePasswordVisibility,
                   validateEmail: validateEmail,
                   validatePassword: validatePassword,
+                  onGenderSelected: (String gender) {
+                    setState(() {
+                      _selectedGenderController.text = gender;
+                    });
+                  },
                 ),
               ],
             ),

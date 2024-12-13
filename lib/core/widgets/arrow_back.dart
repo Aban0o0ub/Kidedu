@@ -8,7 +8,7 @@ class ArrowBack extends StatelessWidget {
     return Align(
       alignment: Alignment.topLeft,
       child: Padding(
-        padding: const EdgeInsets.only(left: 15),
+        padding: const EdgeInsets.only(top: 40, left: 15),
         child: Container(
           padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:loginpage/features/home/ui/home_page.dart';
+//import 'package:loginpage/features/home/ui/home_page.dart';
+import 'package:loginpage/features/kid_profile/ui/views/kid_profile_page.dart';
 import 'package:loginpage/features/login/ui/views/login_page.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
@@ -25,6 +26,7 @@ class KidAuthBody extends StatefulWidget {
   final Function togglePasswordVisibility;
   final String? Function(String?) validateEmail;
   final String? Function(String?) validatePassword;
+  final Function(String)? onGenderSelected;
 
   const KidAuthBody({
     super.key,
@@ -39,6 +41,7 @@ class KidAuthBody extends StatefulWidget {
     required this.togglePasswordVisibility,
     required this.validateEmail,
     required this.validatePassword,
+    required this.onGenderSelected,
   });
 
   @override
@@ -176,14 +179,21 @@ class KidAuthBodyState extends State<KidAuthBody> {
                 controller: widget.ageController,
               ),
               const SizedBox(height: 15),
-              const SelectGender(),
+              SelectGender(
+                onGenderSelected: (String gender) {
+                  setState(() {
+                    _selectedGender = gender;
+                  });
+                },
+              ),
               const SizedBox(height: 20),
               BlocListener<MyCubit, MyState>(
                 listener: (context, state) {
                   if (state is CreateNewKidSuccess) {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const HomePage()),
+                      MaterialPageRoute(
+                          builder: (context) => const KidProfilePage()),
                     );
                   } else if (state is MyFailure) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -201,7 +211,7 @@ class KidAuthBodyState extends State<KidAuthBody> {
                             email: widget.emailController.text,
                             password: widget.passwordController.text,
                             phoneNumber: widget.phoneNumberController.text,
-                            gender: _selectedGender ?? '',
+                            gender: _selectedGender,
                             governorate: widget.governmentController.text,
                           ),
                         );

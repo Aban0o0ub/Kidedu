@@ -15,12 +15,15 @@ class MyCubit extends Cubit<MyState> {
   //   });
   // }
 
-  void emitCreateNewKid(Kid newkid) async {
+  void emitCreateNewKid(Kid newKid) async {
     try {
+      if (isClosed) return;
       emit(MyLoading());
-      await myRepo.createNewKid(newkid);
-      emit(CreateNewKidSuccess(newkid));
+      await myRepo.createNewKid(newKid);
+      if (isClosed) return;
+      emit(CreateNewKidSuccess(newKid));
     } catch (e) {
+      if (isClosed) return;
       emit(MyFailure(e.toString()));
     }
   }

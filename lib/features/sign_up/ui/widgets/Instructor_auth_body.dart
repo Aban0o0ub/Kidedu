@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:loginpage/features/home/ui/home_page.dart';
+import 'package:loginpage/features/instructor_profile/ui/views/instructor_profile_page.dart';
 import 'package:loginpage/features/login/ui/views/login_page.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
@@ -139,7 +139,8 @@ class InstructorAuthBody extends StatelessWidget {
                   if (state is CreateNewInstructorSuccess) {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const HomePage()),
+                      MaterialPageRoute(
+                          builder: (context) => const InstructorProfilePage()),
                     );
                   } else if (state is MyFailure) {
                     ScaffoldMessenger.of(context).showSnackBar(
