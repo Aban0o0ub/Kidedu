@@ -1,10 +1,13 @@
+import 'package:bson/bson.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:loginpage/core/helper/object_id_converter.dart';
 part 'kid.g.dart';
 
 @JsonSerializable()
 class Kid {
   @JsonKey(name: '_id')
-  int? id;
+  @ObjectIdConverter()
+  ObjectId? id;
   @JsonKey(name: 'Name')
   String? name;
   @JsonKey(name: 'Email')
@@ -25,7 +28,6 @@ class Kid {
   int? v;
   @JsonKey(name: 'Image')
   String? image;
-
   Kid(
       {this.id,
       this.name,
@@ -39,7 +41,6 @@ class Kid {
       this.updatedAt,
       this.v,
       this.image});
-
   factory Kid.fromJson(Map<String, dynamic> json) => _$KidFromJson(json);
   Map<String, dynamic> toJson() => _$KidToJson(this);
 }

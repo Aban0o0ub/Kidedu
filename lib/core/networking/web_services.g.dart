@@ -14,7 +14,7 @@ class _WebServices implements WebServices {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= 'http://192.168.1.5:3000/api/';
+    baseUrl ??= 'http://192.168.1.12:3000/api/';
   }
 
   final Dio _dio;
@@ -160,7 +160,7 @@ class _WebServices implements WebServices {
   }
 
   @override
-  Future<Kid> getKidById(int kidId) async {
+  Future<Kid> getKidById(String kidId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
@@ -172,7 +172,7 @@ class _WebServices implements WebServices {
     )
         .compose(
           _dio.options,
-          'user_kid/{kidId}',
+          'user_kid/${kidId}',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -194,14 +194,14 @@ class _WebServices implements WebServices {
 
   @override
   Future<Kid> updateKidProfile(
-    int kidId,
-    Map<String, dynamic> kidData,
+    String kidId,
+    Kid kidData,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
-    _data.addAll(kidData);
+    _data.addAll(kidData.toJson());
     final _options = _setStreamType<Kid>(Options(
       method: 'POST',
       headers: _headers,
@@ -209,7 +209,7 @@ class _WebServices implements WebServices {
     )
         .compose(
           _dio.options,
-          'user_kid/{kidId}',
+          'user_kid/${kidId}',
           queryParameters: queryParameters,
           data: _data,
         )

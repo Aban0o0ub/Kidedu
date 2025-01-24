@@ -1,6 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loginpage/core/networking/web_services.dart';
 import 'package:loginpage/core/widgets/arrow_back.dart';
+import 'package:loginpage/features/kid_profile/data/Repo/kid_profile_repo.dart';
 import 'package:loginpage/features/kid_profile/logic/cubit/kid_profile_cubit.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
@@ -81,10 +84,39 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     //.....................................................................
-    return BlocProvider(
-      create: (context) => KidProfileCubit(context.read()),
-      child: Scaffold(
-        body: SingleChildScrollView(
+    return Scaffold(
+      body: BlocListener<KidProfileCubit, KidProfileState>(
+        bloc: KidProfileCubit(KidProfileRepo(WebServices(Dio()))),
+        listener: (context, state) {
+          if (state is MyLoading) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            );
+          } else if (state is UpdateKidProfile) {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('The profile has been updated'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else if (state is MyFailure) {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('There is an error'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(left: 20.0, right: 27, bottom: 30),
             child: Column(
@@ -207,52 +239,21 @@ class _EditProfileState extends State<EditProfile> {
                 ),
                 const SizedBox(height: 20),
                 //---------------------------------------------------------------------------
-                BlocListener<KidProfileCubit, KidProfileState>(
-                  listener: (context, state) {
-                    if (state is MyLoading) {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (context) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        },
+                Center(
+                  child: CustomButton(
+                    text: "Confirm changes",
+                    onPressed: () {
+                      Kid updatedKid = Kid(
+                        name: nameController.text,
+                        email: emailController.text,
+                        phoneNumber: phoneController.text,
+                        age: int.tryParse(ageController.text),
+                        governorate: governorateController.text,
                       );
-                    } else if (state is UpdateKidProfile) {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('The profile has been updated'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    } else if (state is MyFailure) {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('There is an error'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  },
-                  child: Center(
-                    child: CustomButton(
-                      text: "Confirm changes",
-                      onPressed: () {
-                        Kid updatedKid = Kid(
-                          name: nameController.text,
-                          email: emailController.text,
-                          phoneNumber: phoneController.text,
-                          age: int.tryParse(ageController.text),
-                          governorate: governorateController.text,
-                        );
-                        context
-                            .read<KidProfileCubit>()
-                            .emitUpdateKidProfile(updatedKid);
-                      },
-                    ),
+                      context
+                          .read<KidProfileCubit>()
+                          .emitUpdateKidProfile(updatedKid);
+                    },
                   ),
                 ),
               ],

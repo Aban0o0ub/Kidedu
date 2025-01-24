@@ -4,7 +4,7 @@ import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:retrofit/retrofit.dart';
 part 'web_services.g.dart';
 
-@RestApi(baseUrl: 'http://192.168.1.5:3000/api/')
+@RestApi(baseUrl: 'http://192.168.1.12:3000/api/')
 abstract class WebServices {
   factory WebServices(Dio dio, {String? baseUrl}) = _WebServices;
 
@@ -23,12 +23,11 @@ abstract class WebServices {
   @POST('user_instructor/login')
   Future<User> loginUserInstructor(@Body() User logininstructor);
 
-  @GET('user_kid/{kidId}')
-  Future<Kid> getKidById(@Path('_id') int kidId);
+  @GET('user_kid/{_id}')
+  Future<Kid> getKidById(@Path('_id') String kidId);
 
-  @POST('user_kid/{kidId}')
-  Future<Kid> updateKidProfile(
-      @Path('_id') int kidId, @Body() Map<String, dynamic> kidData);
+  @POST('user_kid/{_id}')
+  Future<Kid> updateKidProfile(@Path('_id') String kidId, @Body() Kid kidData);
 
   @GET('user_instructor/{instructorId}')
   Future<Instructor> getInstructorById(@Path('_id') int instructorId);

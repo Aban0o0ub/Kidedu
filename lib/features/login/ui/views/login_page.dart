@@ -1,9 +1,13 @@
+//import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/core/injection/injection.dart';
+//import 'package:loginpage/core/networking/web_services.dart';
 import 'package:loginpage/features/home/ui/home_page.dart';
 import 'package:loginpage/features/login/data/models/user.dart';
+//import 'package:loginpage/features/login/data/repo/my_repo.dart';
 import 'package:loginpage/features/login/logic/cubit/my_cubit.dart';
+//import 'package:loginpage/features/sign_up/data/repo/my_repo.dart';
 import 'package:loginpage/features/sign_up/ui/views/role_page.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/auth_prompt.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
@@ -27,6 +31,7 @@ class LoginPageState extends State<LoginPage> {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  LoginCubit loginCubit = getIt<LoginCubit>();
 
   @override
   void initState() {
@@ -142,6 +147,8 @@ class LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 24),
                       BlocListener<LoginCubit, MyState>(
+                        bloc: loginCubit,
+                        //bloc: LoginCubit(LoginRepo(WebServices(Dio()))),
                         listener: (context, state) {
                           if (state is LoginInstructorSuccess) {
                             Navigator.pushReplacement(

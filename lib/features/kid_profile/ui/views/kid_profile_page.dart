@@ -1,18 +1,27 @@
+import 'package:bson/bson.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/core/injection/injection.dart';
-import 'package:loginpage/core/widgets/arrow_back.dart';
 import 'package:loginpage/features/kid_profile/logic/cubit/kid_profile_cubit.dart';
 import 'package:loginpage/features/kid_profile/ui/views/edit_profile.dart';
 import 'package:loginpage/features/kid_profile/ui/widgets/profile_item.dart';
+import 'package:loginpage/features/sign_up/data/models/kid.dart';
+//import 'package:loginpage/features/sign_up/data/models/kid.dart';
 
-class KidProfilePage extends StatelessWidget {
+class KidProfilePage extends StatefulWidget {
   const KidProfilePage({super.key});
 
   @override
+  State<KidProfilePage> createState() => _KidProfilePageState();
+}
+
+class _KidProfilePageState extends State<KidProfilePage> {
+  @override
   Widget build(BuildContext context) {
     //---------------------------------------------------------------
-    final int kidId = 1;
+
+    final ObjectId kidId = ObjectId();
+    KidProfileCubit kidProfileCubit = getIt<KidProfileCubit>();
     return BlocProvider(
       create: (context) => getIt<KidProfileCubit>()..emitGetSingleKid(kidId),
       child: Scaffold(
@@ -22,7 +31,6 @@ class KidProfilePage extends StatelessWidget {
             children: [
               const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: ArrowBack(),
               ),
               Center(
                 child: Column(
@@ -49,11 +57,13 @@ class KidProfilePage extends StatelessWidget {
                     const SizedBox(height: 15),
                     //--------------------------------------------------------------------------
                     BlocBuilder<KidProfileCubit, KidProfileState>(
+                      bloc: kidProfileCubit,
                       builder: (context, state) {
                         if (state is GetSingleKid) {
-                          final kid = state.kid;
+                          Kid kid = Kid();
+                          //print("Kid Name: ${kid.name}");
                           return Text(
-                            kid.name ?? "Kid Name",
+                            kid.name ?? "Amr",
                             style: const TextStyle(
                               fontSize: 35,
                               fontWeight: FontWeight.bold,

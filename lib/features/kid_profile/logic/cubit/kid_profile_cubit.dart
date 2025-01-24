@@ -1,4 +1,6 @@
 import 'package:bloc/bloc.dart';
+import 'package:bson/bson.dart';
+//import 'package:bson/bson.dart';
 import 'package:loginpage/features/kid_profile/data/Repo/kid_profile_repo.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:meta/meta.dart';
@@ -10,7 +12,7 @@ class KidProfileCubit extends Cubit<KidProfileState> {
 
   KidProfileCubit(this.kidProfileRepo) : super(KidProfileInitial());
 
-  Future<void> emitGetSingleKid(int kidId) async {
+  Future<void> emitGetSingleKid(ObjectId kidId) async {
     emit(MyLoading());
     try {
       final kid = await kidProfileRepo.getKidById(kidId);

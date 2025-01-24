@@ -7,7 +7,7 @@ part of 'kid.dart';
 // **************************************************************************
 
 Kid _$KidFromJson(Map<String, dynamic> json) => Kid(
-      id: (json['_id'] as num?)?.toInt(),
+      id: const ObjectIdConverter().fromJson(json['_id'] as String?),
       name: json['Name'] as String?,
       email: json['Email'] as String?,
       password: json['Password'] as String?,
@@ -22,7 +22,7 @@ Kid _$KidFromJson(Map<String, dynamic> json) => Kid(
     );
 
 Map<String, dynamic> _$KidToJson(Kid instance) => <String, dynamic>{
-      '_id': instance.id,
+      '_id': const ObjectIdConverter().toJson(instance.id),
       'Name': instance.name,
       'Email': instance.email,
       'Password': instance.password,
