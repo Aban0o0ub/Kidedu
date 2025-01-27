@@ -13,27 +13,45 @@ import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
 final getIt = GetIt.instance;
 
 void initGetIt() {
-  getIt.registerLazySingleton<MyCubit>(() => MyCubit(getIt()));
-  getIt.registerLazySingleton<MyRepo>(() => MyRepo(getIt()));
-  getIt.registerLazySingleton<LoginCubit>(() => LoginCubit(getIt()));
-  getIt.registerLazySingleton<LoginRepo>(() => LoginRepo(getIt()));
-  getIt.registerLazySingleton<KidProfileCubit>(
+  getIt.registerFactory<MyCubit>(() => MyCubit(getIt()));
+  getIt.registerFactory<MyRepo>(() => MyRepo(getIt()));
+  getIt.registerFactory<LoginCubit>(() => LoginCubit(getIt()));
+  getIt.registerFactory<LoginRepo>(() => LoginRepo(getIt()));
+  getIt.registerFactory<KidProfileCubit>(
       () => KidProfileCubit(getIt<KidProfileRepo>()));
-  getIt.registerLazySingleton<KidProfileRepo>(() => KidProfileRepo(getIt()));
-  getIt.registerLazySingleton<InstructorProfileCubit>(
+  getIt.registerFactory<KidProfileRepo>(() => KidProfileRepo(getIt()));
+  getIt.registerFactory<InstructorProfileCubit>(
       () => InstructorProfileCubit(getIt<InstructorProfileRepo>()));
-  getIt.registerLazySingleton<InstructorProfileRepo>(
+  getIt.registerFactory<InstructorProfileRepo>(
       () => InstructorProfileRepo(getIt()));
-  getIt.registerLazySingleton<WebServices>(
-      () => WebServices(createAndSetupDio()));
+  getIt.registerFactory<WebServices>(() => WebServices(createAndSetupDio()));
 }
 
+// Dio createAndSetupDio() {
+//   Dio dio = Dio();
+
+//   dio
+//     ..options.connectTimeout = const Duration(seconds: 30)
+//     ..options.receiveTimeout = const Duration(seconds: 30);
+
+//   dio.interceptors.add(LogInterceptor(
+//     requestBody: true,
+//     error: true,
+//     requestHeader: false,
+//     responseHeader: false,
+//     request: true,
+//     responseBody: true,
+//   ));
+//   return dio;
+// }
 Dio createAndSetupDio() {
   Dio dio = Dio();
 
-  dio
-    ..options.connectTimeout = const Duration(seconds: 30)
-    ..options.receiveTimeout = const Duration(seconds: 30);
+  dio.options = BaseOptions(
+    baseUrl: 'http://192.168.1.8:3000/api/',
+    connectTimeout: const Duration(seconds: 30),
+    receiveTimeout: const Duration(seconds: 30),
+  );
 
   dio.interceptors.add(LogInterceptor(
     requestBody: true,
@@ -43,5 +61,6 @@ Dio createAndSetupDio() {
     request: true,
     responseBody: true,
   ));
+
   return dio;
 }

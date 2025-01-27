@@ -1,15 +1,32 @@
-import 'package:json_annotation/json_annotation.dart';
+//import 'package:json_annotation/json_annotation.dart';
+//part 'user_res.g.dart';
 
-part 'user_res.g.dart';
+// @JsonSerializable()
+// class UserRes {
+//   final String message;
 
-@JsonSerializable()
+//   UserRes({required this.message});
+
+//   factory UserRes.fromJson(Map<String, dynamic> json) =>
+//       _$UserResFromJson(json);
+
+//   Map<String, dynamic> toJson() => _$UserResToJson(this);
+// }
+
 class UserRes {
   final String message;
 
   UserRes({required this.message});
 
-  factory UserRes.fromJson(Map<String, dynamic> json) =>
-      _$UserResFromJson(json);
+  factory UserRes.fromJson(Map<String, dynamic> json) {
+    return UserRes(
+      message: json['message'] ?? '',
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$UserResToJson(this);
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+    };
+  }
 }
