@@ -27,23 +27,6 @@ void initGetIt() {
   getIt.registerFactory<WebServices>(() => WebServices(createAndSetupDio()));
 }
 
-// Dio createAndSetupDio() {
-//   Dio dio = Dio();
-
-//   dio
-//     ..options.connectTimeout = const Duration(seconds: 30)
-//     ..options.receiveTimeout = const Duration(seconds: 30);
-
-//   dio.interceptors.add(LogInterceptor(
-//     requestBody: true,
-//     error: true,
-//     requestHeader: false,
-//     responseHeader: false,
-//     request: true,
-//     responseBody: true,
-//   ));
-//   return dio;
-// }
 Dio createAndSetupDio() {
   Dio dio = Dio();
 

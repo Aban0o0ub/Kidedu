@@ -1,22 +1,18 @@
-//import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:loginpage/core/injection/injection.dart';
-//import 'package:loginpage/core/networking/web_services.dart';
-import 'package:loginpage/features/home/ui/home_page.dart';
-import 'package:loginpage/features/login/data/models/user.dart';
-//import 'package:loginpage/features/login/data/repo/my_repo.dart';
-import 'package:loginpage/features/login/logic/cubit/my_cubit.dart';
-//import 'package:loginpage/features/sign_up/data/repo/my_repo.dart';
-import 'package:loginpage/features/sign_up/ui/views/role_page.dart';
-import 'package:loginpage/features/sign_up/ui/widgets/auth_prompt.dart';
-import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
-import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
-import 'package:loginpage/features/sign_up/ui/widgets/header_title.dart';
-import 'package:loginpage/features/sign_up/ui/widgets/icon_button.dart';
-import 'package:loginpage/features/sign_up/ui/widgets/or_divider.dart';
-import 'package:loginpage/features/login/ui/widgets/remember_me_checkbox.dart';
-import 'package:loginpage/features/sign_up/ui/widgets/upper_stickers_photo.dart';
+import '../../../../core/injection/injection.dart';
+import '../../../home/ui/home_page.dart';
+import '../../../sign_up/ui/views/role_page.dart';
+import '../../../sign_up/ui/widgets/auth_prompt.dart';
+import '../../../sign_up/ui/widgets/custom_button.dart';
+import '../../../sign_up/ui/widgets/custom_text_field.dart';
+import '../../../sign_up/ui/widgets/header_title.dart';
+import '../../../sign_up/ui/widgets/icon_button.dart';
+import '../../../sign_up/ui/widgets/or_divider.dart';
+import '../../../sign_up/ui/widgets/upper_stickers_photo.dart';
+import '../../data/models/user.dart';
+import '../../logic/cubit/my_cubit.dart';
+import '../widgets/remember_me_checkbox.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -90,7 +86,7 @@ class LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<LoginCubit>(),
+      create: (context) => loginCubit,
       child: Scaffold(
         backgroundColor: Colors.white,
         body: GestureDetector(
@@ -148,7 +144,6 @@ class LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 24),
                       BlocListener<LoginCubit, MyState>(
                         bloc: loginCubit,
-                        //bloc: LoginCubit(LoginRepo(WebServices(Dio()))),
                         listener: (context, state) {
                           if (state is LoginInstructorSuccess) {
                             Navigator.pushReplacement(

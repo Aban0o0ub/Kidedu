@@ -113,11 +113,11 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:loginpage/core/injection/injection.dart';
-import 'package:loginpage/core/widgets/arrow_back.dart';
-import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
-import 'package:loginpage/features/sign_up/ui/widgets/Instructor_auth_body.dart';
-import 'package:loginpage/features/sign_up/ui/widgets/upper_stickers_photo.dart';
+import '../../../../core/injection/injection.dart';
+import '../../../../core/widgets/arrow_back.dart';
+import '../../logic/cubit/my_cubit.dart';
+import '../widgets/Instructor_auth_body.dart';
+import '../widgets/upper_stickers_photo.dart';
 
 class AuthInstructor extends StatefulWidget {
   const AuthInstructor({super.key});

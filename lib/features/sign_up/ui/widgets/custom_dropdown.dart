@@ -7,7 +7,7 @@ class CustomDropdownField extends StatelessWidget {
     required this.hintText,
     required this.controller,
     required this.items,
-    required this.icon,
+    this.icon,
     this.width = 180,
     this.height = 56,
     this.validator,
@@ -18,7 +18,7 @@ class CustomDropdownField extends StatelessWidget {
   final String hintText;
   final TextEditingController controller;
   final List<String> items;
-  final IconData icon;
+  final IconData? icon;
   final double width;
   final double height;
   final String? Function(String?)? validator;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:loginpage/features/sign_up/ui/views/auth_instructor.dart';
-import 'package:loginpage/features/sign_up/ui/views/auth_kid.dart';
-import 'package:loginpage/core/widgets/arrow_back.dart';
-import 'package:loginpage/features/sign_up/ui/widgets/upper_stickers_photo.dart';
+import '../../../../core/widgets/arrow_back.dart';
+import '../widgets/upper_stickers_photo.dart';
+import 'auth_instructor.dart';
+import 'auth_kid.dart';
 
 class RoleSelectionPage extends StatelessWidget {
   const RoleSelectionPage({super.key});

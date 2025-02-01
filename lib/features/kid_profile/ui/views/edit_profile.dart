@@ -1,15 +1,16 @@
-import 'package:dio/dio.dart';
+//import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:loginpage/core/networking/web_services.dart';
+//import 'package:loginpage/core/networking/web_services.dart';
 import 'package:loginpage/core/widgets/arrow_back.dart';
-import 'package:loginpage/features/kid_profile/data/Repo/kid_profile_repo.dart';
+//import 'package:loginpage/features/kid_profile/data/Repo/kid_profile_repo.dart';
 import 'package:loginpage/features/kid_profile/logic/cubit/kid_profile_cubit.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_dropdown.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/select_gender.dart';
+import '../../../../core/injection/injection.dart';
 
 class EditProfile extends StatefulWidget {
   final String? name;
@@ -68,6 +69,7 @@ class _EditProfileState extends State<EditProfile> {
     'South Sinai',
     'Suez'
   ];
+  KidProfileCubit kidProfileCubit = getIt<KidProfileCubit>();
 
   @override
   void initState() {
@@ -86,7 +88,7 @@ class _EditProfileState extends State<EditProfile> {
     //.....................................................................
     return Scaffold(
       body: BlocListener<KidProfileCubit, KidProfileState>(
-        bloc: KidProfileCubit(KidProfileRepo(WebServices(Dio()))),
+        bloc: kidProfileCubit,
         listener: (context, state) {
           if (state is MyLoading) {
             showDialog(

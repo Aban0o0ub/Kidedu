@@ -1,4 +1,4 @@
-import 'package:bson/bson.dart';
+//import 'package:bson/bson.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/core/injection/injection.dart';
@@ -20,10 +20,9 @@ class _KidProfilePageState extends State<KidProfilePage> {
   Widget build(BuildContext context) {
     //---------------------------------------------------------------
 
-    final ObjectId kidId = ObjectId();
     KidProfileCubit kidProfileCubit = getIt<KidProfileCubit>();
     return BlocProvider(
-      create: (context) => getIt<KidProfileCubit>()..emitGetSingleKid(kidId),
+      create: (context) => kidProfileCubit,
       child: Scaffold(
         body: SafeArea(
           child: Column(

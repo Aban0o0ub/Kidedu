@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loginpage/features/instructor_profile/ui/views/instructor_profile_page.dart';
 import 'package:loginpage/features/login/ui/views/login_page.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
@@ -46,13 +47,13 @@ class InstructorAuthBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 200),
+        SizedBox(height: 175.h),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(horizontal: 15.w),
           child: Column(
             children: [
               const CustomTitle(text: 'Sign Up'),
-              const SizedBox(height: 12),
+              SizedBox(height: 11.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -61,31 +62,31 @@ class InstructorAuthBody extends StatelessWidget {
                     hintText: 'Enter your name',
                     controller: nameController,
                     icon: Icons.person,
-                    width: 180,
+                    width: 170.w,
                   ),
+                  SizedBox(width: 8.w),
                   CustomDropdownField(
                     label: 'Government',
                     hintText: 'Select item',
                     controller: governmentController,
                     items: egyptianGovernorates,
                     icon: Icons.location_city,
-                    width: 180,
-                    height: 48,
+                    width: 150.w,
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 7.h),
               CustomTextField(
-                width: double.infinity,
+                width: double.infinity.w,
                 label: "Email",
                 icon: Icons.email,
                 hintText: "Your Email",
                 controller: emailController,
                 validator: validateEmail, // Use passed function
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 7.h),
               CustomTextField(
-                width: double.infinity,
+                width: double.infinity.w,
                 label: "Password",
                 icon: Icons.lock,
                 isPasswordField: obscurePassword,
@@ -99,9 +100,9 @@ class InstructorAuthBody extends StatelessWidget {
                   onPressed: () => togglePasswordVisibility(),
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 7.h),
               CustomTextField(
-                width: double.infinity,
+                width: double.infinity.w,
                 label: "Confirm Password",
                 icon: Icons.lock,
                 hintText: "Re-enter your password",
@@ -115,25 +116,25 @@ class InstructorAuthBody extends StatelessWidget {
                   onPressed: () => togglePasswordVisibility(),
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 7.h),
               CustomTextField(
-                width: double.infinity,
+                width: double.infinity.w,
                 label: "Phone Number",
                 icon: Icons.phone,
                 hintText: "Enter your phone number",
                 controller: phoneNumberController,
                 keyboardType: TextInputType.phone,
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 7.h),
               CustomTextField(
-                width: double.infinity,
+                width: double.infinity.w,
                 label: "Bio",
                 hintText: "Tell us about yourself...",
                 controller: bioController,
                 maxLines: 3,
                 hasIcon: false,
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 21.h),
               BlocListener<MyCubit, MyState>(
                 listener: (context, state) {
                   if (state is CreateNewInstructorSuccess) {
@@ -164,9 +165,9 @@ class InstructorAuthBody extends StatelessWidget {
                   },
                 ),
               ),
-              const SizedBox(height: 28),
+              SizedBox(height: 24.h),
               const OrDivider(),
-              const SizedBox(height: 22),
+              SizedBox(height: 19.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -176,14 +177,14 @@ class InstructorAuthBody extends StatelessWidget {
                       // Google
                     },
                   ),
-                  const SizedBox(width: 20),
+                  SizedBox(width: 20.w),
                   Iconbutton(
                     assetPath: 'assets/images/facebookicon.png',
                     onPressed: () {
                       // Facebook
                     },
                   ),
-                  const SizedBox(width: 20),
+                  SizedBox(width: 20.w),
                   Iconbutton(
                     assetPath: 'assets/images/appstoreicon.png',
                     onPressed: () {
@@ -192,7 +193,7 @@ class InstructorAuthBody extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 28),
+              SizedBox(height: 25.h),
               AuthPrompt(
                 questionText: "Have an account?",
                 actionText: "Login",
@@ -207,7 +208,7 @@ class InstructorAuthBody extends StatelessWidget {
                   );
                 },
               ),
-              const SizedBox(height: 55),
+              SizedBox(height: 50.h),
             ],
           ),
         ),

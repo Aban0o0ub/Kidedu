@@ -6,12 +6,11 @@ class ObjectIdConverter implements JsonConverter<ObjectId?, String?> {
 
   @override
   ObjectId? fromJson(String? json) {
-    if (json == null) return null;
-    return ObjectId.parse(json);
+    return json != null ? ObjectId.parse(json) : null;
   }
 
   @override
   String? toJson(ObjectId? objectId) {
-    return objectId?.oid;
+    return objectId?.toHexString();
   }
 }
