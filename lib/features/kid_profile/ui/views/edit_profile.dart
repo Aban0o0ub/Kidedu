@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/core/widgets/arrow_back.dart';
 //import 'package:loginpage/features/kid_profile/data/Repo/kid_profile_repo.dart';
 import 'package:loginpage/features/kid_profile/logic/cubit/kid_profile_cubit.dart';
-import 'package:loginpage/features/sign_up/data/models/kid.dart';
+//import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_dropdown.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
@@ -19,7 +19,7 @@ class EditProfile extends StatefulWidget {
   final String? age;
   final String? governorate;
 
-  EditProfile({
+  const EditProfile({
     super.key,
     this.name,
     this.email,
@@ -245,16 +245,16 @@ class _EditProfileState extends State<EditProfile> {
                   child: CustomButton(
                     text: "Confirm changes",
                     onPressed: () {
-                      Kid updatedKid = Kid(
-                        name: nameController.text,
-                        email: emailController.text,
-                        phoneNumber: phoneController.text,
-                        age: int.tryParse(ageController.text),
-                        governorate: governorateController.text,
-                      );
-                      context
-                          .read<KidProfileCubit>()
-                          .emitUpdateKidProfile(updatedKid);
+                      // Kid updatedKid = Kid(
+                      //   name: nameController.text,
+                      //   email: emailController.text,
+                      //   phoneNumber: phoneController.text,
+                      //   age: int.tryParse(ageController.text),
+                      //   governorate: governorateController.text,
+                      // );
+                      // context
+                      //.read<KidProfileCubit>()
+                      //.emitUpdateKidProfile(updatedKid);
                     },
                   ),
                 ),

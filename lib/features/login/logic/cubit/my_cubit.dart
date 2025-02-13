@@ -1,7 +1,7 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/features/login/data/models/user.dart';
 import 'package:loginpage/features/login/data/repo/my_repo.dart';
-import 'package:meta/meta.dart';
 
 part 'my_state.dart';
 

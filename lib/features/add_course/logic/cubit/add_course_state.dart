@@ -5,7 +5,7 @@ sealed class AddCourseState {}
 
 final class AddCourseInitial extends AddCourseState {}
 
-final class MyLoading extends AddCourseState {}
+final class AddCourseLoading extends AddCourseState {}
 
 class AddCourseSuccess extends AddCourseState {
   final CourseModel newCourse;

@@ -11,7 +11,7 @@ class AddCourseCubit extends Cubit<AddCourseState> {
   void emitAddCourse(CourseModel newCourse) async {
     try {
       if (isClosed) return;
-      emit(MyLoading());
+      emit(AddCourseLoading());
       await addCourseRepo.addNewCourse(newCourse);
       if (isClosed) return;
       emit(AddCourseSuccess(newCourse));

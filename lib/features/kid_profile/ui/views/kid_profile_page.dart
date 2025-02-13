@@ -1,4 +1,3 @@
-//import 'package:bson/bson.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/core/injection/injection.dart';
@@ -6,20 +5,25 @@ import 'package:loginpage/features/kid_profile/logic/cubit/kid_profile_cubit.dar
 import 'package:loginpage/features/kid_profile/ui/views/edit_profile.dart';
 import 'package:loginpage/features/kid_profile/ui/widgets/profile_item.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
-//import 'package:loginpage/features/sign_up/data/models/kid.dart';
 
 class KidProfilePage extends StatefulWidget {
-  const KidProfilePage({super.key});
-
+  const KidProfilePage({super.key, required this.kidId});
+  final String kidId;
   @override
   State<KidProfilePage> createState() => _KidProfilePageState();
 }
 
 class _KidProfilePageState extends State<KidProfilePage> {
+  late KidProfileCubit kidProfileCubit;
+  @override
+  void initState() {
+    super.initState();
+    kidProfileCubit = getIt<KidProfileCubit>();
+    kidProfileCubit.emitGetSingleKid(widget.kidId);
+  }
+
   @override
   Widget build(BuildContext context) {
-    //---------------------------------------------------------------
-
     KidProfileCubit kidProfileCubit = getIt<KidProfileCubit>();
     return BlocProvider(
       create: (context) => kidProfileCubit,
@@ -59,14 +63,23 @@ class _KidProfilePageState extends State<KidProfilePage> {
                       bloc: kidProfileCubit,
                       builder: (context, state) {
                         if (state is GetSingleKid) {
-                          Kid kid = Kid();
-                          //print("Kid Name: ${kid.name}");
+                          NewKid kid = state.kid;
                           return Text(
-                            kid.name ?? "Amr",
+                            kid.name?.isNotEmpty == true
+                                ? kid.name!
+                                : "Kid name",
                             style: const TextStyle(
                               fontSize: 35,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF02457A),
+                            ),
+                          );
+                        } else if (state is MyFailure) {
+                          return Text(
+                            "there is an error ${state.error}",
+                            style: const TextStyle(
+                              fontSize: 20,
+                              color: Colors.red,
                             ),
                           );
                         }
@@ -79,7 +92,7 @@ class _KidProfilePageState extends State<KidProfilePage> {
                           ),
                         );
                       },
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -94,7 +107,7 @@ class _KidProfilePageState extends State<KidProfilePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => EditProfile()),
+                              builder: (context) => const EditProfile()),
                         );
                       },
                     ),

@@ -1,4 +1,5 @@
 import 'package:loginpage/features/add_course/data/models/add_course.dart';
+import '../../../../core/helper/cache_helper.dart';
 import '../../../../core/networking/web_services.dart';
 
 class AddCourseRepo {
@@ -7,6 +8,14 @@ class AddCourseRepo {
   AddCourseRepo(this.webServices);
 
   Future<CourseModel> addNewCourse(CourseModel newCourse) async {
-    return await webServices.addNewCourse(newCourse, 'Bearer AMOORE');
+    print("Starting addNewCourse...");
+    String? token = await CacheHelper.getData(key: "token");
+    print("Retrieved Token: $token");
+
+    if (token == null) {
+      throw Exception('Token is missing');
+    }
+
+    return await webServices.addNewCourse(newCourse, 'Bearer $token');
   }
 }

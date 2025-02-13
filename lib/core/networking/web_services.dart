@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:loginpage/core/helper/cache_helper.dart';
 import 'package:loginpage/features/add_course/data/models/add_course.dart';
 import 'package:loginpage/features/login/data/models/user.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
@@ -8,13 +9,17 @@ class WebServices {
 
   WebServices(this.dio);
 
-  Future<Kid> createNewKid(Kid newKid) async {
+  Future<KidResponse> createNewKid(NewKid newKid) async {
     try {
       final response = await dio.post(
         'user_kid',
         data: newKid.toJson(),
       );
-      return Kid.fromJson(response.data);
+      KidResponse kid = KidResponse.fromJson(response.data);
+      CacheHelper.setData(key: "token", value: kid.data!.token);
+      CacheHelper.setData(key: "kidId", value: kid.data!.newKid!.sId);
+      print(CacheHelper.getData(key: "token"));
+      return kid;
     } catch (e) {
       throw Exception('Error creating new kid: ${e.toString()}');
     }
@@ -56,42 +61,70 @@ class WebServices {
     }
   }
 
-  Future<Kid> getKidById(String kidId) async {
+  Future<NewKid> getKidById(String kidId) async {
     try {
-      final response = await dio.get('user_kid/$kidId');
-      return Kid.fromJson(response.data);
+      String token = CacheHelper.getData(key: "token");
+      final response = await dio.get(
+        'user_kid/$kidId',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+      final kidResponse = KidResponse.fromJson(response.data);
+      return kidResponse.data!.newKid!;
     } catch (e) {
       throw Exception('Error fetching kid by ID: ${e.toString()}');
     }
   }
 
-  Future<Kid> updateKidProfile(String kidId, Kid kidData) async {
+  Future<KidResponse> updateKidProfile(
+      String kidId, KidResponse kidData, String token) async {
     try {
       final response = await dio.post(
         'user_kid/$kidId',
         data: kidData.toJson(),
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
       );
-      return Kid.fromJson(response.data);
+      return KidResponse.fromJson(response.data);
     } catch (e) {
       throw Exception('Error updating kid profile: ${e.toString()}');
     }
   }
 
-  Future<Instructor> getInstructorById(int instructorId) async {
+  Future<Instructor> getInstructorById(
+      String instructorId, String token) async {
     try {
-      final response = await dio.get('user_instructor/$instructorId');
+      final response = await dio.get(
+        'user_instructor/$instructorId',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
       return Instructor.fromJson(response.data);
     } catch (e) {
       throw Exception('Error fetching instructor by ID: ${e.toString()}');
     }
   }
 
-  Future<Instructor> updateInstructorProfile(
-      int instructorId, Map<String, dynamic> instructorData) async {
+  Future<Instructor> updateInstructorProfile(String instructorId,
+      Map<String, dynamic> instructorData, String token) async {
     try {
       final response = await dio.post(
         'user_instructor/$instructorId',
         data: instructorData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
       );
       return Instructor.fromJson(response.data);
     } catch (e) {
@@ -116,9 +149,16 @@ class WebServices {
     }
   }
 
-  Future<CourseModel> getCourseById(int courseId) async {
+  Future<CourseModel> getCourseById(int courseId, String token) async {
     try {
-      final response = await dio.get('course/$courseId');
+      final response = await dio.get(
+        'course/$courseId',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
       return CourseModel.fromJson(response.data);
     } catch (e) {
       throw Exception('Error fetching course by ID: ${e.toString()}');

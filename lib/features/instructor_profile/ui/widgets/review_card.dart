@@ -4,6 +4,8 @@ Widget buildHorizontalReviewCard({
   required String name,
   required String review,
   required int rating,
+  String? courseName,
+  String? instructorName,
 }) {
   return Container(
     width: 312,
@@ -18,8 +20,7 @@ Widget buildHorizontalReviewCard({
         // Profile picture (optional)
         const CircleAvatar(
           radius: 30,
-          backgroundImage:
-              AssetImage("assets/WhatsApp Image 2024-12-04 at 4.03.23 PM.jpg"),
+          backgroundImage: AssetImage("assets/images/kid pic (2).png"),
         ),
         const SizedBox(width: 10),
         // Review text
@@ -36,6 +37,26 @@ Widget buildHorizontalReviewCard({
                 ),
               ),
               const SizedBox(height: 8),
+              if (courseName != null && instructorName != null)
+                Row(
+                  children: [
+                    Text(
+                      courseName,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF02457A),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '|' + '${instructorName}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF02457A),
+                      ),
+                    ),
+                  ],
+                ),
               // Rating stars
               Row(
                 children: List.generate(

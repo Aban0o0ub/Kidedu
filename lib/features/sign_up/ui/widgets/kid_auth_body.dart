@@ -193,7 +193,10 @@ class KidAuthBodyState extends State<KidAuthBody> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const KidProfilePage()),
+                        builder: (context) => KidProfilePage(
+                          kidId: state.newkid.sId ?? "",
+                        ),
+                      ),
                     );
                   } else if (state is MyFailure) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -205,7 +208,7 @@ class KidAuthBodyState extends State<KidAuthBody> {
                   text: 'Sign Up',
                   onPressed: () {
                     context.read<MyCubit>().emitCreateNewKid(
-                          Kid(
+                          NewKid(
                             age: int.tryParse(widget.ageController.text),
                             name: widget.nameController.text,
                             email: widget.emailController.text,

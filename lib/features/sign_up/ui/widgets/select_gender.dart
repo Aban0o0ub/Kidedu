@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 class SelectGender extends StatefulWidget {
   final Function(String) onGenderSelected;
 
-  const SelectGender({Key? key, required this.onGenderSelected})
-      : super(key: key);
+  const SelectGender({super.key, required this.onGenderSelected});
 
   @override
   State<SelectGender> createState() => _SelectGenderState();

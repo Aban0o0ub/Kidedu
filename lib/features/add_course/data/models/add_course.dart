@@ -1,13 +1,9 @@
-import 'package:bson/bson.dart';
-import '../../../../core/helper/object_id_converter.dart';
-
 class CourseModel {
   String courseName;
-  @ObjectIdConverter()
-  ObjectId instructor;
-  String level;
+  String? instructor;
+  String? level;
   String availability;
-  String? offer;
+  num? offer;
   String category;
   String description;
   num price;
@@ -23,8 +19,8 @@ class CourseModel {
 
   CourseModel(
       {required this.courseName,
-      required this.instructor,
-      required this.level,
+      this.instructor,
+      this.level,
       required this.availability,
       this.offer,
       required this.category,
@@ -43,7 +39,7 @@ class CourseModel {
   factory CourseModel.fromJson(Map<String, dynamic> json) {
     return CourseModel(
       courseName: json['course_name'],
-      instructor: const ObjectIdConverter().fromJson(json['instructor'])!,
+      instructor: json['instructor'],
       level: json['level'],
       availability: json['availability'],
       offer: json['offer'],
@@ -75,7 +71,7 @@ class CourseModel {
   Map<String, dynamic> toJson() {
     return {
       "course_name": courseName,
-      "instructor": const ObjectIdConverter().toJson(instructor),
+      "instructor": instructor,
       "level": level,
       "availability": availability,
       "offer": offer,

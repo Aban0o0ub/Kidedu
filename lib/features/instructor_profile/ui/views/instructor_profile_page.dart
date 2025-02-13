@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:loginpage/features/add_course/ui/views/add_course_page.dart';
 import 'package:loginpage/features/instructor_profile/ui/widgets/profile_body.dart';
-import 'package:loginpage/features/instructor_profile/ui/widgets/profile_header.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
 
 class InstructorProfilePage extends StatelessWidget {
@@ -16,7 +16,7 @@ class InstructorProfilePage extends StatelessWidget {
             padding: EdgeInsets.only(bottom: 100),
             child: Column(
               children: [
-                ProfileHeader(),
+                //ProfileHeader(),
                 ProfileBody(),
               ],
             ),
@@ -27,7 +27,16 @@ class InstructorProfilePage extends StatelessWidget {
             right: 0,
             child: Center(
               child: CustomButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddCoursePage(),
+                    ),
+                  ).then((_) {
+                    FocusScope.of(context).unfocus();
+                  });
+                },
                 text: "Add a new course",
                 width: 320,
               ),

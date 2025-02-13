@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/injection/injection.dart';
-import '../../../home/ui/home_page.dart';
+import '../../../home/ui/views/home_page.dart';
 import '../../../sign_up/ui/views/role_page.dart';
 import '../../../sign_up/ui/widgets/auth_prompt.dart';
 import '../../../sign_up/ui/widgets/custom_button.dart';

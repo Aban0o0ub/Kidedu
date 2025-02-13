@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loginpage/core/injection/injection.dart';
+import 'package:loginpage/features/course_details/ui/views/course_details.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_dropdown.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
-import '../widgets/header_image.dart';
+import '../../data/models/add_course.dart';
+import '../../logic/cubit/add_course_cubit.dart';
 
 class AddCoursePage extends StatefulWidget {
-  AddCoursePage({super.key});
+  const AddCoursePage({super.key});
 
   @override
   State<AddCoursePage> createState() => _AddCoursePageState();
@@ -33,177 +37,232 @@ class _AddCoursePageState extends State<AddCoursePage> {
     'Skills',
     'Games'
   ];
+  AddCourseCubit addCourseCubit = getIt<AddCourseCubit>();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const HeaderImage(),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 15),
-                    CustomTextField(
-                      controller: addcourseController,
-                      label: 'Course Name:-',
-                      hintText: 'Add course name',
-                      keyboardType: TextInputType.name,
-                      contentPadding: const EdgeInsets.only(left: 20),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter course name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    CustomDropdownField(
-                      label: 'Level:-  (optional)',
-                      hintText: 'Select level',
-                      controller: levelcontroller,
-                      items: courseitems,
-                      //icon: Icons.school_outlined,
-                      width: double.infinity,
-                    ),
-                    const SizedBox(height: 15),
-                    CustomDropdownField(
-                      label: "Availability:-",
-                      hintText: 'Select',
-                      controller: availabilitycontroller,
-                      items: availabilityitems,
-                      //icon: Icons.event_available_outlined,
-                      width: double.infinity,
-                    ),
-                    const SizedBox(height: 15),
-                    CustomTextField(
-                      label: 'Price:-',
-                      hintText: 'Enter price',
-                      controller: pricecontroller,
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 15),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: CustomTextField(
-                            label: 'Offer:- (optional)',
-                            hintText: 'Enter percent',
-                            controller: offercontroller,
-                            keyboardType: TextInputType.number,
-                            //icon: Icons.percent_outlined,
+    return BlocProvider(
+      create: (context) => getIt<AddCourseCubit>(),
+      child: Scaffold(
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                //const HeaderImage(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 15),
+                      CustomTextField(
+                        controller: addcourseController,
+                        label: 'Course Name:-',
+                        hintText: 'Add course name',
+                        keyboardType: TextInputType.name,
+                        contentPadding: const EdgeInsets.only(left: 20),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter course name';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 15),
+                      CustomDropdownField(
+                        label: 'Level:-  (optional)',
+                        hintText: 'Select level',
+                        controller: levelcontroller,
+                        items: courseitems,
+                        //icon: Icons.school_outlined,
+                        width: double.infinity,
+                      ),
+                      const SizedBox(height: 15),
+                      CustomDropdownField(
+                        label: "Availability:-",
+                        hintText: 'Select',
+                        controller: availabilitycontroller,
+                        items: availabilityitems,
+                        //icon: Icons.event_available_outlined,
+                        width: double.infinity,
+                      ),
+                      const SizedBox(height: 15),
+                      CustomTextField(
+                        label: 'Price:-',
+                        hintText: 'Enter price',
+                        controller: pricecontroller,
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 15),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: CustomTextField(
+                              label: 'Offer:- (optional)',
+                              hintText: 'Enter percent',
+                              controller: offercontroller,
+                              keyboardType: TextInputType.number,
+                              //icon: Icons.percent_outlined,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          flex: 2,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Text(
-                                "Till",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color(0xFF02457A),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            flex: 2,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  "Till",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Color(0xFF02457A),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: CustomDropdownField(
-                                  label: '',
-                                  hintText: '',
-                                  controller: tillcontroller,
-                                  items: offeritems,
-                                  //icon: Icons.discount_outlined,
-                                  width: double.infinity,
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: CustomDropdownField(
+                                    label: '',
+                                    hintText: '',
+                                    controller: tillcontroller,
+                                    items: offeritems,
+                                    //icon: Icons.discount_outlined,
+                                    width: double.infinity,
+                                  ),
                                 ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      CustomDropdownField(
+                        label: 'Category',
+                        hintText: 'select category',
+                        controller: categorycontroller,
+                        items: categoryitems,
+                        width: double.infinity,
+                      ),
+                      const SizedBox(height: 15),
+                      CustomTextField(
+                        label: 'Description:-',
+                        hintText: 'Till us about your course ...',
+                        controller: descriptioncontroller,
+                      ),
+                      const SizedBox(height: 15),
+                      const Text(
+                        "Schedule:-",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.normal,
+                          color: Color(0xFF02457A),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: CustomTextField(
+                              label: 'Start date',
+                              hintText: '',
+                              controller: startcontroller,
+                              keyboardType: TextInputType.number,
+                              suffixIcon: const Icon(Icons.date_range_outlined),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            flex: 2,
+                            child: CustomTextField(
+                              label: 'End date',
+                              hintText: '',
+                              controller: endcontroller,
+                              suffixIcon: const Icon(Icons.date_range_outlined),
+                              width: double.infinity,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      Visibility(
+                        visible: availabilitycontroller.text == 'Online' ||
+                            availabilitycontroller.text == 'Both',
+                        child: CustomTextField(
+                          label: "Section Name:-",
+                          hintText: 'Add Section Name',
+                          controller: sectioncontroller,
+                        ),
+                      ),
+                      const SizedBox(height: 25),
+                      BlocListener<AddCourseCubit, AddCourseState>(
+                        listener: (context, state) {
+                          if (state is AddCourseLoading) {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => const Center(
+                                child: CircularProgressIndicator(),
                               ),
-                            ],
+                            );
+                          } else if (state is AddCourseSuccess) {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CourseDetails()),
+                            );
+                          } else if (state is AddCourseFailure) {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(state.error)),
+                            );
+                          }
+                        },
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: CustomButton(
+                            onPressed: () {
+                              final price =
+                                  num.tryParse(pricecontroller.text) ?? 0;
+                              final offer =
+                                  num.tryParse(offercontroller.text) ?? 0;
+                              final startDate = startcontroller.text.isNotEmpty
+                                  ? DateTime.tryParse(startcontroller.text)
+                                  : null;
+                              final endDate = endcontroller.text.isNotEmpty
+                                  ? DateTime.tryParse(endcontroller.text)
+                                  : null;
+
+                              context.read<AddCourseCubit>().emitAddCourse(
+                                    CourseModel(
+                                      courseName: addcourseController.text,
+                                      level: levelcontroller.text,
+                                      availability: availabilitycontroller.text,
+                                      category: categorycontroller.text,
+                                      description: descriptioncontroller.text,
+                                      price: price,
+                                      offer: offer,
+                                      firstSection: sectioncontroller.text,
+                                      startDate: startDate,
+                                      endDate: endDate,
+                                    ),
+                                  );
+                            },
+                            text: "Add a new course",
+                            width: 320,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    CustomDropdownField(
-                      label: 'Category',
-                      hintText: 'select category',
-                      controller: categorycontroller,
-                      items: categoryitems,
-                      width: double.infinity,
-                    ),
-                    const SizedBox(height: 15),
-                    CustomTextField(
-                      label: 'Description:-',
-                      hintText: 'Till us about your course ...',
-                      controller: descriptioncontroller,
-                    ),
-                    const SizedBox(height: 15),
-                    const Text(
-                      "Schedule:-",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.normal,
-                        color: Color(0xFF02457A),
                       ),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: CustomTextField(
-                            label: 'Start date',
-                            hintText: '',
-                            controller: startcontroller,
-                            keyboardType: TextInputType.number,
-                            suffixIcon: const Icon(Icons.date_range_outlined),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          flex: 2,
-                          child: CustomTextField(
-                            label: 'End date',
-                            hintText: '',
-                            controller: endcontroller,
-                            suffixIcon: const Icon(Icons.date_range_outlined),
-                            width: double.infinity,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    Visibility(
-                      visible: availabilitycontroller.text == 'Online' ||
-                          availabilitycontroller.text == 'Both',
-                      child: CustomTextField(
-                        label: "Section Name:-",
-                        hintText: 'Add Section Name',
-                        controller: sectioncontroller,
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    Align(
-                      alignment: Alignment.center,
-                      child: CustomButton(
-                        onPressed: () {},
-                        text: "Add a new course",
-                        width: 320,
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                  ],
+                      const SizedBox(height: 25),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

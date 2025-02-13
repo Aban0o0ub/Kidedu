@@ -8,13 +8,13 @@ final class KidProfileInitial extends KidProfileState {}
 final class MyLoading extends KidProfileState {}
 
 class GetSingleKid extends KidProfileState {
-  final Kid kid;
+  final NewKid kid;
 
   GetSingleKid(this.kid);
 }
 
 class UpdateKidProfile extends KidProfileState {
-  final Kid kid;
+  final KidResponse kid;
 
   UpdateKidProfile(this.kid);
 }

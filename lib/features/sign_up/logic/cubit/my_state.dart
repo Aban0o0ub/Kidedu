@@ -9,7 +9,7 @@ final class MyLoading extends MyState {}
 
 //in case of success
 class CreateNewKidSuccess extends MyState {
-  final Kid newkid;
+  final NewKid newkid;
 
   CreateNewKidSuccess(this.newkid);
 }
@@ -30,4 +30,3 @@ class MyFailure extends MyState {
 
 //   GetAllKids(this.allKidsList);
 // }
-

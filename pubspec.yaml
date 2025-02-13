@@ -30,6 +30,8 @@ environment:
 dependencies:
   bson: ^5.0.5
   build_runner: ^2.4.13
+  carousel_slider: ^5.0.0
+  convex_bottom_bar: ^3.2.0
   cupertino_icons: ^1.0.6
   dio: ^5.7.0
   flutter:
@@ -43,6 +45,7 @@ dependencies:
   provider: ^6.0.0
   retrofit: ^4.4.1
   retrofit_generator: ^9.1.5
+  shared_preferences: ^2.5.1
 
 dev_dependencies:
   flutter_lints: ^3.0.0

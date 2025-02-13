@@ -4,7 +4,7 @@ class BuildIconWithText extends StatelessWidget {
   final IconData iconData;
   final String label;
 
-  BuildIconWithText(this.iconData, this.label);
+  const BuildIconWithText(this.iconData, this.label, {super.key});
 
   @override
   Widget build(BuildContext context) {

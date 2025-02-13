@@ -1,7 +1,7 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:loginpage/features/sign_up/data/repo/my_repo.dart';
-import 'package:meta/meta.dart';
 
 part 'my_state.dart';
 
@@ -9,16 +9,11 @@ class MyCubit extends Cubit<MyState> {
   final MyRepo myRepo;
   MyCubit(this.myRepo) : super(MyInitial());
 
-  // void emitGetAllKids() {
-  //   myRepo.getAllKids().then((kidslist) {
-  //     emit(GetAllKids(kidslist));
-  //   });
-  // }
-
-  void emitCreateNewKid(Kid newKid) async {
+  void emitCreateNewKid(NewKid newKid) async {
     try {
       if (isClosed) return;
       emit(MyLoading());
+      print("Request Data: ${newKid.toJson()}");
       await myRepo.createNewKid(newKid);
       if (isClosed) return;
       emit(CreateNewKidSuccess(newKid));
@@ -28,12 +23,16 @@ class MyCubit extends Cubit<MyState> {
     }
   }
 
-  void emitCreateNewInstructor(Instructor newinstructor) async {
+  void emitCreateNewInstructor(Instructor newInstructor) async {
     try {
+      if (isClosed) return;
       emit(MyLoading());
-      await myRepo.createNewInstructor(newinstructor);
-      emit(CreateNewInstructorSuccess(newinstructor));
+      print("Request Data: ${newInstructor.toJson()}");
+      await myRepo.createNewInstructor(newInstructor);
+      if (isClosed) return;
+      emit(CreateNewInstructorSuccess(newInstructor));
     } catch (e) {
+      if (isClosed) return;
       emit(MyFailure(e.toString()));
     }
   }
