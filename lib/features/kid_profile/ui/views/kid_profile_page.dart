@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/core/injection/injection.dart';
 import 'package:loginpage/features/kid_profile/logic/cubit/kid_profile_cubit.dart';
+import 'package:loginpage/features/kid_profile/ui/views/achievments.dart';
 import 'package:loginpage/features/kid_profile/ui/views/edit_profile.dart';
 import 'package:loginpage/features/kid_profile/ui/widgets/profile_item.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
@@ -121,7 +122,16 @@ class _KidProfilePageState extends State<KidProfilePage> {
                     profileitem(
                       image: 'assets/images/achievements.jpeg',
                       title: 'Achievements',
-                      onTap: () {},
+                      onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const AchievmentPage()),
+                          ).then((_) {
+                            FocusScope.of(context).unfocus();
+                          });
+                        },
                     ),
                     const Divider(color: Color(0xFF02457A)),
                     profileitem(

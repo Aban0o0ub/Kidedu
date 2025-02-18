@@ -7,6 +7,7 @@ import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
 import '../../data/models/add_course.dart';
 import '../../logic/cubit/add_course_cubit.dart';
+import '../widgets/header_image.dart';
 
 class AddCoursePage extends StatefulWidget {
   const AddCoursePage({super.key});
@@ -52,7 +53,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                //const HeaderImage(),
+                const HeaderImage(),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Column(

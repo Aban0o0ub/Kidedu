@@ -20,7 +20,7 @@ Widget buildHorizontalReviewCard({
         // Profile picture (optional)
         const CircleAvatar(
           radius: 30,
-          backgroundImage: AssetImage("assets/images/kid pic (2).png"),
+          backgroundImage: AssetImage("assets/images/kidprofile.jpeg"),
         ),
         const SizedBox(width: 10),
         // Review text

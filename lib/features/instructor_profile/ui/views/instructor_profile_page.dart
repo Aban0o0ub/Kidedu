@@ -3,6 +3,8 @@ import 'package:loginpage/features/add_course/ui/views/add_course_page.dart';
 import 'package:loginpage/features/instructor_profile/ui/widgets/profile_body.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
 
+import '../widgets/profile_header.dart';
+
 class InstructorProfilePage extends StatelessWidget {
   const InstructorProfilePage({super.key});
 
@@ -16,7 +18,7 @@ class InstructorProfilePage extends StatelessWidget {
             padding: EdgeInsets.only(bottom: 100),
             child: Column(
               children: [
-                //ProfileHeader(),
+                ProfileHeader(),
                 ProfileBody(),
               ],
             ),

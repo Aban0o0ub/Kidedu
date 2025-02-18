@@ -1,24 +1,27 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
-import '../widgets/home.dart';
+import 'package:loginpage/features/home/ui/views/cart.dart';
+import 'package:loginpage/features/home/ui/widgets/home.dart';
+import '../../../kid_profile/ui/views/kid_profile_page.dart';
 import '../widgets/test.dart';
+import 'my_courses.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
   static List<String> backgroundImages = [
-    "assets/images/Rectangle 695.png",
-    "assets/images/Rectangle 703.png",
-    "assets/images/Rectangle 700.png",
-    "assets/images/Rectangle 701.png",
-    "assets/images/Rectangle 702.png"
+    "assets/images/yellow.jpg",
+    "assets/images/pink.jpg",
+    "assets/images/orange.jpg",
+    "assets/images/green.jpg",
+    "assets/images/babyblue.jpg"
   ];
 
   static List<String> iconImages = [
-    "assets/images/learning_13717613 1.png",
-    "assets/images/skills_6171936 1.png",
-    "assets/images/sports_3311579 1.png",
-    "assets/images/puzzle_8317697 1.png",
-    "assets/images/paint-brush_4645388 1.png"
+    "assets/images/education.jpg",
+    "assets/images/skills.jpg",
+    "assets/images/sports.jpg",
+    "assets/images/Games.jpg",
+    "assets/images/arts.jpg"
   ];
 
   static List<String> courseTitles = [
@@ -64,13 +67,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<Widget> screens = [
-    const Test1(),
+    KidProfilePage(kidId: '',),
     const Test2(),
-    home(
+    Home(
         courseTitles: HomePage.courseTitles,
         backgroundImages: HomePage.backgroundImages,
         iconImages: HomePage.iconImages),
-    const Test3(),
-    const Test4(),
+    MyCourses(),
+    CartPage(),
   ];
 }
