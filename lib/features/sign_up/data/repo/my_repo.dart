@@ -10,11 +10,11 @@ class MyRepo {
   //   return await webServices.getAllKids();
   // }
 
-  Future<KidResponse> createNewKid(NewKid newkid) async {
+  Future<KidResponse> createNewKid(KidData newkid) async {
     return await webServices.createNewKid(newkid);
   }
 
-  Future<Instructor> createNewInstructor(Instructor newinstructor) async {
+  Future<InstructorResponse> createNewInstructor(NewInstructor newinstructor) async {
     return await webServices.createNewInstructor(newinstructor);
   }
 }

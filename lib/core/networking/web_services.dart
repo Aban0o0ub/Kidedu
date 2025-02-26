@@ -1,3 +1,4 @@
+import 'dart:convert'; // ضروري لتحويل JSON
 import 'package:dio/dio.dart';
 import 'package:loginpage/core/helper/cache_helper.dart';
 import 'package:loginpage/features/add_course/data/models/add_course.dart';
@@ -9,29 +10,40 @@ class WebServices {
 
   WebServices(this.dio);
 
-  Future<KidResponse> createNewKid(NewKid newKid) async {
+  Future<KidResponse> createNewKid(KidData newKid) async {
     try {
       final response = await dio.post(
         'user_kid',
         data: newKid.toJson(),
       );
       KidResponse kid = KidResponse.fromJson(response.data);
-      CacheHelper.setData(key: "token", value: kid.data!.token);
-      CacheHelper.setData(key: "kidId", value: kid.data!.newKid!.sId);
-      print(CacheHelper.getData(key: "token"));
+
+      if (kid.data != null) {
+        await CacheHelper.setData(key: "token", value: kid.data!.token);
+
+        if (kid.data!.newKid != null) {
+          String kidJson = jsonEncode(kid.data!.newKid!.toJson());
+          await CacheHelper.setData(key: "kid_data", value: kidJson);
+        }
+      }
+
       return kid;
     } catch (e) {
       throw Exception('Error creating new kid: ${e.toString()}');
     }
   }
 
-  Future<Instructor> createNewInstructor(Instructor newInstructor) async {
+  Future<InstructorResponse> createNewInstructor(
+      NewInstructor newInstructor) async {
     try {
       final response = await dio.post(
         'user_instructor',
         data: newInstructor.toJson(),
       );
-      return Instructor.fromJson(response.data);
+      InstructorResponse instructor =
+          InstructorResponse.fromJson(response.data);
+      CacheHelper.setData(key: "token", value: instructor.data!.token);
+      return instructor;
     } catch (e) {
       throw Exception('Error creating new instructor: ${e.toString()}');
     }
@@ -61,21 +73,32 @@ class WebServices {
     }
   }
 
-  Future<NewKid> getKidById(String kidId) async {
+  Future<KidData> getKidByToken() async {
     try {
-      String token = CacheHelper.getData(key: "token");
+      String? token = CacheHelper.getData(key: "token");
+      String? kidDataJson = CacheHelper.getData(key: "kid_data");
+
+      if (token == null || kidDataJson == null) {
+        throw Exception('Missing token or kid data');
+      }
+
+      Map<String, dynamic> kidMap = jsonDecode(kidDataJson);
+      KidData cachedKidData = KidData.fromJson(kidMap);
+
       final response = await dio.get(
-        'user_kid/$kidId',
+        'user_kid/profile',
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token',
+            'token': 'Bearer $token',
           },
         ),
       );
+
       final kidResponse = KidResponse.fromJson(response.data);
-      return kidResponse.data!.newKid!;
+
+      return kidResponse.data?.newKid ?? cachedKidData;
     } catch (e) {
-      throw Exception('Error fetching kid by ID: ${e.toString()}');
+      throw Exception('Error fetching kid: ${e.toString()}');
     }
   }
 
@@ -97,43 +120,56 @@ class WebServices {
     }
   }
 
-  Future<Instructor> getInstructorById(
-      String instructorId, String token) async {
+  Future<NewInstructor> getInstructorByToken() async {
     try {
+      String? token = CacheHelper.getData(key: "token");
+
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+
       final response = await dio.get(
-        'user_instructor/$instructorId',
+        'user_instructor/profile',
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
           },
         ),
       );
-      return Instructor.fromJson(response.data);
+
+      final instructorResponse = InstructorResponse.fromJson(response.data);
+      return instructorResponse.data!.newinstructor!;
     } catch (e) {
-      throw Exception('Error fetching instructor by ID: ${e.toString()}');
+      throw Exception('Error fetching instructor: ${e.toString()}');
     }
   }
 
-  Future<Instructor> updateInstructorProfile(String instructorId,
-      Map<String, dynamic> instructorData, String token) async {
-    try {
-      final response = await dio.post(
-        'user_instructor/$instructorId',
-        data: instructorData,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        ),
-      );
-      return Instructor.fromJson(response.data);
-    } catch (e) {
-      throw Exception('Error updating instructor profile: ${e.toString()}');
-    }
-  }
+  // Future<Instructor> updateInstructorProfile(String instructorId,
+  //     Map<String, dynamic> instructorData, String token) async {
+  //   try {
+  //     final response = await dio.post(
+  //       'user_instructor/$instructorId',
+  //       data: instructorData,
+  //       options: Options(
+  //         headers: {
+  //           'Authorization': 'Bearer $token',
+  //         },
+  //       ),
+  //     );
+  //     return Instructor.fromJson(response.data);
+  //   } catch (e) {
+  //     throw Exception('Error updating instructor profile: ${e.toString()}');
+  //   }
+  // }
 
-  Future<CourseModel> addNewCourse(CourseModel newCourse, String token) async {
+  Future<CourseModel> addNewCourse(CourseModel newCourse) async {
     try {
+      String? token = CacheHelper.getData(key: "token");
+
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+
       final response = await dio.post(
         'course',
         data: newCourse.toJson(),

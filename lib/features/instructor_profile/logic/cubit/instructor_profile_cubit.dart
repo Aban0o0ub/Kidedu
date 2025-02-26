@@ -15,21 +15,21 @@ class InstructorProfileCubit extends Cubit<InstructorProfileState> {
     emit(MyLoading());
     try {
       final instructor =
-          await instructorProfileRepo.getInstructorById(instructorId);
+          await instructorProfileRepo.getInstructorProfile();
       emit(GetSingleInstructor(instructor));
     } catch (e) {
       emit(MyFailure(e.toString()));
     }
   }
 
-  Future<void> emitUpdateKidProfile(Instructor instructor) async {
-    emit(MyLoading());
-    try {
-      final updatedInstructor = await instructorProfileRepo
-          .updateInstructorProfile(instructor.id!, instructor.toJson());
-      emit(UpdateInstructorProfile(updatedInstructor));
-    } catch (e) {
-      emit(MyFailure(e.toString()));
-    }
-  }
+  // Future<void> emitUpdateKidProfile(NewInstructor instructor) async {
+  //   emit(MyLoading());
+  //   try {
+  //     final updatedInstructor = await instructorProfileRepo
+  //         .updateInstructorProfile(instructor.id!, instructor.toJson());
+  //     emit(UpdateInstructorProfile(updatedInstructor));
+  //   } catch (e) {
+  //     emit(MyFailure(e.toString()));
+  //   }
+  // }
 }

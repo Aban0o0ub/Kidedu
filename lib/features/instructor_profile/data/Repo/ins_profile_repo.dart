@@ -8,19 +8,19 @@ class InstructorProfileRepo {
 
   InstructorProfileRepo(this.webServices);
 
-  Future<Instructor> getInstructorById(String instructorId) async {
+  Future<NewInstructor> getInstructorProfile() async {
     String? token = await CacheHelper.getData(key: "token");
     if (token == null) {
       throw Exception('Token is missing');
     }
 
-    return await webServices.getInstructorById(instructorId, 'Bearer $token');
+    return await webServices.getInstructorByToken();
   }
 
-  Future<Instructor> updateInstructorProfile(
-      String instructorId, Map<String, dynamic> instructorData) async {
-    var response = await webServices.updateInstructorProfile(
-        instructorId, instructorData, 'Bearer THIS-IS-THE-SECRET-KEY(AMOORE)');
-    return response;
-  }
-}
+//   Future<Instructor> updateInstructorProfile(
+//       String instructorId, Map<String, dynamic> instructorData) async {
+//     var response = await webServices.updateInstructorProfile(
+//         instructorId, instructorData, 'Bearer THIS-IS-THE-SECRET-KEY(AMOORE)');
+//     return response;
+//   }
+ }

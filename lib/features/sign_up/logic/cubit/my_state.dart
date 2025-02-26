@@ -9,13 +9,13 @@ final class MyLoading extends MyState {}
 
 //in case of success
 class CreateNewKidSuccess extends MyState {
-  final NewKid newkid;
+  final KidData newkid;
 
   CreateNewKidSuccess(this.newkid);
 }
 
 class CreateNewInstructorSuccess extends MyState {
-  final Instructor newinstructor;
+  final NewInstructor newinstructor;
 
   CreateNewInstructorSuccess(this.newinstructor);
 }

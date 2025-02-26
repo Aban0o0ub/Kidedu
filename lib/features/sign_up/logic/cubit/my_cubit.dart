@@ -9,7 +9,7 @@ class MyCubit extends Cubit<MyState> {
   final MyRepo myRepo;
   MyCubit(this.myRepo) : super(MyInitial());
 
-  void emitCreateNewKid(NewKid newKid) async {
+  void emitCreateNewKid(KidData newKid) async {
     try {
       if (isClosed) return;
       emit(MyLoading());
@@ -23,7 +23,7 @@ class MyCubit extends Cubit<MyState> {
     }
   }
 
-  void emitCreateNewInstructor(Instructor newInstructor) async {
+  void emitCreateNewInstructor(NewInstructor newInstructor) async {
     try {
       if (isClosed) return;
       emit(MyLoading());

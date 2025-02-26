@@ -8,8 +8,8 @@ import 'package:loginpage/features/kid_profile/ui/widgets/profile_item.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 
 class KidProfilePage extends StatefulWidget {
-  const KidProfilePage({super.key, required this.kidId});
-  final String kidId;
+  const KidProfilePage({super.key});
+
   @override
   State<KidProfilePage> createState() => _KidProfilePageState();
 }
@@ -20,14 +20,14 @@ class _KidProfilePageState extends State<KidProfilePage> {
   void initState() {
     super.initState();
     kidProfileCubit = getIt<KidProfileCubit>();
-    kidProfileCubit.emitGetSingleKid(widget.kidId);
+    kidProfileCubit.emitGetKidProfile();
   }
 
   @override
   Widget build(BuildContext context) {
-    KidProfileCubit kidProfileCubit = getIt<KidProfileCubit>();
-    return BlocProvider(
-      create: (context) => kidProfileCubit,
+    //KidProfileCubit kidProfileCubit = getIt<KidProfileCubit>();
+    return BlocProvider.value(
+      value: kidProfileCubit,
       child: Scaffold(
         body: SafeArea(
           child: Column(
@@ -61,14 +61,23 @@ class _KidProfilePageState extends State<KidProfilePage> {
                     const SizedBox(height: 15),
                     //--------------------------------------------------------------------------
                     BlocBuilder<KidProfileCubit, KidProfileState>(
-                      bloc: kidProfileCubit,
                       builder: (context, state) {
                         if (state is GetSingleKid) {
-                          NewKid kid = state.kid;
+                          KidData? kid = state.kid;
+
+                          if (kid.name == null || kid.name!.isEmpty) {
+                            return const Text(
+                              "Kid name not available",
+                              style: TextStyle(
+                                fontSize: 35,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF02457A),
+                              ),
+                            );
+                          }
+
                           return Text(
-                            kid.name?.isNotEmpty == true
-                                ? kid.name!
-                                : "Kid name",
+                            kid.name!,
                             style: const TextStyle(
                               fontSize: 35,
                               fontWeight: FontWeight.bold,
@@ -77,15 +86,16 @@ class _KidProfilePageState extends State<KidProfilePage> {
                           );
                         } else if (state is MyFailure) {
                           return Text(
-                            "there is an error ${state.error}",
+                            "There is an error: ${state.error}",
                             style: const TextStyle(
                               fontSize: 20,
                               color: Colors.red,
                             ),
                           );
                         }
+
                         return const Text(
-                          "Kid Name",
+                          "Loading...",
                           style: TextStyle(
                             fontSize: 35,
                             fontWeight: FontWeight.bold,
@@ -123,15 +133,14 @@ class _KidProfilePageState extends State<KidProfilePage> {
                       image: 'assets/images/achievements.jpeg',
                       title: 'Achievements',
                       onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const AchievmentPage()),
-                          ).then((_) {
-                            FocusScope.of(context).unfocus();
-                          });
-                        },
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AchievmentPage()),
+                        ).then((_) {
+                          FocusScope.of(context).unfocus();
+                        });
+                      },
                     ),
                     const Divider(color: Color(0xFF02457A)),
                     profileitem(

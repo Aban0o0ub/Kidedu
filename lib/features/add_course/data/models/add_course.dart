@@ -16,6 +16,7 @@ class CourseModel {
   num? ratingQuantity;
   num? ratingSum;
   List<String>? allSections;
+  String? token;
 
   CourseModel(
       {required this.courseName,
@@ -34,7 +35,8 @@ class CourseModel {
       this.ratingAvg,
       this.ratingQuantity,
       this.ratingSum,
-      this.allSections});
+      this.allSections,
+      this.token,});
 
   factory CourseModel.fromJson(Map<String, dynamic> json) {
     return CourseModel(
@@ -65,6 +67,7 @@ class CourseModel {
       allSections: json['all_sections'] != null
           ? List<String>.from(json['all_sections'])
           : null,
+           token: json['token'],
     );
   }
 
@@ -87,6 +90,7 @@ class CourseModel {
       "rating_quantity": ratingQuantity,
       "rating_sum": ratingSum,
       "all_sections": allSections,
+      "token": token,
     };
   }
 }

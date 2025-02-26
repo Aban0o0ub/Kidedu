@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loginpage/core/helper/cache_helper.dart';
-import 'package:loginpage/features/home/ui/views/home_page.dart';
-import 'package:loginpage/features/kid_profile/logic/cubit/kid_profile_cubit.dart';
+import 'package:loginpage/features/onBoarding/ui/welcome_page.dart';
 import 'package:provider/provider.dart';
 import 'core/injection/injection.dart';
 import 'features/add_course/logic/cubit/add_course_cubit.dart';
@@ -18,9 +17,6 @@ void main() async {
       providers: [
         BlocProvider<AddCourseCubit>(
           create: (context) => getIt<AddCourseCubit>(),
-        ),
-        BlocProvider<KidProfileCubit>(
-          create: (context) => getIt<KidProfileCubit>(),
         ),
       ],
       child: const KidEdu(),
@@ -43,7 +39,7 @@ class KidEdu extends StatelessWidget {
             fontFamily: 'Alegreya',
           ),
           debugShowCheckedModeBanner: false,
-          home: HomePage(),
+          home: WelcomePage(),
         );
       },
     );

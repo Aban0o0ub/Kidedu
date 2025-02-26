@@ -8,7 +8,7 @@ final class KidProfileInitial extends KidProfileState {}
 final class MyLoading extends KidProfileState {}
 
 class GetSingleKid extends KidProfileState {
-  final NewKid kid;
+  final KidData kid;
 
   GetSingleKid(this.kid);
 }

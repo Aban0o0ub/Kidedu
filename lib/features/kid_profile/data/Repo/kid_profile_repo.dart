@@ -11,14 +11,15 @@ class KidProfileRepo {
   //   return await webServices.getKidById(
   //       kidId, 'Bearer THIS-IS-THE-SECRET-KEY(AMOORE)');
   // }
-  Future<NewKid> getKidById(String kidId) async {
-    String? token = await CacheHelper.getData(key: "token");
-    if (token == null) {
-      throw Exception('Token is missing');
-    }
-
-    return await webServices.getKidById(kidId);
+  Future<KidData> getKidProfile() async {
+  String? token = await CacheHelper.getData(key: "token");
+  if (token == null) {
+    throw Exception('Token is missing');
   }
+
+  return await webServices.getKidByToken(); 
+}
+
 
   Future<KidResponse> updateKidProfile(
       String kidId, Map<String, dynamic> kidData) async {

@@ -153,7 +153,7 @@ class InstructorAuthBody extends StatelessWidget {
                   text: 'Sign Up',
                   onPressed: () {
                     context.read<MyCubit>().emitCreateNewInstructor(
-                          Instructor(
+                          NewInstructor(
                             name: nameController.text,
                             email: emailController.text,
                             password: passwordController.text,

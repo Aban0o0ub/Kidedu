@@ -10,10 +10,22 @@ class KidProfileCubit extends Cubit<KidProfileState> {
 
   KidProfileCubit(this.kidProfileRepo) : super(KidProfileInitial());
 
-  Future<void> emitGetSingleKid(String kidId) async {
+//  Future<void> emitGetKidProfile() async {
+//    print("Fetching kid profile...");
+//   emit(MyLoading());
+//   try {
+//     final kid = await kidProfileRepo.getKidProfile();
+//     print("Fetched Kid Data: ${kid.toJson()}");
+//     emit(GetSingleKid(kid));
+//   } catch (e) {
+//     emit(MyFailure(e.toString()));
+//   }
+// }
+  Future<void> emitGetKidProfile() async {
+    print("Fetching kid profile...");
     emit(MyLoading());
     try {
-      final kid = await kidProfileRepo.getKidById(kidId);
+      final kid = await kidProfileRepo.getKidProfile();
       print("Fetched Kid Data: ${kid.toJson()}");
       emit(GetSingleKid(kid));
     } catch (e) {

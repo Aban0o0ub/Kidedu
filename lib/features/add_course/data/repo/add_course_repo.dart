@@ -16,6 +16,6 @@ class AddCourseRepo {
       throw Exception('Token is missing');
     }
 
-    return await webServices.addNewCourse(newCourse, 'Bearer $token');
+    return await webServices.addNewCourse(newCourse);
   }
 }

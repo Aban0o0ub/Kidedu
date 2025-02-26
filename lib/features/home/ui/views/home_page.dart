@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<Widget> screens = [
-    KidProfilePage(kidId: '',),
+    KidProfilePage(),
     const Test2(),
     Home(
         courseTitles: HomePage.courseTitles,

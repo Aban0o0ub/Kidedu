@@ -8,13 +8,13 @@ final class InstructorProfileInitial extends InstructorProfileState {}
 final class MyLoading extends InstructorProfileState {}
 
 class GetSingleInstructor extends InstructorProfileState {
-  final Instructor instructor;
+  final NewInstructor instructor;
 
   GetSingleInstructor(this.instructor);
 }
 
 class UpdateInstructorProfile extends InstructorProfileState {
-  final Instructor instructor;
+  final NewInstructor instructor;
 
   UpdateInstructorProfile(this.instructor);
 }

@@ -194,7 +194,7 @@ class KidAuthBodyState extends State<KidAuthBody> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => KidProfilePage(
-                          kidId: state.newkid.sId ?? "",
+                          
                         ),
                       ),
                     );
@@ -208,7 +208,7 @@ class KidAuthBodyState extends State<KidAuthBody> {
                   text: 'Sign Up',
                   onPressed: () {
                     context.read<MyCubit>().emitCreateNewKid(
-                          NewKid(
+                          KidData(
                             age: int.tryParse(widget.ageController.text),
                             name: widget.nameController.text,
                             email: widget.emailController.text,
