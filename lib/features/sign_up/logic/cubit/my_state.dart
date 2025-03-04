@@ -15,7 +15,7 @@ class CreateNewKidSuccess extends MyState {
 }
 
 class CreateNewInstructorSuccess extends MyState {
-  final NewInstructor newinstructor;
+  final InstructorData newinstructor;
 
   CreateNewInstructorSuccess(this.newinstructor);
 }

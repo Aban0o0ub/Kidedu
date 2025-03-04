@@ -46,6 +46,7 @@ dependencies:
   retrofit: ^4.4.1
   retrofit_generator: ^9.1.5
   shared_preferences: ^2.5.1
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_lints: ^5.0.0

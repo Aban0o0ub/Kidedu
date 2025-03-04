@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 //import 'package:loginpage/features/home/ui/home_page.dart';
-import 'package:loginpage/features/kid_profile/ui/views/kid_profile_page.dart';
 import 'package:loginpage/features/login/ui/views/login_page.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
@@ -13,6 +12,8 @@ import 'package:loginpage/features/sign_up/ui/widgets/header_title.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/icon_button.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/or_divider.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/select_gender.dart';
+
+import '../../../home/ui/views/home_page.dart';
 
 class KidAuthBody extends StatefulWidget {
   final TextEditingController nameController;
@@ -193,9 +194,7 @@ class KidAuthBodyState extends State<KidAuthBody> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => KidProfilePage(
-                          
-                        ),
+                        builder: (context) => HomePage(),
                       ),
                     );
                   } else if (state is MyFailure) {

@@ -1,17 +1,15 @@
-//import 'package:dio/dio.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-//import 'package:loginpage/core/networking/web_services.dart';
 import 'package:loginpage/core/widgets/arrow_back.dart';
-//import 'package:loginpage/features/kid_profile/data/Repo/kid_profile_repo.dart';
 import 'package:loginpage/features/kid_profile/logic/cubit/kid_profile_cubit.dart';
-//import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_dropdown.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/select_gender.dart';
 import '../../../../core/injection/injection.dart';
-
+import 'package:image_picker/image_picker.dart';
+import '../widgets/bottom_sheet.dart';
 class EditProfile extends StatefulWidget {
   final String? name;
   final String? email;
@@ -33,6 +31,8 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
+ XFile? _imageFile;
+  final ImagePicker picker = ImagePicker();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -70,7 +70,14 @@ class _EditProfileState extends State<EditProfile> {
     'Suez'
   ];
   KidProfileCubit kidProfileCubit = getIt<KidProfileCubit>();
-
+ Future<void> takePhoto(ImageSource source) async {
+    final XFile? pickedFile = await picker.pickImage(source: source);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = pickedFile;
+      });
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -135,13 +142,18 @@ class _EditProfileState extends State<EditProfile> {
                   child: Stack(
                     alignment: Alignment.bottomRight,
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 60,
-                        backgroundImage:
-                            AssetImage('assets/images/kidprofile.jpeg'),
+                        backgroundImage: _imageFile != null
+                  ? FileImage(File(_imageFile!.path))
+                  : const AssetImage('assets/images/kidprofile.jpeg')
+                      as ImageProvider,
                       ),
                       GestureDetector(
-                        //onTap: () {},
+                        onTap: () {
+                          showModalBottomSheet(context: context,
+                           builder:(( builder)=> bottomSheet(context,takePhoto)));
+                        },
                         child: CircleAvatar(
                           radius: 16,
                           backgroundColor: Colors.grey.withOpacity(0.3),
@@ -264,5 +276,9 @@ class _EditProfileState extends State<EditProfile> {
         ),
       ),
     );
+    
   }
+
+
+
 }

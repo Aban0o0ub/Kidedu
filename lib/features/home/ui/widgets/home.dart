@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:loginpage/features/home/ui/views/courses_in_category.dart';
+import 'package:loginpage/features/home/ui/widgets/education_category.dart';
 import 'package:loginpage/features/home/ui/widgets/ads_part.dart';
 import 'package:loginpage/features/home/ui/widgets/categories_item.dart';
 import 'package:loginpage/features/home/ui/widgets/home_appbar.dart';
@@ -19,7 +19,7 @@ class Home extends StatelessWidget {
   final List<String> iconImages;
 
   final List<Widget> categoryPages = [
-  CoursesInCategory(),  // FirstPage
+  EducationCategory(),  // FirstPage
          
 ];
 

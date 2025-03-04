@@ -75,7 +75,6 @@ class _KidProfilePageState extends State<KidProfilePage> {
                               ),
                             );
                           }
-
                           return Text(
                             kid.name!,
                             style: const TextStyle(
@@ -93,12 +92,8 @@ class _KidProfilePageState extends State<KidProfilePage> {
                             ),
                           );
                         }
-
-                        return const Text(
-                          "Loading...",
-                          style: TextStyle(
-                            fontSize: 35,
-                            fontWeight: FontWeight.bold,
+                        return const Center(
+                          child: CircularProgressIndicator(
                             color: Color(0xFF02457A),
                           ),
                         );

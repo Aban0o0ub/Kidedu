@@ -11,11 +11,13 @@ class InstructorProfileCubit extends Cubit<InstructorProfileState> {
   InstructorProfileCubit(this.instructorProfileRepo)
       : super(InstructorProfileInitial());
 
-  Future<void> emitGetSingleInstructor(String instructorId) async {
+  Future<void> emitGetInstructorProfile() async {
     emit(MyLoading());
     try {
       final instructor =
           await instructorProfileRepo.getInstructorProfile();
+                print("Fetched Instructor Data: ${instructor.toJson()}");
+
       emit(GetSingleInstructor(instructor));
     } catch (e) {
       emit(MyFailure(e.toString()));

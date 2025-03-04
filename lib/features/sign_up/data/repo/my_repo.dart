@@ -14,7 +14,7 @@ class MyRepo {
     return await webServices.createNewKid(newkid);
   }
 
-  Future<InstructorResponse> createNewInstructor(NewInstructor newinstructor) async {
+  Future<InstructorResponse> createNewInstructor(InstructorData newinstructor) async {
     return await webServices.createNewInstructor(newinstructor);
   }
 }

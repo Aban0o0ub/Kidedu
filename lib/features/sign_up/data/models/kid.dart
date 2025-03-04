@@ -1,10 +1,8 @@
 import 'package:dio/dio.dart';
 
-import '../../../../core/helper/cache_helper.dart';
-
 class KidResponse {
   String? status;
-  KidDataWrapper? data; // تعديل اسم الكلاس
+  KidDataWrapper? data; 
 
   KidResponse({this.status, this.data});
 
@@ -15,7 +13,7 @@ class KidResponse {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
-    data['status'] = this.status;
+    data['status'] = status;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -36,10 +34,10 @@ class KidDataWrapper {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
-    if (this.newKid != null) {
-      data['newKid'] = this.newKid!.toJson();
+    if (newKid != null) {
+      data['newKid'] = newKid!.toJson();
     }
-    data['token'] = this.token;
+    data['token'] = token;
     return data;
   }
 }
@@ -86,17 +84,17 @@ class KidData {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
-    data['_id'] = this.sId;
-    data['Name'] = this.name;
-    data['Email'] = this.email;
-    data['Password'] = this.password;
-    data['Age'] = this.age;
-    data['Gender'] = this.gender;
-    data['Governorate'] = this.governorate;
-    data['PhoneNumber'] = this.phoneNumber;
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
-    data['__v'] = this.iV;
+    data['_id'] = sId;
+    data['Name'] = name;
+    data['Email'] = email;
+    data['Password'] =password;
+    data['Age'] = age;
+    data['Gender'] = gender;
+    data['Governorate'] = governorate;
+    data['PhoneNumber'] =phoneNumber;
+    data['createdAt'] =createdAt;
+    data['updatedAt'] = updatedAt;
+    data['__v'] = iV;
     return data;
   }
 
@@ -126,13 +124,13 @@ class KidData {
 ///////////////////////////////////////////////////////////////////////////////
 class InstructorResponse {
   String? status;
-  InstructorData? data;
+  InstructorDataWrapper? data;
 
   InstructorResponse({this.status, this.data});
 
   InstructorResponse.fromJson(Map<String, dynamic> json) {
     status = json['status'];
-    data = json['data'] != null ? InstructorData.fromJson(json['data']) : null;
+    data = json['data'] != null ? InstructorDataWrapper.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -145,28 +143,28 @@ class InstructorResponse {
   }
 }
 
-class InstructorData {
-  NewInstructor? newinstructor;
+class InstructorDataWrapper {
+  InstructorData? newInstructor;
   String? token;
 
-  InstructorData({this.newinstructor, this.token});
+  InstructorDataWrapper({this.newInstructor, this.token});
 
-  InstructorData.fromJson(Map<String, dynamic> json) {
-    newinstructor =
-        json['newinstructor'] != null ? NewInstructor.fromJson(json['instructor']) : null;
+  InstructorDataWrapper.fromJson(Map<String, dynamic> json) {
+    newInstructor =
+        json['newInstructor'] != null ? InstructorData.fromJson(json['newInstructor']) : null;
     token = json['token'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
-    if (newinstructor != null) {
-      data['newinstructor'] = newinstructor!.toJson();
+    if (newInstructor != null) {
+      data['newInstructor'] = newInstructor!.toJson();
     }
     data['token'] = token;
     return data;
   }
 }
-class NewInstructor {
+class InstructorData {
   String? id;
   String? name;
   String? email;
@@ -174,14 +172,14 @@ class NewInstructor {
   String? governorate;
   String? phoneNumber;
   String? bio;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
   int? v;
   String? image;
   String? title;
   String? experience;
 
-  NewInstructor({
+  InstructorData({
     this.id,
     this.name,
     this.email,
@@ -197,23 +195,22 @@ class NewInstructor {
     this.experience,
   });
 
-  factory NewInstructor.fromJson(Map<String, dynamic> json) {
-    return NewInstructor(
-      id: json['_id'],
-      name: json['Name'],
-      email: json['Email'],
-      password: json['Password'],
-      bio: json['Bio'],
-      governorate: json['Governorate'],
-      phoneNumber: json['PhoneNumber'],
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
-      v: json['__v'],
-      image: json['Image'],
-      title: json['Title'],
-      experience: json['Experience'],
-    );
-  }
+  InstructorData.fromJson(Map<String, dynamic> json) {
+  id = json['_id'];
+  name = json['Name'];
+  email = json['Email'];
+  password = json['Password'];
+  bio = json['Bio'];
+  governorate = json['Governorate'];
+  phoneNumber = json['PhoneNumber'];
+  createdAt = json['createdAt'];
+  updatedAt = json['updatedAt'];
+  v = json['__v'];
+  image = json['Image'];
+  title = json['Title'];
+  experience = json['Experience'];
+}
+
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
@@ -225,8 +222,8 @@ class NewInstructor {
     if (bio != null) data['Bio'] = bio;
     if (governorate != null) data['Governorate'] = governorate;
     if (phoneNumber != null) data['PhoneNumber'] = phoneNumber;
-    if (createdAt != null) data['createdAt'] = createdAt!.toIso8601String();
-    if (updatedAt != null) data['updatedAt'] = updatedAt!.toIso8601String();
+    if (createdAt != null) data['createdAt'] = createdAt;
+    if (updatedAt != null) data['updatedAt'] = updatedAt;
     if (v != null) data['__v'] = v;
     if (image != null) data['Image'] = image;
     if (title != null) data['Title'] = title;
@@ -244,17 +241,13 @@ class NewInstructor {
     }
   }
 
-  static Future<InstructorResponse> createInstructor(Dio dio, NewInstructor newInstructor) async {
+  static Future<InstructorResponse> createInstructor(Dio dio, InstructorData newInstructor) async {
     try {
       final response = await dio.post(
         'user_instructor',
         data: newInstructor.toJson(),
       );
-      InstructorResponse instructor = InstructorResponse.fromJson(response.data);
-      
-      CacheHelper.setData(key: "token", value: instructor.data!.token);
-      
-      return instructor;
+      return InstructorResponse.fromJson(response.data);
     } catch (e) {
       throw Exception('Error creating new instructor: ${e.toString()}');
     }

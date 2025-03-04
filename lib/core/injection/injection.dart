@@ -14,6 +14,9 @@ import 'package:loginpage/features/login/logic/cubit/my_cubit.dart';
 import 'package:loginpage/features/sign_up/data/repo/my_repo.dart';
 import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
 
+import '../../features/home/data/Repo/course_category_repo.dart';
+import '../../features/home/logic/cubit/course_category_cubit.dart';
+
 final getIt = GetIt.instance;
 
 void initGetIt() {
@@ -32,6 +35,8 @@ void initGetIt() {
   getIt.registerFactory<AddCourseRepo>(() => AddCourseRepo(getIt()));
   getIt.registerFactory<CourseDetailsCubit>(() => CourseDetailsCubit(getIt()));
   getIt.registerFactory<CourseDetailsRepo>(() => CourseDetailsRepo(getIt()));
+  getIt.registerFactory<CourseCategoryCubit>(() => CourseCategoryCubit(getIt()));
+  getIt.registerFactory<CourseCategoryRepo>(() => CourseCategoryRepo(getIt()));
   getIt.registerFactory<WebServices>(() => WebServices(createAndSetupDio()));
 }
 

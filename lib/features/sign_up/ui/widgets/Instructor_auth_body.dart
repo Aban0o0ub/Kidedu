@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loginpage/features/instructor_profile/ui/views/instructor_profile_page.dart';
 import 'package:loginpage/features/login/ui/views/login_page.dart';
-import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/auth_prompt.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
@@ -12,6 +11,8 @@ import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/header_title.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/icon_button.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/or_divider.dart';
+
+import '../../data/models/kid.dart';
 
 class InstructorAuthBody extends StatelessWidget {
   final TextEditingController nameController;
@@ -153,7 +154,7 @@ class InstructorAuthBody extends StatelessWidget {
                   text: 'Sign Up',
                   onPressed: () {
                     context.read<MyCubit>().emitCreateNewInstructor(
-                          NewInstructor(
+                          InstructorData(
                             name: nameController.text,
                             email: emailController.text,
                             password: passwordController.text,

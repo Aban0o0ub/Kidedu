@@ -1,6 +1,5 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:loginpage/features/home/ui/views/cart.dart';
 import 'package:loginpage/features/home/ui/widgets/home.dart';
 import '../../../kid_profile/ui/views/kid_profile_page.dart';
 import '../widgets/test.dart';
@@ -74,6 +73,6 @@ class _HomePageState extends State<HomePage> {
         backgroundImages: HomePage.backgroundImages,
         iconImages: HomePage.iconImages),
     MyCourses(),
-    CartPage(),
+    //CartPage(),
   ];
 }

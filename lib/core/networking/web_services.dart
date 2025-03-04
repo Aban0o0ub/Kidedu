@@ -34,7 +34,7 @@ class WebServices {
   }
 
   Future<InstructorResponse> createNewInstructor(
-      NewInstructor newInstructor) async {
+      InstructorData newInstructor) async {
     try {
       final response = await dio.post(
         'user_instructor',
@@ -42,7 +42,18 @@ class WebServices {
       );
       InstructorResponse instructor =
           InstructorResponse.fromJson(response.data);
-      CacheHelper.setData(key: "token", value: instructor.data!.token);
+
+      if (instructor.data != null) {
+        await CacheHelper.setData(key: "token", value: instructor.data!.token);
+
+        if (instructor.data!.newInstructor != null) {
+          String instructorJson =
+              jsonEncode(instructor.data!.newInstructor!.toJson());
+          await CacheHelper.setData(
+              key: "instructor_data", value: instructorJson);
+        }
+      }
+
       return instructor;
     } catch (e) {
       throw Exception('Error creating new instructor: ${e.toString()}');
@@ -120,26 +131,34 @@ class WebServices {
     }
   }
 
-  Future<NewInstructor> getInstructorByToken() async {
+  Future<InstructorData> getInstructorByToken() async {
     try {
       String? token = CacheHelper.getData(key: "token");
-
-      if (token == null) {
-        throw Exception('Missing token');
+      String? instructorDataJson = CacheHelper.getData(key: "instructor_data");
+ print("DEBUG: Token from cache -> $token");
+    print("DEBUG: Instructor data from cache -> $instructorDataJson");
+      if (token == null || instructorDataJson == null) {
+        throw Exception('Missing token or instructor data');
       }
 
+      Map<String, dynamic> instructorMap = jsonDecode(instructorDataJson);
+      InstructorData cachedinstructorData =
+          InstructorData.fromJson(instructorMap);
+    print("DEBUG: Cached instructor data -> ${cachedinstructorData.toString()}");
       final response = await dio.get(
         'user_instructor/profile',
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token',
+            'token': 'Bearer $token',
           },
         ),
       );
-
+    print("DEBUG: API Response -> ${response.data}");
       final instructorResponse = InstructorResponse.fromJson(response.data);
-      return instructorResponse.data!.newinstructor!;
+    print("DEBUG: Parsed InstructorResponse -> ${instructorResponse.toString()}");
+      return instructorResponse.data?.newInstructor ?? cachedinstructorData;
     } catch (e) {
+          print("ERROR: Exception occurred -> ${e.toString()}");
       throw Exception('Error fetching instructor: ${e.toString()}');
     }
   }
@@ -175,7 +194,7 @@ class WebServices {
         data: newCourse.toJson(),
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token',
+            'token': 'Bearer $token',
           },
         ),
       );
@@ -184,6 +203,7 @@ class WebServices {
       throw Exception('Error creating new course: ${e.toString()}');
     }
   }
+  
 
   Future<CourseModel> getCourseById(int courseId, String token) async {
     try {
@@ -191,7 +211,7 @@ class WebServices {
         'course/$courseId',
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token',
+            'token': 'Bearer $token',
           },
         ),
       );
@@ -200,4 +220,42 @@ class WebServices {
       throw Exception('Error fetching course by ID: ${e.toString()}');
     }
   }
+  // Future<CourseModel> getCourseByCategory(String category) async {
+  //   try {
+  //     String? token = CacheHelper.getData(key: "token");
+  //     final response = await dio.get(
+  //       'course/$category',
+  //       options: Options(
+  //         headers: {
+  //           'token': 'Bearer $token',
+  //         },
+  //       ),
+  //     );
+  //     return CourseModel.fromJson(response.data);
+  //   } catch (e) {
+  //     throw Exception('Error fetching course by Category: ${e.toString()}');
+  //   }
+  // }
+  Future<CourseModel> getCourseByCategory(String category) async {
+  try {
+    String? token = CacheHelper.getData(key: "token");
+    final response = await dio.get(
+      'course/$category',
+      options: Options(
+        headers: {
+          'token': 'Bearer $token',
+        },
+      ),
+    );
+
+    if (response.data == null || response.data["data"] == null || response.data["data"]["new_course"] == null) {
+      throw Exception("No course data found for this category");
+    }
+
+    return CourseModel.fromJson(response.data["data"]["new_course"]);
+  } catch (e) {
+    throw Exception('Error fetching course by Category: ${e.toString()}');
+  }
+}
+
 }

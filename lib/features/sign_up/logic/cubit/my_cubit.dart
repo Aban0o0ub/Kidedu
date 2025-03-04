@@ -23,7 +23,7 @@ class MyCubit extends Cubit<MyState> {
     }
   }
 
-  void emitCreateNewInstructor(NewInstructor newInstructor) async {
+  void emitCreateNewInstructor(InstructorData newInstructor) async {
     try {
       if (isClosed) return;
       emit(MyLoading());

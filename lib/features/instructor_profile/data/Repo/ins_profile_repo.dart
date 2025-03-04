@@ -8,7 +8,7 @@ class InstructorProfileRepo {
 
   InstructorProfileRepo(this.webServices);
 
-  Future<NewInstructor> getInstructorProfile() async {
+  Future<InstructorData> getInstructorProfile() async {
     String? token = await CacheHelper.getData(key: "token");
     if (token == null) {
       throw Exception('Token is missing');
