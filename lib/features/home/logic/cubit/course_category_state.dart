@@ -8,9 +8,10 @@ final class CourseCategoryInitial extends CourseCategoryState {}
 final class CourseCategoryLoading extends CourseCategoryState {}
 
 final class GetCourseByCategorySuccess extends CourseCategoryState {
-  final CourseModel newCourse;
-  GetCourseByCategorySuccess(this.newCourse);
+  final List<CourseData> courses;
+  GetCourseByCategorySuccess(this.courses);
 }
+
 
 final class GetCourseByCategoryFailure extends CourseCategoryState {
   final String error;

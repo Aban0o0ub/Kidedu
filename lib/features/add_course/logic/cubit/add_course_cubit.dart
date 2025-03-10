@@ -8,16 +8,19 @@ class AddCourseCubit extends Cubit<AddCourseState> {
   final AddCourseRepo addCourseRepo;
   AddCourseCubit(this.addCourseRepo) : super(AddCourseInitial());
 
-  void emitAddCourse(CourseModel newCourse) async {
-    try {
-      if (isClosed) return;
-      emit(AddCourseLoading());
-      await addCourseRepo.addNewCourse(newCourse);
-      if (isClosed) return;
-      emit(AddCourseSuccess(newCourse));
-    } catch (e) {
-      if (isClosed) return;
-      emit(AddCourseFailure(e.toString()));
-    }
+ void emitAddCourse(CourseRequest newCourse) async {
+  try {
+    if (isClosed) return;
+    emit(AddCourseLoading());
+
+    CourseResponse courseResponse = await addCourseRepo.addNewCourse(newCourse);
+
+    if (isClosed) return;
+    emit(AddCourseSuccess(courseResponse));
+  } catch (e) {
+    if (isClosed) return;
+    emit(AddCourseFailure(e.toString()));
   }
+}
+
 }

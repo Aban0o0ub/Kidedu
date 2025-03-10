@@ -43,7 +43,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<AddCourseCubit>(),
+      create: (context) => addCourseCubit,
       child: Scaffold(
         body: GestureDetector(
           onTap: () {
@@ -224,34 +224,30 @@ class _AddCoursePageState extends State<AddCoursePage> {
                           }
                         },
                         child: Align(
-                          alignment: Alignment.center,
-                          child: CustomButton(
-                            onPressed: () {
-                              final price =
-                                  num.tryParse(pricecontroller.text) ?? 0;
-                              final offer =
-                                  num.tryParse(offercontroller.text) ?? 0;
-                              final startDate = startcontroller.text.isNotEmpty
-                                  ? DateTime.tryParse(startcontroller.text)
-                                  : null;
-                              final endDate = endcontroller.text.isNotEmpty
-                                  ? DateTime.tryParse(endcontroller.text)
-                                  : null;
+  alignment: Alignment.center,
+  child: CustomButton(
+    onPressed: () {
+      final price = num.tryParse(pricecontroller.text) ?? 0;
+      final startDate = DateTime.tryParse(startcontroller.text);
+      final endDate = DateTime.tryParse(endcontroller.text);
 
-                              context.read<AddCourseCubit>().emitAddCourse(
-                                    CourseModel(
-                                      courseName: addcourseController.text,
-                                      level: levelcontroller.text,
-                                      availability: availabilitycontroller.text,
-                                      category: categorycontroller.text,
-                                      description: descriptioncontroller.text,
-                                      price: price,
-                                      offer: offer,
-                                      firstSection: sectioncontroller.text,
-                                      startDate: startDate,
-                                      endDate: endDate,
-                                    ),
-                                  );
+      context.read<AddCourseCubit>().emitAddCourse(
+        CourseRequest(
+          courseName: addcourseController.text,
+          level: levelcontroller.text,
+          availability: availabilitycontroller.text,
+          category: categorycontroller.text,
+          description: descriptioncontroller.text,
+          price: price,
+          offer: offercontroller.text,
+          firstSection: sectioncontroller.text,
+          startDate: startDate,  // ✅ تحويل إلى DateTime
+          endDate: endDate,      // ✅ تحويل إلى DateTime
+        ),
+      );
+    
+
+
                             },
                             text: "Add a new course",
                             width: 320,

@@ -6,7 +6,7 @@ class CourseDetailsRepo {
 
   CourseDetailsRepo(this.webServices);
 
-  Future<CourseModel> getCourseById(int courseId) async {
+  Future<CourseResponse> getCourseById(int courseId) async {
     return await webServices.getCourseById(
         courseId, 'Bearer THIS-IS-THE-SECRET-KEY(AMOORE)');
   }

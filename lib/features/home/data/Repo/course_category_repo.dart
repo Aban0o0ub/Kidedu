@@ -6,7 +6,12 @@ class CourseCategoryRepo {
 
   CourseCategoryRepo(this.webServices);
 
-  Future <CourseModel> getCourseByCategory(String category) async {
-    return await webServices.getCourseByCategory(category);
+Future<List<CourseData>> getCourseByCategory(String category) async {
+    try {
+      return await webServices.getCourseByCategory(category);
+    } catch (e) {
+      throw Exception("Error fetching courses: ${e.toString()}");
+    }
   }
 }
+

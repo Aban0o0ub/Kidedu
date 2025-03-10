@@ -1,45 +1,36 @@
-class CourseModel {
-  String courseName;
+class CourseRequest {
+  String? courseName;
   String? instructor;
   String? level;
-  String availability;
-  num? offer;
-  String category;
-  String description;
-  num price;
+  String? availability;
+  String? offer;
+  String? category;
+  String? description;
+  num? price;
   num? priceAfterDiscount;
   DateTime? startDate;
   DateTime? endDate;
   String? courseImage;
-  String firstSection;
-  num? ratingAvg;
-  num? ratingQuantity;
-  num? ratingSum;
-  List<String>? allSections;
-  String? token;
+  String? firstSection;
 
-  CourseModel(
-      {required this.courseName,
-      this.instructor,
-      this.level,
-      required this.availability,
-      this.offer,
-      required this.category,
-      required this.description,
-      required this.price,
-      this.priceAfterDiscount,
-      this.startDate,
-      this.endDate,
-      this.courseImage,
-      required this.firstSection,
-      this.ratingAvg,
-      this.ratingQuantity,
-      this.ratingSum,
-      this.allSections,
-      this.token,});
+  CourseRequest({
+    this.courseName,
+    this.instructor,
+    this.level,
+    this.availability,
+    this.offer,
+    this.category,
+    this.description,
+    this.price,
+    this.priceAfterDiscount,
+    this.startDate,
+    this.endDate,
+    this.courseImage,
+    this.firstSection,
+  });
 
-  factory CourseModel.fromJson(Map<String, dynamic> json) {
-    return CourseModel(
+  factory CourseRequest.fromJson(Map<String, dynamic> json) {
+    return CourseRequest(
       courseName: json['course_name'],
       instructor: json['instructor'],
       level: json['level'],
@@ -56,18 +47,6 @@ class CourseModel {
           json['end_date'] != null ? DateTime.parse(json['end_date']) : null,
       courseImage: json['course_image'],
       firstSection: json['first_section'],
-      ratingAvg: json['rating_Avarage'] != null
-          ? json['rating_Avarage'].toDouble()
-          : null,
-      ratingQuantity: json['rating_quantity'] != null
-          ? json['rating_quantity'].toDouble()
-          : null,
-      ratingSum:
-          json['rating_sum'] != null ? json['rating_sum'].toDouble() : null,
-      allSections: json['all_sections'] != null
-          ? List<String>.from(json['all_sections'])
-          : null,
-           token: json['token'],
     );
   }
 
@@ -82,15 +61,130 @@ class CourseModel {
       "description": description,
       "price": price,
       "price_after_discount": priceAfterDiscount,
-      "start_date": startDate?.toIso8601String(),
-      "end_date": endDate?.toIso8601String(),
+       "start_date": startDate?.toIso8601String(), // تحويل إلى String
+    "end_date": endDate?.toIso8601String(),
       "course_image": courseImage,
       "first_section": firstSection,
-      "rating_Avarage": ratingAvg,
-      "rating_quantity": ratingQuantity,
-      "rating_sum": ratingSum,
-      "all_sections": allSections,
-      "token": token,
+    };
+  }
+}
+
+class CourseResponse {
+  String? status;
+  CourseData? data;
+  List<CourseData>? courses; 
+
+  CourseResponse({this.status, this.data, this.courses});
+
+  factory CourseResponse.fromJson(Map<String, dynamic> json) {
+  return CourseResponse(
+    status: json['status'],
+    data: json['data'] != null && json['data']['new_course'] is Map<String, dynamic>
+        ? CourseData.fromJson(json['data']['new_course'])
+        : null,
+    courses: json['data'] != null && json['data']['new_course'] is List
+        ? List<CourseData>.from(
+            json['data']['new_course'].map((course) => CourseData.fromJson(course)))
+        : [],
+  );
+}
+
+
+
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status,
+      'data': data != null ? data!.toJson() : null,
+      'courses': courses != null
+          ? courses!.map((course) => course.toJson()).toList()
+          : null,
+    };
+  }
+}
+
+class CourseData {
+  String? id;
+  String? courseName;
+  Map<String, dynamic>? instructor; 
+  List<dynamic>? kids;
+  String? level;
+  String? availability;
+  String? offer;
+  num? price;
+  String? category;
+  String? description;
+ DateTime? startDate;
+  DateTime? endDate;
+  String? courseImage;
+  String? createdAt;
+  String? updatedAt;
+  int? v;
+
+
+  CourseData({
+    this.id,
+    this.courseName,
+    this.instructor,
+    this.kids,
+    this.level,
+    this.availability,
+    this.offer,
+    this.category,
+    this.description,
+    this.startDate,
+    this.endDate,
+    this.courseImage,
+    this.createdAt,
+    this.updatedAt,
+    this.v,
+    this.price
+  });
+
+  factory CourseData.fromJson(Map<String, dynamic> json) {
+    return CourseData(
+      id: json['_id'],
+      courseName: json['course_name'],
+instructor: json['instructor'] as Map<String, dynamic>?,
+      kids: json['kids'] != null ? List<dynamic>.from(json['kids']) : [],
+      level: json['level'],
+      availability: json['availability'],
+      offer: json['offer'],
+      category: json['category'],
+      description: json['description'],
+       startDate: json['start_date'] != null
+          ? DateTime.parse(json['start_date'])
+          : null,
+      endDate:
+          json['end_date'] != null ? DateTime.parse(json['end_date']) : null,
+      courseImage: json['course_image'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+      v: json['__v'],
+      price: json['price'],
+
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'course_name': courseName,
+      'instructor': instructor,
+      'kids': kids,
+      'level': level,
+      'availability': availability,
+      'offer': offer,
+      'category': category,
+      'description': description,
+       "start_date": startDate?.toIso8601String(), // تحويل إلى String
+    "end_date": endDate?.toIso8601String(),
+      'course_image': courseImage,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      '__v': v,
+      "price": price,
+
     };
   }
 }

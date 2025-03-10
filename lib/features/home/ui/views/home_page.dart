@@ -1,8 +1,8 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:loginpage/features/home/ui/views/search.dart';
 import 'package:loginpage/features/home/ui/widgets/home.dart';
 import '../../../kid_profile/ui/views/kid_profile_page.dart';
-import '../widgets/test.dart';
 import 'my_courses.dart';
 
 class HomePage extends StatefulWidget {
@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
 
   List<Widget> screens = [
     KidProfilePage(),
-    const Test2(),
+    SearchPage(),
     Home(
         courseTitles: HomePage.courseTitles,
         backgroundImages: HomePage.backgroundImages,

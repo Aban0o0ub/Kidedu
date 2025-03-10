@@ -181,31 +181,33 @@ class WebServices {
   //   }
   // }
 
-  Future<CourseModel> addNewCourse(CourseModel newCourse) async {
-    try {
-      String? token = CacheHelper.getData(key: "token");
+  Future<CourseResponse> addNewCourse(CourseRequest newCourse) async {
+  try {
+    String? token = CacheHelper.getData(key: "token");
 
-      if (token == null) {
-        throw Exception('Missing token');
-      }
-
-      final response = await dio.post(
-        'course',
-        data: newCourse.toJson(),
-        options: Options(
-          headers: {
-            'token': 'Bearer $token',
-          },
-        ),
-      );
-      return CourseModel.fromJson(response.data);
-    } catch (e) {
-      throw Exception('Error creating new course: ${e.toString()}');
+    if (token == null) {
+      throw Exception('Missing token');
     }
+
+    final response = await dio.post(
+      'course',
+      data: newCourse.toJson(),
+      options: Options(
+        headers: {
+          'token': 'Bearer $token',
+        },
+      ),
+    );
+
+    return CourseResponse.fromJson(response.data);
+  } catch (e) {
+    throw Exception('Error creating new course: ${e.toString()}');
   }
+}
+
   
 
-  Future<CourseModel> getCourseById(int courseId, String token) async {
+  Future<CourseResponse> getCourseById(int courseId, String token) async {
     try {
       final response = await dio.get(
         'course/$courseId',
@@ -215,47 +217,45 @@ class WebServices {
           },
         ),
       );
-      return CourseModel.fromJson(response.data);
+      return CourseResponse.fromJson(response.data);
     } catch (e) {
       throw Exception('Error fetching course by ID: ${e.toString()}');
     }
   }
-  // Future<CourseModel> getCourseByCategory(String category) async {
-  //   try {
-  //     String? token = CacheHelper.getData(key: "token");
-  //     final response = await dio.get(
-  //       'course/$category',
-  //       options: Options(
-  //         headers: {
-  //           'token': 'Bearer $token',
-  //         },
-  //       ),
-  //     );
-  //     return CourseModel.fromJson(response.data);
-  //   } catch (e) {
-  //     throw Exception('Error fetching course by Category: ${e.toString()}');
-  //   }
-  // }
-  Future<CourseModel> getCourseByCategory(String category) async {
+  
+Future<List<CourseData>> getCourseByCategory(String category) async {
   try {
     String? token = CacheHelper.getData(key: "token");
     final response = await dio.get(
-      'course/$category',
+      'course/category',
+      queryParameters: {'category': category}, 
       options: Options(
         headers: {
           'token': 'Bearer $token',
         },
       ),
     );
-
     if (response.data == null || response.data["data"] == null || response.data["data"]["new_course"] == null) {
       throw Exception("No course data found for this category");
     }
+    var newCourse = response.data["data"]["new_course"];
 
-    return CourseModel.fromJson(response.data["data"]["new_course"]);
+    List<CourseData> courses = [];
+
+    if (newCourse is List) {
+      courses = newCourse.map((course) => CourseData.fromJson(course)).toList();
+    } else if (newCourse is Map<String, dynamic>) {
+      courses.add(CourseData.fromJson(newCourse));
+    } else {
+      throw Exception("Unexpected format of course data");
+    }
+
+    return courses;
   } catch (e) {
-    throw Exception('Error fetching course by Category: ${e.toString()}');
+    throw Exception('Error fetching course by category: ${e.toString()}');
   }
 }
+
+
 
 }

@@ -28,10 +28,13 @@ class CourseCard extends StatelessWidget {
         child: Row(
           children: [
             // 🔹 صورة الكورس
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset("assets/images/swimming.jpg", width: 80, height: 80, fit: BoxFit.cover),
-            ),
+           ClipRRect(
+  borderRadius: BorderRadius.circular(8),
+  child: courseImage != null && courseImage!.isNotEmpty
+      ? Image.network(courseImage!, width: 80, height: 80, fit: BoxFit.cover)
+      : Image.asset("assets/images/CourseDefaultPhoto.jpeg", width: 80, height: 80, fit: BoxFit.cover),
+),
+
             const SizedBox(width: 12),
             // 🔹 تفاصيل الكورس
             Expanded(
@@ -50,12 +53,12 @@ class CourseCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Text("By $instructor", style: const TextStyle(color: Colors.grey)),
+Text(instructor != null ? "By $instructor" : "No instructor", style: const TextStyle(color: Colors.grey)),
                   Text(description, style: const TextStyle(fontSize: 14)),
                   const SizedBox(height: 5),
                   Row(
                     children: [
-                      Text(price as String , style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                      Text("\$${price.toString()}" , style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
                       const SizedBox(width: 8),
                       Text(availability, style: const TextStyle(color: Colors.grey)),
                     ],

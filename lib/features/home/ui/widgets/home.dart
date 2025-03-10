@@ -7,7 +7,7 @@ import 'package:loginpage/features/instructor_profile/ui/widgets/course_box.dart
 import 'package:loginpage/features/instructor_profile/ui/widgets/review_card.dart';
 
 class Home extends StatelessWidget {
-   Home({
+  Home({
     super.key,
     required this.courseTitles,
     required this.backgroundImages,
@@ -19,10 +19,10 @@ class Home extends StatelessWidget {
   final List<String> iconImages;
 
   final List<Widget> categoryPages = [
-  EducationCategory(),  // FirstPage
-         
-];
-
+    EducationCategory(
+      category: "Education",
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class Home extends StatelessWidget {
                   const SizedBox(height: 38),
                   AdsPart(),
                   const SizedBox(height: 20),
-                  
+
                   // Trending Section
                   const Align(
                     alignment: Alignment.centerLeft,
@@ -75,7 +75,7 @@ class Home extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // Categories Section
                   const Align(
                     alignment: Alignment.centerLeft,
@@ -94,10 +94,12 @@ class Home extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GridView.builder(
-                      padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
+                      padding:
+                          const EdgeInsets.only(top: 20, left: 10, right: 10),
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
                         mainAxisSpacing: 15,
                         crossAxisSpacing: 10,
@@ -110,11 +112,11 @@ class Home extends StatelessWidget {
                           iconImage: iconImages[index],
                           title: courseTitles[index],
                           onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => categoryPages[index]),
-      );
-    },
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+ builder: (context) => EducationCategory(category: courseTitles[index]), ),                           );
+                          },
                         );
                       },
                     ),
@@ -154,7 +156,8 @@ class Home extends StatelessWidget {
                           const SizedBox(width: 10),
                           buildHorizontalReviewCard(
                             name: "Sara Ali",
-                            review: "Practical examples and clear explanations!",
+                            review:
+                                "Practical examples and clear explanations!",
                             rating: 4,
                             courseName: "For Mathematics for kids",
                             instructorName: "Abanoub Atef",

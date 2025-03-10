@@ -8,7 +8,7 @@ final class AddCourseInitial extends AddCourseState {}
 final class AddCourseLoading extends AddCourseState {}
 
 class AddCourseSuccess extends AddCourseState {
-  final CourseModel newCourse;
+  final CourseResponse newCourse;
 
   AddCourseSuccess(this.newCourse);
 }

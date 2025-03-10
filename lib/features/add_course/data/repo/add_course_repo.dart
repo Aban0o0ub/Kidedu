@@ -7,15 +7,16 @@ class AddCourseRepo {
 
   AddCourseRepo(this.webServices);
 
-  Future<CourseModel> addNewCourse(CourseModel newCourse) async {
-    print("Starting addNewCourse...");
-    String? token = await CacheHelper.getData(key: "token");
-    print("Retrieved Token: $token");
+  Future<CourseResponse> addNewCourse(CourseRequest newCourse) async {
+  print("Starting addNewCourse...");
+  String? token = await CacheHelper.getData(key: "token");
+  print("Retrieved Token: $token");
 
-    if (token == null) {
-      throw Exception('Token is missing');
-    }
-
-    return await webServices.addNewCourse(newCourse);
+  if (token == null) {
+    throw Exception('Token is missing');
   }
+
+  return await webServices.addNewCourse(newCourse);
+}
+
 }

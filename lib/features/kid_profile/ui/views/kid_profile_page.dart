@@ -4,6 +4,7 @@ import 'package:loginpage/core/injection/injection.dart';
 import 'package:loginpage/features/kid_profile/logic/cubit/kid_profile_cubit.dart';
 import 'package:loginpage/features/kid_profile/ui/views/achievments.dart';
 import 'package:loginpage/features/kid_profile/ui/views/edit_profile.dart';
+import 'package:loginpage/features/kid_profile/ui/views/settings.dart';
 import 'package:loginpage/features/kid_profile/ui/widgets/profile_item.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 
@@ -159,7 +160,13 @@ class _KidProfilePageState extends State<KidProfilePage> {
                     profileitem(
                       image: 'assets/images/settings.jpeg',
                       title: 'Settings',
-                      onTap: () {},
+                      onTap: () {Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SettingsPage()),
+                        ).then((_) {
+                          FocusScope.of(context).unfocus();
+                        });},
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),

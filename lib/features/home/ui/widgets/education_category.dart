@@ -5,11 +5,11 @@ import 'package:loginpage/features/home/logic/cubit/course_category_cubit.dart';
 import 'package:loginpage/features/home/ui/widgets/course_card.dart';
 
 import '../../../../core/injection/injection.dart';
-import '../../../add_course/data/models/add_course.dart';
 
 class EducationCategory extends StatefulWidget {
-  const EducationCategory({super.key});
-  
+  final String category; 
+
+  const EducationCategory({super.key, required this.category});
 
   @override
   State<EducationCategory> createState() => _EducationCategoryState();
@@ -17,29 +17,16 @@ class EducationCategory extends StatefulWidget {
 
 class _EducationCategoryState extends State<EducationCategory> {
   late CourseCategoryCubit courseCategoryCubit;
-  CourseModel? course;
 
   @override
   void initState() {
     super.initState();
     courseCategoryCubit = getIt<CourseCategoryCubit>();
 
-    Future.microtask(() async {
-      try {
-        // استدعاء الميثود وجلب بيانات الكورس
-        course = await courseCategoryCubit.courseDetailsRepo.getCourseByCategory(""); 
-
-        if (course != null && course!.category.isNotEmpty) {
-          courseCategoryCubit.emitGetCourseByCategory(course!.category);
-          setState(() {});
-        }
-      } catch (e) {
-        print("❌ خطأ أثناء جلب البيانات: $e");
-      }
+    Future.microtask(() {
+      courseCategoryCubit.emitGetCourseByCategory(widget.category);
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -71,17 +58,24 @@ class _EducationCategoryState extends State<EducationCategory> {
                   if (state is CourseCategoryLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is GetCourseByCategorySuccess) {
-                    return CourseCard(
-                      //courseImage: state.newCourse.courseImage,
-                      courseName: state.newCourse.courseName,
-                      //instructor: state.newCourse.instructor,
-                      description: state.newCourse.description,
-                      price: state.newCourse.price,
-                      availability: state.newCourse.availability,
+                    return ListView.builder(
+                      itemCount: state.courses.length,
+                      itemBuilder: (context, index) {
+                        final course = state.courses[index];
+                        return CourseCard(
+                          courseImage: course.courseImage,
+                          courseName: course.courseName ?? "Unknown Course",
+                          instructor: course.instructor?['Name'],
+                          description: course.description ?? "",
+                          price: course.price ?? 0,
+                          availability: course.availability ?? "unavailable",
+                        );
+                      },
                     );
                   } else if (state is GetCourseByCategoryFailure) {
                     return Center(
-                      child: Text("Error: ${state.error}", style: const TextStyle(color: Colors.red)),
+                      child: Text("Error: ${state.error}",
+                          style: const TextStyle(color: Colors.red)),
                     );
                   }
                   return const Center(child: Text("No courses available."));
