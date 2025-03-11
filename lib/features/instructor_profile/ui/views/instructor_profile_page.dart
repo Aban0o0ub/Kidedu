@@ -6,6 +6,7 @@ import 'package:loginpage/features/instructor_profile/ui/widgets/profile_body.da
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
 
 import '../../../../core/injection/injection.dart';
+import '../../logic/cubit/my_courses_cubit.dart';
 import '../widgets/profile_header.dart';
 
 class InstructorProfilePage extends StatefulWidget {
@@ -17,17 +18,23 @@ class InstructorProfilePage extends StatefulWidget {
 
 class _InstructorProfilePage extends State<InstructorProfilePage> {
   late InstructorProfileCubit instructorProfileCubit;
+    late MyCoursesCubit myCoursesCubit;
   @override
   void initState() {
     super.initState();
     instructorProfileCubit = getIt<InstructorProfileCubit>();
     instructorProfileCubit.emitGetInstructorProfile();
+
+    myCoursesCubit = getIt<MyCoursesCubit>();
+    myCoursesCubit.emitGetMyCourses();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: instructorProfileCubit,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: instructorProfileCubit),
+        BlocProvider.value(value: myCoursesCubit),],
       child: Scaffold(
         backgroundColor: Colors.white,
         body: Stack(

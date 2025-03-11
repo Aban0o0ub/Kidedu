@@ -5,6 +5,8 @@ import 'package:loginpage/features/instructor_profile/ui/widgets/course_box.dart
 import 'package:loginpage/features/instructor_profile/ui/widgets/info_container.dart';
 import 'package:loginpage/features/instructor_profile/ui/widgets/review_card.dart';
 
+import '../../logic/cubit/my_courses_cubit.dart';
+
 class ProfileBody extends StatefulWidget {
   const ProfileBody({super.key});
 
@@ -82,26 +84,45 @@ class _ProfileBodyState extends State<ProfileBody> {
                       ),
                     ),
                     const SizedBox(height: 7),
-                    SizedBox(
-                      height: 165, // Height of the boxes
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          buildCourseBox(
-                            imagePath: "assets/images/ui.jpeg",
-                            description: "UI basics for beginners",
-                          ),
-                          buildCourseBox(
-                            imagePath: "assets/images/ux.jpeg",
-                            description: "UX basics for beginners",
-                          ),
-                          buildCourseBox(
-                            imagePath: "assets/images/uiux.jpeg",
-                            description: "UI/UX full diploma",
-                          ),
-                        ],
-                      ),
-                    ),
+                   BlocBuilder<MyCoursesCubit, MyCoursesState>(
+  builder: (context, state) {
+    if (state is MyCoursesLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (state is GetMyCoursesFailure) {
+      return Center(child: Text("Error: ${state.error}"));
+    } else if (state is GetMyCoursesSuccess) {
+      final courses = state.courses;
+
+      if (courses.isEmpty) {
+        return const Center(
+          child: Text(
+            "No courses yet",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        );
+      }
+
+      return SizedBox(
+        height: 165,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: courses.length,
+          itemBuilder: (context, index) {
+            return buildCourseBox(
+              imagePath: courses[index].courseImage != null
+                  ? "assets/images/${courses[index].courseImage}"
+                  : "assets/images/CourseDefaultPhoto.jpeg",
+              courseName: courses[index].courseName ?? 'No Course Name',
+            );
+          },
+        ),
+      );
+    } else {
+      return const Center(child: Text("No courses available."));
+    }
+  },
+),
+
                     const SizedBox(height: 30),
                     const Align(
                       alignment: Alignment.centerLeft,

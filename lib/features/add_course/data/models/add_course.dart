@@ -61,8 +61,8 @@ class CourseRequest {
       "description": description,
       "price": price,
       "price_after_discount": priceAfterDiscount,
-       "start_date": startDate?.toIso8601String(), // تحويل إلى String
-    "end_date": endDate?.toIso8601String(),
+      "start_date": startDate?.toIso8601String(), // تحويل إلى String
+      "end_date": endDate?.toIso8601String(),
       "course_image": courseImage,
       "first_section": firstSection,
     };
@@ -72,25 +72,23 @@ class CourseRequest {
 class CourseResponse {
   String? status;
   CourseData? data;
-  List<CourseData>? courses; 
+  List<CourseData>? courses;
 
   CourseResponse({this.status, this.data, this.courses});
 
   factory CourseResponse.fromJson(Map<String, dynamic> json) {
-  return CourseResponse(
-    status: json['status'],
-    data: json['data'] != null && json['data']['new_course'] is Map<String, dynamic>
-        ? CourseData.fromJson(json['data']['new_course'])
-        : null,
-    courses: json['data'] != null && json['data']['new_course'] is List
-        ? List<CourseData>.from(
-            json['data']['new_course'].map((course) => CourseData.fromJson(course)))
-        : [],
-  );
-}
-
-
-
+    return CourseResponse(
+      status: json['status'],
+      data: json['data'] != null &&
+              json['data']['new_course'] is Map<String, dynamic>
+          ? CourseData.fromJson(json['data']['new_course'])
+          : null,
+      courses: json['data'] != null && json['data']['new_course'] is List
+          ? List<CourseData>.from(json['data']['new_course']
+              .map((course) => CourseData.fromJson(course)))
+          : [],
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -106,7 +104,7 @@ class CourseResponse {
 class CourseData {
   String? id;
   String? courseName;
-  Map<String, dynamic>? instructor; 
+  Map<String, dynamic>? instructor;
   List<dynamic>? kids;
   String? level;
   String? availability;
@@ -114,45 +112,45 @@ class CourseData {
   num? price;
   String? category;
   String? description;
- DateTime? startDate;
+  DateTime? startDate;
   DateTime? endDate;
   String? courseImage;
   String? createdAt;
   String? updatedAt;
   int? v;
 
-
-  CourseData({
-    this.id,
-    this.courseName,
-    this.instructor,
-    this.kids,
-    this.level,
-    this.availability,
-    this.offer,
-    this.category,
-    this.description,
-    this.startDate,
-    this.endDate,
-    this.courseImage,
-    this.createdAt,
-    this.updatedAt,
-    this.v,
-    this.price
-  });
+  CourseData(
+      {this.id,
+      this.courseName,
+      this.instructor,
+      this.kids,
+      this.level,
+      this.availability,
+      this.offer,
+      this.category,
+      this.description,
+      this.startDate,
+      this.endDate,
+      this.courseImage,
+      this.createdAt,
+      this.updatedAt,
+      this.v,
+      this.price});
 
   factory CourseData.fromJson(Map<String, dynamic> json) {
     return CourseData(
       id: json['_id'],
       courseName: json['course_name'],
-instructor: json['instructor'] as Map<String, dynamic>?,
+      instructor: json['instructor'] is Map<String, dynamic>
+          ? json['instructor'] as Map<String, dynamic>
+          : null,
       kids: json['kids'] != null ? List<dynamic>.from(json['kids']) : [],
       level: json['level'],
       availability: json['availability'],
       offer: json['offer'],
       category: json['category'],
       description: json['description'],
-       startDate: json['start_date'] != null
+      startDate: json['start_date'] != null
           ? DateTime.parse(json['start_date'])
           : null,
       endDate:
@@ -162,7 +160,6 @@ instructor: json['instructor'] as Map<String, dynamic>?,
       updatedAt: json['updatedAt'],
       v: json['__v'],
       price: json['price'],
-
     );
   }
 
@@ -177,14 +174,13 @@ instructor: json['instructor'] as Map<String, dynamic>?,
       'offer': offer,
       'category': category,
       'description': description,
-       "start_date": startDate?.toIso8601String(), // تحويل إلى String
-    "end_date": endDate?.toIso8601String(),
+      "start_date": startDate?.toIso8601String(), // تحويل إلى String
+      "end_date": endDate?.toIso8601String(),
       'course_image': courseImage,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       '__v': v,
       "price": price,
-
     };
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 Widget buildCourseBox(
-    {required String imagePath, required String description}) {
+    {required String imagePath, required String courseName}) {
   return Container(
     width: 148.05, // width of the box
     height: 165, // height of the box
@@ -32,7 +32,7 @@ Widget buildCourseBox(
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            description,
+            courseName,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,

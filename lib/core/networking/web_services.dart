@@ -135,8 +135,6 @@ class WebServices {
     try {
       String? token = CacheHelper.getData(key: "token");
       String? instructorDataJson = CacheHelper.getData(key: "instructor_data");
- print("DEBUG: Token from cache -> $token");
-    print("DEBUG: Instructor data from cache -> $instructorDataJson");
       if (token == null || instructorDataJson == null) {
         throw Exception('Missing token or instructor data');
       }
@@ -144,7 +142,7 @@ class WebServices {
       Map<String, dynamic> instructorMap = jsonDecode(instructorDataJson);
       InstructorData cachedinstructorData =
           InstructorData.fromJson(instructorMap);
-    print("DEBUG: Cached instructor data -> ${cachedinstructorData.toString()}");
+     
       final response = await dio.get(
         'user_instructor/profile',
         options: Options(
@@ -153,12 +151,10 @@ class WebServices {
           },
         ),
       );
-    print("DEBUG: API Response -> ${response.data}");
       final instructorResponse = InstructorResponse.fromJson(response.data);
-    print("DEBUG: Parsed InstructorResponse -> ${instructorResponse.toString()}");
+     
       return instructorResponse.data?.newInstructor ?? cachedinstructorData;
     } catch (e) {
-          print("ERROR: Exception occurred -> ${e.toString()}");
       throw Exception('Error fetching instructor: ${e.toString()}');
     }
   }
@@ -182,30 +178,33 @@ class WebServices {
   // }
 
   Future<CourseResponse> addNewCourse(CourseRequest newCourse) async {
-  try {
-    String? token = CacheHelper.getData(key: "token");
+    try {
+      String? token = CacheHelper.getData(key: "token");
 
-    if (token == null) {
-      throw Exception('Missing token');
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+      final response = await dio.post(
+        'course',
+        data: newCourse.toJson(),
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+        ),
+      );
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData.containsKey('data')) {
+        final courseData = responseData['data']['new_course'];
+        return CourseResponse.fromJson(courseData);
+      }
+
+      throw Exception("Invalid response format: ${response.data}");
+    } catch (e) {
+      throw Exception('Error creating new course: ${e.toString()}');
     }
-
-    final response = await dio.post(
-      'course',
-      data: newCourse.toJson(),
-      options: Options(
-        headers: {
-          'token': 'Bearer $token',
-        },
-      ),
-    );
-
-    return CourseResponse.fromJson(response.data);
-  } catch (e) {
-    throw Exception('Error creating new course: ${e.toString()}');
   }
-}
-
-  
 
   Future<CourseResponse> getCourseById(int courseId, String token) async {
     try {
@@ -222,37 +221,70 @@ class WebServices {
       throw Exception('Error fetching course by ID: ${e.toString()}');
     }
   }
-  
-Future<List<CourseData>> getCourseByCategory(String category) async {
+
+  Future<List<CourseData>> getCourseByCategory(String category) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      final response = await dio.get(
+        'course/category',
+        queryParameters: {'category': category},
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+        ),
+      );
+      if (response.data == null ||
+          response.data["data"] == null ||
+          response.data["data"]["new_course"] == null) {
+        throw Exception("No course data found for this category");
+      }
+      var newCourse = response.data["data"]["new_course"];
+
+      List<CourseData> courses = [];
+
+      if (newCourse is List) {
+        courses =
+            newCourse.map((course) => CourseData.fromJson(course)).toList();
+      } else if (newCourse is Map<String, dynamic>) {
+        courses.add(CourseData.fromJson(newCourse));
+      } else {
+        throw Exception("Unexpected format of course data");
+      }
+
+      return courses;
+    } catch (e) {
+      throw Exception('Error fetching course by category: ${e.toString()}');
+    }
+  }
+
+   Future<List<CourseData>> getAllCoursesByInstructor() async {
   try {
     String? token = CacheHelper.getData(key: "token");
+
     final response = await dio.get(
-      'course/category',
-      queryParameters: {'category': category}, 
+      'course/getCoursesForInstructor',
       options: Options(
         headers: {
           'token': 'Bearer $token',
         },
+        validateStatus: (status) {
+          return status! < 500; 
+        },
       ),
     );
-    if (response.data == null || response.data["data"] == null || response.data["data"]["new_course"] == null) {
-      throw Exception("No course data found for this category");
-    }
-    var newCourse = response.data["data"]["new_course"];
 
-    List<CourseData> courses = [];
-
-    if (newCourse is List) {
-      courses = newCourse.map((course) => CourseData.fromJson(course)).toList();
-    } else if (newCourse is Map<String, dynamic>) {
-      courses.add(CourseData.fromJson(newCourse));
+    if (response.statusCode == 200) {
+      return (response.data as List)
+          .map((course) => CourseData.fromJson(course))
+          .toList();
+    } else if (response.statusCode == 404) {
+      return []; 
     } else {
-      throw Exception("Unexpected format of course data");
+      throw Exception("Unexpected error: ${response.statusMessage}");
     }
-
-    return courses;
   } catch (e) {
-    throw Exception('Error fetching course by category: ${e.toString()}');
+    throw Exception("Error fetching courses: ${e.toString()}");
   }
 }
 

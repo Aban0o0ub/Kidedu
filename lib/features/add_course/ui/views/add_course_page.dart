@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/core/injection/injection.dart';
-import 'package:loginpage/features/course_details/ui/views/course_details.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_dropdown.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
@@ -199,61 +198,41 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         ),
                       ),
                       const SizedBox(height: 25),
-                      BlocListener<AddCourseCubit, AddCourseState>(
-                        listener: (context, state) {
-                          if (state is AddCourseLoading) {
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (context) => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          } else if (state is AddCourseSuccess) {
-                            Navigator.pop(context);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CourseDetails()),
-                            );
-                          } else if (state is AddCourseFailure) {
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(state.error)),
-                            );
-                          }
-                        },
-                        child: Align(
-  alignment: Alignment.center,
-  child: CustomButton(
-    onPressed: () {
-      final price = num.tryParse(pricecontroller.text) ?? 0;
-      final startDate = DateTime.tryParse(startcontroller.text);
-      final endDate = DateTime.tryParse(endcontroller.text);
+                     BlocListener<AddCourseCubit, AddCourseState>(
+  listener: (context, state) {
+    print("Current state: $state");
+  },
+  child: Align(
+    alignment: Alignment.center,
+    child: CustomButton(
+      onPressed: () {
+        final price = num.tryParse(pricecontroller.text) ?? 0;
+        final startDate = DateTime.tryParse(startcontroller.text);
+        final endDate = DateTime.tryParse(endcontroller.text);
 
-      context.read<AddCourseCubit>().emitAddCourse(
-        CourseRequest(
-          courseName: addcourseController.text,
-          level: levelcontroller.text,
-          availability: availabilitycontroller.text,
-          category: categorycontroller.text,
-          description: descriptioncontroller.text,
-          price: price,
-          offer: offercontroller.text,
-          firstSection: sectioncontroller.text,
-          startDate: startDate,  // ✅ تحويل إلى DateTime
-          endDate: endDate,      // ✅ تحويل إلى DateTime
-        ),
-      );
-    
+        context.read<AddCourseCubit>().emitAddCourse(
+              context, // ✅ تمرير `context` إلى `emitAddCourse`
+              CourseRequest(
+                courseName: addcourseController.text,
+                level: levelcontroller.text,
+                availability: availabilitycontroller.text,
+                category: categorycontroller.text,
+                description: descriptioncontroller.text,
+                price: price,
+                offer: offercontroller.text,
+                firstSection: sectioncontroller.text,
+                startDate: startDate,
+                endDate: endDate,
+              ),
+            );
+      },
+      text: "Save",
+      width: 320,
+    ),
+  ),
+),
 
 
-                            },
-                            text: "Add a new course",
-                            width: 320,
-                          ),
-                        ),
-                      ),
                       const SizedBox(height: 25),
                     ],
                   ),

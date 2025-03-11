@@ -16,29 +16,34 @@ import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
 
 import '../../features/home/data/Repo/course_category_repo.dart';
 import '../../features/home/logic/cubit/course_category_cubit.dart';
+import '../../features/instructor_profile/logic/cubit/my_courses_cubit.dart';
 
 final getIt = GetIt.instance;
 
 void initGetIt() {
-  getIt.registerFactory<MyCubit>(() => MyCubit(getIt()));
-  getIt.registerFactory<MyRepo>(() => MyRepo(getIt()));
-  getIt.registerFactory<LoginCubit>(() => LoginCubit(getIt()));
-  getIt.registerFactory<LoginRepo>(() => LoginRepo(getIt()));
-  getIt.registerFactory<KidProfileCubit>(
-      () => KidProfileCubit(getIt<KidProfileRepo>()));
-  getIt.registerFactory<KidProfileRepo>(() => KidProfileRepo(getIt()));
-  getIt.registerFactory<InstructorProfileCubit>(
-      () => InstructorProfileCubit(getIt<InstructorProfileRepo>()));
-  getIt.registerFactory<InstructorProfileRepo>(
-      () => InstructorProfileRepo(getIt()));
-  getIt.registerFactory<AddCourseCubit>(() => AddCourseCubit(getIt()));
-  getIt.registerFactory<AddCourseRepo>(() => AddCourseRepo(getIt()));
-  getIt.registerFactory<CourseDetailsCubit>(() => CourseDetailsCubit(getIt()));
-  getIt.registerFactory<CourseDetailsRepo>(() => CourseDetailsRepo(getIt()));
-  getIt.registerFactory<CourseCategoryCubit>(() => CourseCategoryCubit(getIt()));
-  getIt.registerFactory<CourseCategoryRepo>(() => CourseCategoryRepo(getIt()));
-  getIt.registerFactory<WebServices>(() => WebServices(createAndSetupDio()));
+  //WebServices
+  getIt.registerLazySingleton<WebServices>(() => WebServices(createAndSetupDio()));
+
+  // Repositories
+  getIt.registerLazySingleton<MyRepo>(() => MyRepo(getIt<WebServices>()));
+  getIt.registerLazySingleton<LoginRepo>(() => LoginRepo(getIt<WebServices>()));
+  getIt.registerLazySingleton<KidProfileRepo>(() => KidProfileRepo(getIt<WebServices>()));
+  getIt.registerLazySingleton<InstructorProfileRepo>(() => InstructorProfileRepo(getIt<WebServices>()));
+  getIt.registerLazySingleton<AddCourseRepo>(() => AddCourseRepo(getIt<WebServices>()));
+  getIt.registerLazySingleton<CourseDetailsRepo>(() => CourseDetailsRepo(getIt<WebServices>()));
+  getIt.registerLazySingleton<CourseCategoryRepo>(() => CourseCategoryRepo(getIt<WebServices>()));
+
+  //Cubits
+  getIt.registerFactory<MyCubit>(() => MyCubit(getIt<MyRepo>()));
+  getIt.registerFactory<LoginCubit>(() => LoginCubit(getIt<LoginRepo>()));
+  getIt.registerFactory<KidProfileCubit>(() => KidProfileCubit(getIt<KidProfileRepo>()));
+  getIt.registerFactory<InstructorProfileCubit>(() => InstructorProfileCubit(getIt<InstructorProfileRepo>()));
+  getIt.registerFactory<AddCourseCubit>(() => AddCourseCubit(getIt<AddCourseRepo>()));
+  getIt.registerFactory<CourseDetailsCubit>(() => CourseDetailsCubit(getIt<CourseDetailsRepo>()));
+  getIt.registerFactory<CourseCategoryCubit>(() => CourseCategoryCubit(getIt<CourseCategoryRepo>()));
+  getIt.registerFactory<MyCoursesCubit>(() => MyCoursesCubit(getIt<InstructorProfileRepo>()));
 }
+
 
 Dio createAndSetupDio() {
   Dio dio = Dio();
