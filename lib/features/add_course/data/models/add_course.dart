@@ -61,7 +61,7 @@ class CourseRequest {
       "description": description,
       "price": price,
       "price_after_discount": priceAfterDiscount,
-      "start_date": startDate?.toIso8601String(), // تحويل إلى String
+      "start_date": startDate?.toIso8601String(),
       "end_date": endDate?.toIso8601String(),
       "course_image": courseImage,
       "first_section": firstSection,
@@ -104,6 +104,7 @@ class CourseResponse {
 class CourseData {
   String? id;
   String? courseName;
+  String? courseId;
   Map<String, dynamic>? instructor;
   List<dynamic>? kids;
   String? level;
@@ -122,6 +123,7 @@ class CourseData {
   CourseData(
       {this.id,
       this.courseName,
+      this.courseId,
       this.instructor,
       this.kids,
       this.level,
@@ -141,6 +143,7 @@ class CourseData {
     return CourseData(
       id: json['_id'],
       courseName: json['course_name'],
+      courseId: json['course_id'],
       instructor: json['instructor'] is Map<String, dynamic>
           ? json['instructor'] as Map<String, dynamic>
           : null,
@@ -167,6 +170,7 @@ class CourseData {
     return {
       '_id': id,
       'course_name': courseName,
+      'course_id': courseId,
       'instructor': instructor,
       'kids': kids,
       'level': level,
@@ -174,7 +178,7 @@ class CourseData {
       'offer': offer,
       'category': category,
       'description': description,
-      "start_date": startDate?.toIso8601String(), // تحويل إلى String
+      "start_date": startDate?.toIso8601String(),
       "end_date": endDate?.toIso8601String(),
       'course_image': courseImage,
       'createdAt': createdAt,

@@ -5,6 +5,8 @@ import 'package:loginpage/features/add_course/data/models/add_course.dart';
 import 'package:loginpage/features/login/data/models/user.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 
+import '../../features/cart/data/model/cart_model.dart';
+
 class WebServices {
   final Dio dio;
 
@@ -287,6 +289,37 @@ class WebServices {
     throw Exception("Error fetching courses: ${e.toString()}");
   }
 }
+
+Future<CartModel> addCart(Map<String, dynamic> cartData) async {
+  try {
+    String? token = CacheHelper.getData(key: "token");
+
+    if (token == null) {
+      throw Exception('Missing token');
+    }
+
+    final response = await dio.post(
+      'cart/add', 
+      data: cartData, 
+      options: Options(
+        headers: {
+          'token': 'Bearer $token',
+        },
+      ),
+    );
+
+    final responseData = response.data;
+    if (responseData is Map<String, dynamic> &&
+        responseData.containsKey('cart')) {
+      return CartModel.fromJson(responseData['cart']); 
+    }
+
+    throw Exception("Invalid response format: ${response.data}");
+  } catch (e) {
+    throw Exception('Error adding course to cart: ${e.toString()}');
+  }
+}
+
 
 
 
