@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/injection/injection.dart';
+import '../../../../core/regex/app_regex.dart';
 import '../../../../core/widgets/arrow_back.dart';
 import '../../logic/cubit/my_cubit.dart';
 import '../widgets/kid_auth_body.dart';
@@ -31,19 +32,71 @@ class _AuthKidState extends State<AuthKid> {
     });
   }
 
+String? validateName(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Name is required';
+  } else if (!AppRegex.isValidName(value)) {
+    return 'Name must start with a capital letter and contain only letters';
+  }
+  return null;
+}
+  String? validateGovernorate(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please select a governorate';
+    }
+    return null;
+  }
+
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your email';
+      return 'Email is required';
+    } else if (!AppRegex.isValidEmail(value)) {
+      return 'Please enter a valid email';
     }
     return null;
   }
 
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your password';
+      return 'Password is required';
+    } else if (!AppRegex.hasLowercase(value)) {
+      return 'Password must contain at least one lowercase letter';
+    } else if (!AppRegex.hasUppercase(value)) {
+      return 'Password must contain at least one uppercase letter';
+    } else if (!AppRegex.hasNumber(value)) {
+      return 'Password must contain at least one number';
+    } else if (!AppRegex.hasSpecialCharacter(value)) {
+      return 'Password must contain at least one special character';
+    } else if (!AppRegex.hasMinLength(value)) {
+      return 'Password must be at least 8 characters long';
     }
     return null;
   }
+
+  String? validatePhoneNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Phone number is required';
+    } else if (!AppRegex.validPhoneNumber(value)) {
+      return 'Enter a valid Egyptian phone number';
+    }
+    return null;
+  }
+
+  String? validateConfirmPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please confirm your password';
+    } else if (value != _passwordController.text) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+ String? validateAge(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Please enter your age';
+  }
+
+  return AppRegex.validAge(value);  
+}
 
   @override
   Widget build(BuildContext context) {

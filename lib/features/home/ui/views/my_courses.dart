@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:go_router/go_router.dart';
+import '../../../../core/routing/routes.dart';
 import '../../../../core/widgets/arrow_back.dart';
-import '../widgets/home.dart';
 import 'home_page.dart';
 
 class MyCourses extends StatefulWidget {
@@ -36,7 +36,6 @@ class EmptyCourses extends StatelessWidget {
         children: [
           SizedBox(height: 25),
           Image.asset("assets/images/emptycourse.jpg", width: 400, height: 400),
-          
           Text(
             "You haven't joined a course yet",
             textAlign: TextAlign.center,
@@ -48,17 +47,11 @@ class EmptyCourses extends StatelessWidget {
           SizedBox(height: 120),
           TextButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Home(
-                    courseTitles: HomePage.courseTitles,
-                    backgroundImages: HomePage.backgroundImages,
-                    iconImages: HomePage.iconImages,
-                  ),
-                ),
-              ).then((_) {
-                FocusScope.of(context).unfocus();
+              FocusScope.of(context).unfocus();
+              context.push(Routes.homePage, extra: {
+                'courseTitles': HomePage.courseTitles,
+                'backgroundImages': HomePage.backgroundImages,
+                'iconImages': HomePage.iconImages,
               });
             },
             child: Text(

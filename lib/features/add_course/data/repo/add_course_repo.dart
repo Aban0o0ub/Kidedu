@@ -1,4 +1,4 @@
-import 'package:loginpage/features/add_course/data/models/add_course.dart';
+import 'package:loginpage/features/add_course/data/models/Course_Model.dart';
 import '../../../../core/helper/cache_helper.dart';
 import '../../../../core/networking/web_services.dart';
 

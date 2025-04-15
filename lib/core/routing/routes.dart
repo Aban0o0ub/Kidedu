@@ -1,0 +1,19 @@
+class Routes {
+  static const welcomePage = '/';
+  static const roleSelectionPage = '/roleSelection';
+  static const authKidPage = '/authKid';
+  static const authInstructorPage = '/authInstructor';
+  static const homePage = '/home';
+  static const instructorProfilePage = '/instructorProfile';
+  static const addCoursePage = '/addCourse';
+  static const loginPage = '/login';
+  static const policyPage = '/policy';
+  static const conditionsPage = '/conditions';
+  static const editProfilePage = '/editProfile';
+  static const achievementPage = '/achievement';
+  static const settingsPage = '/settings';
+  static const courseDetails = '/courseDetails';
+  static const paymentScreen = '/paymentScreen';
+  static const paymentDetailsView = '/paymentDetailsView';
+  static const cartPage = '/cart';
+}

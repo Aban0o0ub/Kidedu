@@ -135,7 +135,7 @@ class _SearchPageState extends State<SearchPage> {
               color: Colors.black26,
               blurRadius: 4,
               spreadRadius: 0,
-              offset: Offset(0, 3), // تقليل الظل قليلًا
+              offset: Offset(0, 3), 
             ),
           ],
         ),

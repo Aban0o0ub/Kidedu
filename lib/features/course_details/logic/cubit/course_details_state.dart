@@ -8,9 +8,8 @@ final class CourseDetailsInitial extends CourseDetailsState {}
 final class CourseDetailsLoading extends CourseDetailsState {}
 
 class GetCourseSuccess extends CourseDetailsState {
-  final CourseResponse newCourse;
-
-  GetCourseSuccess(this.newCourse);
+final CourseData course;
+  GetCourseSuccess(this.course);
 }
 
 class GetCourseFailure extends CourseDetailsState {

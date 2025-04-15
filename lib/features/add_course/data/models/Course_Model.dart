@@ -77,18 +77,22 @@ class CourseResponse {
   CourseResponse({this.status, this.data, this.courses});
 
   factory CourseResponse.fromJson(Map<String, dynamic> json) {
-    return CourseResponse(
-      status: json['status'],
-      data: json['data'] != null &&
-              json['data']['new_course'] is Map<String, dynamic>
-          ? CourseData.fromJson(json['data']['new_course'])
-          : null,
-      courses: json['data'] != null && json['data']['new_course'] is List
-          ? List<CourseData>.from(json['data']['new_course']
-              .map((course) => CourseData.fromJson(course)))
-          : [],
-    );
-  }
+  return CourseResponse(
+    status: json['status'],
+    data: json['data'] != null
+        ? CourseData.fromJson(json['data']['new_course'] ??
+            json['data']['onlyCourse'] ??
+            {})
+        : null,
+    courses: json['data'] != null && json['data']['new_course'] is List
+        ? List<CourseData>.from(json['data']['new_course']
+            .map((course) => CourseData.fromJson(course)))
+        : json['data']?['onlyCourse'] != null
+            ? [CourseData.fromJson(json['data']['onlyCourse'])]
+            : [],
+  );
+}
+
 
   Map<String, dynamic> toJson() {
     return {
@@ -141,12 +145,13 @@ class CourseData {
 
   factory CourseData.fromJson(Map<String, dynamic> json) {
     return CourseData(
-      id: json['_id'],
+      id: json['id'] ?? json['_id'],
       courseName: json['course_name'],
       courseId: json['course_id'],
       instructor: json['instructor'] is Map<String, dynamic>
-          ? json['instructor'] as Map<String, dynamic>
-          : null,
+    ? json['instructor']
+    : {'_id': json['instructor']},
+
       kids: json['kids'] != null ? List<dynamic>.from(json['kids']) : [],
       level: json['level'],
       availability: json['availability'],

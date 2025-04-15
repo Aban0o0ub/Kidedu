@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart'; 
 import '../../data/Repo/ins_profile_repo.dart';
-import '../../../add_course/data/models/add_course.dart';
+import '../../../add_course/data/models/Course_Model.dart';
 part 'my_courses_state.dart';
 
 class MyCoursesCubit extends Cubit<MyCoursesState> {

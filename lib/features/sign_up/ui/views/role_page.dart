@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/routing/routes.dart';
 import '../../../../core/widgets/arrow_back.dart';
 import '../widgets/upper_stickers_photo.dart';
-import 'auth_instructor.dart';
-import 'auth_kid.dart';
+
 
 class RoleSelectionPage extends StatelessWidget {
   const RoleSelectionPage({super.key});
@@ -47,11 +48,7 @@ class RoleSelectionPage extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const AuthKid()),
-                          ).then((_) {
+                          context.push(Routes.authKidPage).then((_) {
                             FocusScope.of(context).unfocus();
                           });
                         },
@@ -95,11 +92,7 @@ class RoleSelectionPage extends StatelessWidget {
                       const SizedBox(height: 15),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const AuthInstructor()),
-                          ).then((_) {
+                          context.push(Routes.authInstructorPage).then((_) {
                             FocusScope.of(context).unfocus();
                           });
                         },

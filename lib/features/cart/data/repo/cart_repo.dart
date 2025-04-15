@@ -6,15 +6,22 @@ class CartRepo {
   final WebServices webServices;
 
   CartRepo(this.webServices);
-Future<CartModel> addCart(CartCourse newCart) async {
-  String? token = await CacheHelper.getData(key: "token");
 
-  if (token == null) {
-    throw Exception('Token is missing');
+  Future<CartModel> addCart(Map<String, dynamic> cartCourse) async {
+    try {
+      String? token = await CacheHelper.getData(key: "token");
+
+      if (token == null) {
+        throw Exception('Token is missing');
+      }
+
+      final addCartRequest = AddCartRequest(courseIds: cartCourse['courseIds']);
+
+      final cartResponse = await webServices.addCart(addCartRequest.toJson());
+
+      return cartResponse;
+    } catch (e) {
+      throw Exception('Error adding course to cart: ${e.toString()}');
+    }
   }
-  
- return await webServices.addCart({'courseId': newCart.courseId});
-}
-
-
 }

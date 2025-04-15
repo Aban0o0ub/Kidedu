@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:loginpage/features/login/ui/views/login_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loginpage/features/onBoarding/ui/circle_border.dart';
+import '../../../core/routing/routes.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -114,12 +115,7 @@ class _WelcomePageState extends State<WelcomePage> {
                           curve: Curves.easeInOut,
                         );
                       } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginPage(),
-                          ),
-                        );
+                        context.push(Routes.roleSelectionPage);
                       }
                     },
                     child: Container(

@@ -5,9 +5,11 @@ import 'package:loginpage/features/home/logic/cubit/course_category_cubit.dart';
 import 'package:loginpage/features/home/ui/widgets/course_card.dart';
 
 import '../../../../core/injection/injection.dart';
+import '../../../../core/widgets/fluttertoast.dart';
+import '../../../cart/logic/cubit/cart_cubit.dart';
 
 class EducationCategory extends StatefulWidget {
-  final String category; 
+  final String category;
 
   const EducationCategory({super.key, required this.category});
 
@@ -53,35 +55,51 @@ class _EducationCategoryState extends State<EducationCategory> {
             ),
             //SizedBox(height: 16),
             Expanded(
-              child: BlocBuilder<CourseCategoryCubit, CourseCategoryState>(
-                builder: (context, state) {
-                  if (state is CourseCategoryLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (state is GetCourseByCategorySuccess) {
-                    return ListView.builder(
-                      itemCount: state.courses.length,
-                      itemBuilder: (context, index) {
-                        final course = state.courses[index];
-                        return CourseCard(
-                          courseImage: course.courseImage,
-                          courseName: course.courseName ?? "Unknown Course",
-                          instructor: course.instructor?['Name'],
-                          description: course.description ?? "",
-                          price: course.price ?? 0,
-                          availability: course.availability ?? "unavailable",
+              child: BlocProvider(
+                create: (context) => getIt<CartCubit>(),
+                child: BlocListener<CartCubit, CartState>(
+                  listener: (context, state) {
+                    if (state is AddCartSuccess) {
+                      showCustomToast(context, "Course added to cart!",
+                          isSuccess: true);
+                    } else if (state is AddCartFailure) {
+                      showCustomToast(context, "Failed to add course!",
+                          isSuccess: false);
+                    }
+                  },
+                  child: BlocBuilder<CourseCategoryCubit, CourseCategoryState>(
+                    builder: (context, state) {
+                      if (state is CourseCategoryLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (state is GetCourseByCategorySuccess) {
+                        return ListView.builder(
+                          itemCount: state.courses.length,
+                          itemBuilder: (context, index) {
+                            final course = state.courses[index];
+                            return CourseCard(
+                              courseImage: course.courseImage,
+                              courseName: course.courseName ?? "Unknown Course",
+                              instructor: course.instructor?['Name'],
+                              description: course.description ?? "",
+                              price: course.price ?? 0,
+                              availability:
+                                  course.availability ?? "unavailable",
+                              id: course.id,
+                            );
+                          },
                         );
-                      },
-                    );
-                  } else if (state is GetCourseByCategoryFailure) {
-                    return Center(
-                      child: Text("Error: ${state.error}",
-                          style: const TextStyle(color: Colors.red)),
-                    );
-                  }
-                  return const Center(child: Text("No courses available."));
-                },
+                      } else if (state is GetCourseByCategoryFailure) {
+                        return Center(
+                          child: Text("Error: ${state.error}",
+                              style: const TextStyle(color: Colors.red)),
+                        );
+                      }
+                      return const Center(child: Text("No courses available."));
+                    },
+                  ),
+                ),
               ),
-            ),
+            ), 
           ],
         ),
       ),

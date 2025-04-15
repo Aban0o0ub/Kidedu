@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart'; // ✅ استيراد @immutable
 import '../../data/Repo/course_category_repo.dart';
-import '../../../add_course/data/models/add_course.dart'; // ✅ استيراد CourseModel
+import '../../../add_course/data/models/Course_Model.dart'; // ✅ استيراد CourseModel
 part 'course_category_state.dart';
 
 class CourseCategoryCubit extends Cubit<CourseCategoryState> {

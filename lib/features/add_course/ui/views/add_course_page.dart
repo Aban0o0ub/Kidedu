@@ -4,7 +4,7 @@ import 'package:loginpage/core/injection/injection.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_dropdown.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
-import '../../data/models/add_course.dart';
+import '../../data/models/Course_Model.dart';
 import '../../logic/cubit/add_course_cubit.dart';
 import '../widgets/header_image.dart';
 
@@ -198,41 +198,42 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         ),
                       ),
                       const SizedBox(height: 25),
-                     BlocListener<AddCourseCubit, AddCourseState>(
-  listener: (context, state) {
-    print("Current state: $state");
-  },
-  child: Align(
-    alignment: Alignment.center,
-    child: CustomButton(
-      onPressed: () {
-        final price = num.tryParse(pricecontroller.text) ?? 0;
-        final startDate = DateTime.tryParse(startcontroller.text);
-        final endDate = DateTime.tryParse(endcontroller.text);
+                      BlocListener<AddCourseCubit, AddCourseState>(
+                        listener: (context, state) {
+                          print("Current state: $state");
+                        },
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: CustomButton(
+                            onPressed: () {
+                              final price =
+                                  num.tryParse(pricecontroller.text) ?? 0;
+                              final startDate =
+                                  DateTime.tryParse(startcontroller.text);
+                              final endDate =
+                                  DateTime.tryParse(endcontroller.text);
 
-        context.read<AddCourseCubit>().emitAddCourse(
-              context, // ✅ تمرير `context` إلى `emitAddCourse`
-              CourseRequest(
-                courseName: addcourseController.text,
-                level: levelcontroller.text,
-                availability: availabilitycontroller.text,
-                category: categorycontroller.text,
-                description: descriptioncontroller.text,
-                price: price,
-                offer: offercontroller.text,
-                firstSection: sectioncontroller.text,
-                startDate: startDate,
-                endDate: endDate,
-              ),
-            );
-      },
-      text: "Save",
-      width: 320,
-    ),
-  ),
-),
-
-
+                              context.read<AddCourseCubit>().emitAddCourse(
+                                    context, // ✅ تمرير `context` إلى `emitAddCourse`
+                                    CourseRequest(
+                                      courseName: addcourseController.text,
+                                      level: levelcontroller.text,
+                                      availability: availabilitycontroller.text,
+                                      category: categorycontroller.text,
+                                      description: descriptioncontroller.text,
+                                      price: price,
+                                      offer: offercontroller.text,
+                                      firstSection: sectioncontroller.text,
+                                      startDate: startDate,
+                                      endDate: endDate,
+                                    ),
+                                  );
+                            },
+                            text: "Save",
+                            width: 320,
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 25),
                     ],
                   ),

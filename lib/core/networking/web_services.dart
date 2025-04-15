@@ -1,11 +1,12 @@
 import 'dart:convert'; // ضروري لتحويل JSON
 import 'package:dio/dio.dart';
 import 'package:loginpage/core/helper/cache_helper.dart';
-import 'package:loginpage/features/add_course/data/models/add_course.dart';
+import 'package:loginpage/features/add_course/data/models/Course_Model.dart';
 import 'package:loginpage/features/login/data/models/user.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 
 import '../../features/cart/data/model/cart_model.dart';
+import '../../features/payment/data/model/payment_model.dart';
 
 class WebServices {
   final Dio dio;
@@ -144,7 +145,7 @@ class WebServices {
       Map<String, dynamic> instructorMap = jsonDecode(instructorDataJson);
       InstructorData cachedinstructorData =
           InstructorData.fromJson(instructorMap);
-     
+
       final response = await dio.get(
         'user_instructor/profile',
         options: Options(
@@ -154,7 +155,7 @@ class WebServices {
         ),
       );
       final instructorResponse = InstructorResponse.fromJson(response.data);
-     
+
       return instructorResponse.data?.newInstructor ?? cachedinstructorData;
     } catch (e) {
       throw Exception('Error fetching instructor: ${e.toString()}');
@@ -182,7 +183,6 @@ class WebServices {
   Future<CourseResponse> addNewCourse(CourseRequest newCourse) async {
     try {
       String? token = CacheHelper.getData(key: "token");
-
       if (token == null) {
         throw Exception('Missing token');
       }
@@ -199,26 +199,43 @@ class WebServices {
       if (responseData is Map<String, dynamic> &&
           responseData.containsKey('data')) {
         final courseData = responseData['data']['new_course'];
+        String courseId = courseData["_id"];
+        List<String> courses =
+            CacheHelper.getData(key: "courseIds")?.cast<String>() ?? [];
+        courses.add(courseId);
+        await CacheHelper.setData(key: "courseIds", value: courses);
+        print("✅ Updated courseIds in cache: $courses");
         return CourseResponse.fromJson(courseData);
       }
-
       throw Exception("Invalid response format: ${response.data}");
     } catch (e) {
       throw Exception('Error creating new course: ${e.toString()}');
     }
   }
 
-  Future<CourseResponse> getCourseById(int courseId, String token) async {
+  Future<CourseData> getCourseById(String id) async {
     try {
+      String? token = await CacheHelper.getData(key: "token");
+      if (id.isEmpty) {
+        throw Exception('Course ID is not available');
+      }
+      if (token == null || token.isEmpty) {
+        throw Exception('Token is not available');
+      }
       final response = await dio.get(
-        'course/$courseId',
+        'course/$id',
         options: Options(
           headers: {
             'token': 'Bearer $token',
           },
         ),
       );
-      return CourseResponse.fromJson(response.data);
+      CourseResponse courseResponse = CourseResponse.fromJson(response.data);
+      if (courseResponse.data != null) {
+        return courseResponse.data!;
+      } else {
+        throw Exception("Course data not found in response.");
+      }
     } catch (e) {
       throw Exception('Error fetching course by ID: ${e.toString()}');
     }
@@ -260,67 +277,126 @@ class WebServices {
     }
   }
 
-   Future<List<CourseData>> getAllCoursesByInstructor() async {
-  try {
-    String? token = CacheHelper.getData(key: "token");
+  Future<List<CourseData>> getAllCoursesByInstructor() async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
 
-    final response = await dio.get(
-      'course/getCoursesForInstructor',
-      options: Options(
-        headers: {
-          'token': 'Bearer $token',
-        },
-        validateStatus: (status) {
-          return status! < 500; 
-        },
-      ),
-    );
+      final response = await dio.get(
+        'course/getCoursesForInstructor',
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+          validateStatus: (status) {
+            return status! < 500;
+          },
+        ),
+      );
 
-    if (response.statusCode == 200) {
-      return (response.data as List)
-          .map((course) => CourseData.fromJson(course))
-          .toList();
-    } else if (response.statusCode == 404) {
-      return []; 
-    } else {
-      throw Exception("Unexpected error: ${response.statusMessage}");
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((course) => CourseData.fromJson(course))
+            .toList();
+      } else if (response.statusCode == 404) {
+        return [];
+      } else {
+        throw Exception("Unexpected error: ${response.statusMessage}");
+      }
+    } catch (e) {
+      throw Exception("Error fetching courses: ${e.toString()}");
     }
-  } catch (e) {
-    throw Exception("Error fetching courses: ${e.toString()}");
   }
-}
 
-Future<CartModel> addCart(Map<String, dynamic> cartData) async {
-  try {
-    String? token = CacheHelper.getData(key: "token");
+  Future<CartModel> addCart(Map<String, dynamic> cartCourseData) async {
+    try {
+      String? token = await CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
 
-    if (token == null) {
-      throw Exception('Missing token');
+      final addCartRequest =
+          AddCartRequest(courseIds: cartCourseData['courseIds']);
+
+      final response = await dio.post(
+        'cart/add',
+        data: addCartRequest.toJson(),
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+        ),
+      );
+
+      final responseData = response.data;
+
+      if (responseData is Map<String, dynamic> &&
+          responseData.containsKey('cart')) {
+        final addCartResponse = AddCartResponse.fromJson(responseData);
+        return addCartResponse.cart;
+      }
+
+      throw Exception("Invalid response format: ${response.data}");
+    } catch (e) {
+      throw Exception('Error adding course to cart: ${e.toString()}');
     }
-
-    final response = await dio.post(
-      'cart/add', 
-      data: cartData, 
-      options: Options(
-        headers: {
-          'token': 'Bearer $token',
-        },
-      ),
-    );
-
-    final responseData = response.data;
-    if (responseData is Map<String, dynamic> &&
-        responseData.containsKey('cart')) {
-      return CartModel.fromJson(responseData['cart']); 
-    }
-
-    throw Exception("Invalid response format: ${response.data}");
-  } catch (e) {
-    throw Exception('Error adding course to cart: ${e.toString()}');
   }
-}
 
 
 
+  Future<CartModel> getCart() async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
 
+      final response = await dio.get(
+        'cart/',
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+        ),
+      );
+
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData.containsKey('results')) {
+        return CartModel.fromJson(responseData['results']);
+      }
+
+      throw Exception("Invalid response format: ${response.data}");
+    } catch (e) {
+      throw Exception('Error fetching cart data: ${e.toString()}');
+    }
+  }
+
+  Future<PaymentResponse> processPayment(PaymentRequest paymentRequest) async {
+    try {
+      String? token = await CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+
+      final response = await dio.post(
+        'payment/process',
+        data: paymentRequest.toJson(),
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        PaymentResponse paymentResponse =
+            PaymentResponse.fromJson(response.data);
+        return paymentResponse;
+      } else {
+        throw Exception('Failed to process payment');
+      }
+    } catch (e) {
+      throw Exception('Error processing payment: ${e.toString()}');
+    }
+  }
 }

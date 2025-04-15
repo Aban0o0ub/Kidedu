@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:loginpage/features/instructor_profile/ui/views/instructor_profile_page.dart';
-import 'package:loginpage/features/login/ui/views/login_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/auth_prompt.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
@@ -11,7 +10,7 @@ import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/header_title.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/icon_button.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/or_divider.dart';
-
+import '../../../../core/routing/routes.dart';
 import '../../data/models/kid.dart';
 
 class InstructorAuthBody extends StatelessWidget {
@@ -139,11 +138,7 @@ class InstructorAuthBody extends StatelessWidget {
               BlocListener<MyCubit, MyState>(
                 listener: (context, state) {
                   if (state is CreateNewInstructorSuccess) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const InstructorProfilePage()),
-                    );
+                    context.push(Routes.instructorProfilePage);
                   } else if (state is MyFailure) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(state.error)),
@@ -199,10 +194,7 @@ class InstructorAuthBody extends StatelessWidget {
                 questionText: "Have an account?",
                 actionText: "Login",
                 onActionPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                  ).then(
+                  context.push(Routes.loginPage).then(
                     (_) {
                       FocusScope.of(context).unfocus();
                     },

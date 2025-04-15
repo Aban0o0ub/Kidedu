@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loginpage/core/helper/cache_helper.dart';
-import 'package:loginpage/features/onBoarding/ui/welcome_page.dart';
 import 'package:provider/provider.dart';
 import 'core/injection/injection.dart';
+import 'core/routing/app_router.dart';
 import 'features/add_course/logic/cubit/add_course_cubit.dart';
 
 void main() async {
@@ -34,13 +34,14 @@ class KidEdu extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
+        return MaterialApp.router(
           theme: ThemeData(
             fontFamily: 'Alegreya',
           ),
           debugShowCheckedModeBanner: false,
-          home: WelcomePage(),
+          routerConfig: router,
         );
+       
       },
     );
   }

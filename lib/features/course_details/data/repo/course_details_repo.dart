@@ -1,13 +1,22 @@
 import '../../../../core/networking/web_services.dart';
-import '../../../add_course/data/models/add_course.dart';
+import '../../../add_course/data/models/Course_Model.dart';
 
 class CourseDetailsRepo {
   final WebServices webServices;
 
   CourseDetailsRepo(this.webServices);
 
-  Future<CourseResponse> getCourseById(int courseId) async {
-    return await webServices.getCourseById(
-        courseId, 'Bearer THIS-IS-THE-SECRET-KEY(AMOORE)');
+  Future<CourseData> getCourseById(String id) async {
+    try {
+      if (id.isEmpty) {
+        throw Exception('Course ID cannot be empty');
+      }
+
+      final courseData = await webServices.getCourseById(id);
+      return courseData;
+    } catch (e) {
+      throw Exception(
+          "Error fetching course details for ID: $id. ${e.toString()}");
+    }
   }
 }

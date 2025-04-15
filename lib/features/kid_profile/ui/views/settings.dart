@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/routing/routes.dart';
 import '../../../../core/widgets/appbar.dart';
-import '../../../../core/widgets/privacy_policy.dart';
-import '../../../../core/widgets/terms_conditions.dart';
 import '../widgets/logout_delete.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -33,7 +33,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 value: isDarkMode,
                 onChanged: (value) {
                   setState(() {
-                    isDarkMode = value; // 🔹 مجرد تغيير في الحالة المحلية فقط
+                    isDarkMode = value;
                   });
                 },
               ),
@@ -61,21 +61,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 "Privacy Policy",
                 showArrow: false,
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PolicyPage()),
-                  );
+                  context.push(Routes.policyPage);
                 },
               ),
               _buildDivider(),
-              _buildListTile(Icons.description, "Terms And Conditions",
-                  showArrow: false,
-                  onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ConditionsPage()),
-                  );
-                },),
+              _buildListTile(
+                Icons.description,
+                "Terms And Conditions",
+                showArrow: false,
+                onTap: () {
+                  context.push(Routes.conditionsPage);
+                },
+              ),
               const SizedBox(height: 20),
               _buildDivider(),
               const Padding(
@@ -131,7 +128,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 height: 12,
               ),
               Row(
-                //mainAxisAlignment:MainAxisAlignment.center, // توزيع متساوٍ بين العناصر
+                //mainAxisAlignment:MainAxisAlignment.center,
                 children: [
                   Expanded(
                     child: SimpleSettingsTile(
@@ -194,7 +191,7 @@ Widget _buildListTile(
   String text, {
   String? trailingText,
   bool showArrow = true,
-  VoidCallback? onTap, // ✅ تمرير onTap كمعامل
+  VoidCallback? onTap, 
 }) {
   return ListTile(
     leading: Icon(icon, color: Color(0xFF02457A)),
@@ -205,6 +202,6 @@ Widget _buildListTile(
     trailing: trailingText != null
         ? Text(trailingText, style: const TextStyle(color: Colors.grey))
         : (showArrow ? const Icon(Icons.arrow_forward_ios, size: 16) : null),
-    onTap: onTap, // ✅ جعل العنصر قابلًا للنقر
+    onTap: onTap, 
   );
 }

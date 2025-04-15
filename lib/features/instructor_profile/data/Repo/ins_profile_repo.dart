@@ -2,7 +2,7 @@ import 'package:loginpage/core/networking/web_services.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 
 import '../../../../core/helper/cache_helper.dart';
-import '../../../add_course/data/models/add_course.dart';
+import '../../../add_course/data/models/Course_Model.dart';
 
 class InstructorProfileRepo {
   final WebServices webServices;

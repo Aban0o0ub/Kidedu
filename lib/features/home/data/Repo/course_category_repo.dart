@@ -1,5 +1,5 @@
 import '../../../../../core/networking/web_services.dart';
-import '../../../add_course/data/models/add_course.dart';
+import '../../../add_course/data/models/Course_Model.dart';
 
 class CourseCategoryRepo {
   final WebServices webServices;

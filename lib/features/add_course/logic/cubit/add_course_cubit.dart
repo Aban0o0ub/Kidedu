@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../instructor_profile/ui/views/instructor_profile_page.dart';
-import '../../data/models/add_course.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/routing/routes.dart';
+import '../../data/models/Course_Model.dart';
 import '../../data/repo/add_course_repo.dart';
 part 'add_course_state.dart';
 
@@ -18,10 +19,8 @@ class AddCourseCubit extends Cubit<AddCourseState> {
 
     if (isClosed) return;
     emit(AddCourseSuccess(courseResponse));
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const InstructorProfilePage()),
-    );
+    context.go(Routes.instructorProfilePage);
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text("Course created successfully!"),

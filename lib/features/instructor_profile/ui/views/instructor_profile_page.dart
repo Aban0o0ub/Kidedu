@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:loginpage/features/add_course/ui/views/add_course_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loginpage/features/instructor_profile/logic/cubit/instructor_profile_cubit.dart';
 import 'package:loginpage/features/instructor_profile/ui/widgets/profile_body.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
-
 import '../../../../core/injection/injection.dart';
+import '../../../../core/routing/routes.dart';
 import '../../logic/cubit/my_courses_cubit.dart';
 import '../widgets/profile_header.dart';
 
@@ -18,7 +18,7 @@ class InstructorProfilePage extends StatefulWidget {
 
 class _InstructorProfilePage extends State<InstructorProfilePage> {
   late InstructorProfileCubit instructorProfileCubit;
-    late MyCoursesCubit myCoursesCubit;
+  late MyCoursesCubit myCoursesCubit;
   @override
   void initState() {
     super.initState();
@@ -34,7 +34,8 @@ class _InstructorProfilePage extends State<InstructorProfilePage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: instructorProfileCubit),
-        BlocProvider.value(value: myCoursesCubit),],
+        BlocProvider.value(value: myCoursesCubit),
+      ],
       child: Scaffold(
         backgroundColor: Colors.white,
         body: Stack(
@@ -56,12 +57,7 @@ class _InstructorProfilePage extends State<InstructorProfilePage> {
               child: Center(
                 child: CustomButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AddCoursePage(),
-                      ),
-                    ).then((_) {
+                    context.push(Routes.addCoursePage).then((_) {
                       FocusScope.of(context).unfocus();
                     });
                   },
