@@ -3,6 +3,7 @@ import '../../features/add_course/ui/views/add_course_page.dart';
 import '../../features/cart/ui/views/cart.dart';
 import '../../features/course_details/ui/views/course_details.dart';
 import '../../features/home/ui/views/home_page.dart';
+import '../../features/home/ui/views/my_courses.dart';
 import '../../features/instructor_profile/ui/views/instructor_profile_page.dart';
 import '../../features/kid_profile/ui/views/achievments.dart';
 import '../../features/kid_profile/ui/views/edit_profile.dart';
@@ -87,6 +88,10 @@ final GoRouter router = GoRouter(
     GoRoute(
   path: Routes.cartPage,
   builder: (context, state) => const Cart(), 
+),
+GoRoute(
+  path: Routes.myCourses,
+  builder: (context, state) => const MyCourses(),
 ),
 
   ],

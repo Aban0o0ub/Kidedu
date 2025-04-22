@@ -16,3 +16,15 @@ final class AddCartFailure extends CartState {
   final String error;
   AddCartFailure(this.error);
 }
+
+final class GetCartSuccess extends CartState {
+  final CartModel cart;
+  GetCartSuccess(this.cart);
+}
+
+final class GetCartFailure extends CartState {
+  final String error;
+  GetCartFailure(this.error);
+}
+class CartStatusChanged extends CartState {}
+

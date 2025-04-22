@@ -49,7 +49,8 @@ if (state is PaymentSuccess) {
                    child: CustomButton(
                   text: 'Confirm',
                   onPressed: () {
-                    context.read<PaymentCubit>().emitCreatePaymentMethod(cardNumber);
+                     final cleanedCardNumber = cardNumber.replaceAll(' ', '');
+                    context.read<PaymentCubit>().emitCreatePaymentMethod(cleanedCardNumber);
                   },
                 ),
               ),

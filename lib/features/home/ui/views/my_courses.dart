@@ -5,7 +5,10 @@ import '../../../../core/widgets/arrow_back.dart';
 import 'home_page.dart';
 
 class MyCourses extends StatefulWidget {
+  const MyCourses({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _MyCoursesState createState() => _MyCoursesState();
 }
 

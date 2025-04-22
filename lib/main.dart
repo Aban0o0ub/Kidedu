@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'core/injection/injection.dart';
 import 'core/routing/app_router.dart';
 import 'features/add_course/logic/cubit/add_course_cubit.dart';
+import 'features/cart/logic/cubit/cart_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +19,11 @@ void main() async {
         BlocProvider<AddCourseCubit>(
           create: (context) => getIt<AddCourseCubit>(),
         ),
+        BlocProvider<CartCubit>(
+      create: (_) => getIt<CartCubit>()..emitGetCart(),
+    ),
       ],
+     
       child: const KidEdu(),
     ),
   );

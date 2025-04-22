@@ -341,35 +341,58 @@ class WebServices {
     }
   }
 
+//  Future<CartModel> getCart() async {
+//   try {
+//     String? token = CacheHelper.getData(key: "token");
+//     if (token == null) {
+//       throw Exception('Missing token');
+//     }
 
+//     final response = await dio.get(
+//       'cart/',
+//       options: Options(
+//         headers: {
+//           'token': 'Bearer $token',
+//         },
+//       ),
+//     );
 
-  Future<CartModel> getCart() async {
-    try {
-      String? token = CacheHelper.getData(key: "token");
-      if (token == null) {
-        throw Exception('Missing token');
-      }
+//     final responseData = response.data;
+//         print('📦 Response Data: $responseData');
+//     if (responseData is Map<String, dynamic> &&
+//         responseData.containsKey('cart')) {
+//       return CartModel.fromJson(responseData['cart']);
+//     }
 
-      final response = await dio.get(
-        'cart/',
-        options: Options(
-          headers: {
-            'token': 'Bearer $token',
-          },
-        ),
-      );
+//     throw Exception("Invalid response format: ${response.data}");
+//   } catch (e) {
+//     throw Exception('Error fetching cart data: ${e.toString()}');
+//   }
+// }
+Future<CartModel> getCart() async {
+  try {
+    String? token = CacheHelper.getData(key: "token");
+    if (token == null) throw Exception('Missing token');
 
-      final responseData = response.data;
-      if (responseData is Map<String, dynamic> &&
-          responseData.containsKey('results')) {
-        return CartModel.fromJson(responseData['results']);
-      }
+    final response = await dio.get(
+      'cart/',
+      options: Options(headers: {'token': 'Bearer $token'}),
+    );
+print('FULL RESPONSE: ${response.data}');
+print('RESPONSE TYPE: ${response.data.runtimeType}');
 
-      throw Exception("Invalid response format: ${response.data}");
-    } catch (e) {
-      throw Exception('Error fetching cart data: ${e.toString()}');
-    }
+    final responseData = response.data['cart'];
+
+if (responseData == null) {
+  throw Exception("Received null response data");
+}
+
+return CartModel.fromJson(responseData);
+
+  } catch (e) {
+    throw Exception('Error fetching cart data: ${e.toString()}');
   }
+}
 
   Future<PaymentResponse> processPayment(PaymentRequest paymentRequest) async {
     try {

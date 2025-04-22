@@ -19,11 +19,14 @@ class EducationCategory extends StatefulWidget {
 
 class _EducationCategoryState extends State<EducationCategory> {
   late CourseCategoryCubit courseCategoryCubit;
+  CartCubit? cartCubit;
 
   @override
   void initState() {
     super.initState();
     courseCategoryCubit = getIt<CourseCategoryCubit>();
+        cartCubit = getIt<CartCubit>();
+
 
     Future.microtask(() {
       courseCategoryCubit.emitGetCourseByCategory(widget.category);
@@ -55,8 +58,8 @@ class _EducationCategoryState extends State<EducationCategory> {
             ),
             //SizedBox(height: 16),
             Expanded(
-              child: BlocProvider(
-                create: (context) => getIt<CartCubit>(),
+              child:  BlocProvider(
+                 create: (context) => getIt<CartCubit>(),
                 child: BlocListener<CartCubit, CartState>(
                   listener: (context, state) {
                     if (state is AddCartSuccess) {
@@ -85,6 +88,7 @@ class _EducationCategoryState extends State<EducationCategory> {
                               availability:
                                   course.availability ?? "unavailable",
                               id: course.id,
+                              fromCartPage: false,
                             );
                           },
                         );

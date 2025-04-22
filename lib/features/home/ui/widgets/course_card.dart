@@ -14,6 +14,7 @@ class CourseCard extends StatefulWidget {
   final num price;
   final String availability;
   String? id;
+  final bool fromCartPage;
 
   CourseCard({
     super.key,
@@ -24,6 +25,7 @@ class CourseCard extends StatefulWidget {
     required this.price,
     required this.availability,
     this.id,
+    this.fromCartPage = false,
   });
 
   @override
@@ -89,47 +91,72 @@ class _CourseCardState extends State<CourseCard> {
                 ],
               ),
             ),
-            BlocBuilder<CartCubit, CartState>(
-              builder: (context, state) {
-                final cartCubit = context.read<CartCubit>();
-                final courseId = widget.id ?? '';
-                final isAddedToCart = cartCubit.isCourseAddedToCart(courseId);
+            widget.fromCartPage
+                ? SizedBox(
+                    width: 120,
+                    child: OutlinedButton(
+                      onPressed: () {},
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.red),
+                        backgroundColor: Colors.white,
+                      ),
+                      child: const Text(
+                        "Remove from Cart",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  )
+                : BlocBuilder<CartCubit, CartState>(
+                    buildWhen: (previous, current) =>
+                        current is CartStatusChanged ||
+                        current is CartInitial ||
+                        current is CartLoading,
+                    builder: (context, state) {
+                      final cartCubit = context.read<CartCubit>();
+                      final courseId = widget.id ?? '';
+                      final isAddedToCart =
+                          cartCubit.isCourseAddedToCart(courseId);
 
-                return OutlinedButton(
-                  onPressed: state is CartLoading
-                      ? null
-                      : () {
-                          if (isAddedToCart) {
-                            context.push(Routes.cartPage);
-                          } else {
-                            context.read<CartCubit>().emitAddNewCart(courseId);
-                          }
-                        },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.blue),
-                    backgroundColor: isAddedToCart ? Colors.white : Colors.blue,
-                  ),
-                  child: state is CartLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          isAddedToCart ? "Go to cart" : "Add to cart",
-                          style: TextStyle(
-                            color: isAddedToCart ? Colors.blue : Colors.white,
-                          ),
+                      return OutlinedButton(
+                        onPressed: state is CartLoading
+                            ? null
+                            : () {
+                                if (isAddedToCart) {
+                                  context.push(Routes.cartPage);
+                                } else {
+                                  context
+                                      .read<CartCubit>()
+                                      .emitAddNewCart(courseId);
+                                }
+                              },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.blue),
+                          backgroundColor:
+                              isAddedToCart ? Colors.white : Colors.blue,
                         ),
-                );
-              },
-            ),
+                        child: state is CartLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                isAddedToCart ? "Go to cart" : "Add to cart",
+                                style: TextStyle(
+                                  color: isAddedToCart
+                                      ? Colors.blue
+                                      : Colors.white,
+                                ),
+                              ),
+                      );
+                    },
+                  ),
           ],
         ),
       ),
     );
   }
-} 
+}

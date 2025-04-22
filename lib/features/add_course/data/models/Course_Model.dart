@@ -115,6 +115,7 @@ class CourseData {
   String? availability;
   String? offer;
   num? price;
+  num? priceAfterDiscount;
   String? category;
   String? description;
   DateTime? startDate;
@@ -140,19 +141,21 @@ class CourseData {
       this.courseImage,
       this.createdAt,
       this.updatedAt,
+      this.priceAfterDiscount,
       this.v,
       this.price});
 
   factory CourseData.fromJson(Map<String, dynamic> json) {
     return CourseData(
-      id: json['id'] ?? json['_id'],
+      id: json['_id'] ?? json['id'],
       courseName: json['course_name'],
       courseId: json['course_id'],
       instructor: json['instructor'] is Map<String, dynamic>
     ? json['instructor']
     : {'_id': json['instructor']},
 
-      kids: json['kids'] != null ? List<dynamic>.from(json['kids']) : [],
+      //kids: json['kids'] != null ? List<dynamic>.from(json['kids']) : [],
+      kids: json['kid'] != null ? List<dynamic>.from(json['kid']) : [],
       level: json['level'],
       availability: json['availability'],
       offer: json['offer'],
@@ -168,6 +171,7 @@ class CourseData {
       updatedAt: json['updatedAt'],
       v: json['__v'],
       price: json['price'],
+       priceAfterDiscount: json['price_after_offer'],
     );
   }
 
@@ -190,6 +194,7 @@ class CourseData {
       'updatedAt': updatedAt,
       '__v': v,
       "price": price,
+       "price_after_offer": priceAfterDiscount,
     };
   }
 }

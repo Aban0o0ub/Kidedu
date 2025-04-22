@@ -19,6 +19,8 @@ import '../../features/cart/logic/cubit/cart_cubit.dart';
 import '../../features/home/data/Repo/course_category_repo.dart';
 import '../../features/home/logic/cubit/course_category_cubit.dart';
 import '../../features/instructor_profile/logic/cubit/my_courses_cubit.dart';
+import '../../features/payment/data/repo/payment_repo.dart';
+import '../../features/payment/logic/cubit/payment_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -41,6 +43,8 @@ void initGetIt() {
   getIt.registerLazySingleton<CourseCategoryRepo>(
       () => CourseCategoryRepo(getIt<WebServices>()));
   getIt.registerLazySingleton<CartRepo>(() => CartRepo(getIt<WebServices>()));
+    getIt.registerLazySingleton<PaymentRepo>(() => PaymentRepo(getIt<WebServices>()));
+
 
   //Cubits
   getIt.registerFactory<MyCubit>(() => MyCubit(getIt<MyRepo>()));
@@ -57,7 +61,9 @@ void initGetIt() {
       () => CourseCategoryCubit(getIt<CourseCategoryRepo>()));
   getIt.registerFactory<MyCoursesCubit>(
       () => MyCoursesCubit(getIt<InstructorProfileRepo>()));
-  getIt.registerFactory<CartCubit>(() => CartCubit(getIt<CartRepo>()));
+  getIt.registerLazySingleton<CartCubit>(() => CartCubit(getIt<CartRepo>()));
+    getIt.registerFactory<PaymentCubit>(() => PaymentCubit(getIt<PaymentRepo>()));
+
 }
 
 Dio createAndSetupDio() {
