@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/foundation.dart'; // ✅ استيراد @immutable
+import 'package:flutter/foundation.dart';
 import '../../data/Repo/course_category_repo.dart';
-import '../../../add_course/data/models/Course_Model.dart'; // ✅ استيراد CourseModel
+import '../../../add_course/data/models/Course_Model.dart';
 part 'course_category_state.dart';
 
 class CourseCategoryCubit extends Cubit<CourseCategoryState> {
@@ -19,4 +19,14 @@ class CourseCategoryCubit extends Cubit<CourseCategoryState> {
       emit(GetCourseByCategoryFailure(e.toString()));
     }
   }
+
+   Future<void> emitGetKidCourses() async {
+  emit(GetKidCoursesLoading());
+  try {
+    final List<CourseData> myCourses = await courseDetailsRepo.getKidCourses(); 
+    emit(GetKidCoursesSuccess(myCourses));
+  } catch (e) {
+    emit(GetKidCoursesFailure(e.toString()));
+  }
+}
 }

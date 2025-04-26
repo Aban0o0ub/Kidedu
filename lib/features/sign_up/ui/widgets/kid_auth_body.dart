@@ -243,7 +243,7 @@ class KidAuthBodyState extends State<KidAuthBody> {
                 BlocListener<MyCubit, MyState>(
                   listener: (context, state) {
                     if (state is CreateNewKidSuccess) {
-                      context.push(Routes.homePage);
+                      context.push(Routes.loginPage);
                     } else if (state is MyFailure) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(state.error)),

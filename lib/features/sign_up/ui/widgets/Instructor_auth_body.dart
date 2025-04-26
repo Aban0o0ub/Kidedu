@@ -138,7 +138,7 @@ class InstructorAuthBody extends StatelessWidget {
               BlocListener<MyCubit, MyState>(
                 listener: (context, state) {
                   if (state is CreateNewInstructorSuccess) {
-                    context.push(Routes.instructorProfilePage);
+                    context.push(Routes.loginPage);
                   } else if (state is MyFailure) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(state.error)),

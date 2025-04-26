@@ -15,20 +15,15 @@ class WebServices {
 
   Future<KidResponse> createNewKid(KidData newKid) async {
     try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
       final response = await dio.post(
         'user_kid',
         data: newKid.toJson(),
       );
       KidResponse kid = KidResponse.fromJson(response.data);
-
-      if (kid.data != null) {
-        await CacheHelper.setData(key: "token", value: kid.data!.token);
-
-        if (kid.data!.newKid != null) {
-          String kidJson = jsonEncode(kid.data!.newKid!.toJson());
-          await CacheHelper.setData(key: "kid_data", value: kidJson);
-        }
-      }
 
       return kid;
     } catch (e) {
@@ -39,6 +34,10 @@ class WebServices {
   Future<InstructorResponse> createNewInstructor(
       InstructorData newInstructor) async {
     try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
       final response = await dio.post(
         'user_instructor',
         data: newInstructor.toJson(),
@@ -46,44 +45,44 @@ class WebServices {
       InstructorResponse instructor =
           InstructorResponse.fromJson(response.data);
 
-      if (instructor.data != null) {
-        await CacheHelper.setData(key: "token", value: instructor.data!.token);
-
-        if (instructor.data!.newInstructor != null) {
-          String instructorJson =
-              jsonEncode(instructor.data!.newInstructor!.toJson());
-          await CacheHelper.setData(
-              key: "instructor_data", value: instructorJson);
-        }
-      }
-
       return instructor;
     } catch (e) {
       throw Exception('Error creating new instructor: ${e.toString()}');
     }
   }
 
-  Future<User> loginUserKid(User loginKid) async {
+  Future<LoginResponse> loginUser(User loginUser) async {
     try {
-      final response = await dio.post(
-        'user_kid/login',
-        data: loginKid.toJson(),
-      );
-      return User.fromJson(response.data);
-    } catch (e) {
-      throw Exception('Error logging in as kid: ${e.toString()}');
-    }
-  }
+      print('BaseUrl = ${dio.options.baseUrl}');
 
-  Future<User> loginUserInstructor(User loginInstructor) async {
-    try {
       final response = await dio.post(
-        'user_instructor/login',
-        data: loginInstructor.toJson(),
+        'authentication/login',
+        data: loginUser.toJson(),
       );
-      return User.fromJson(response.data);
+
+      if (response.statusCode == 200 && response.data != null) {
+        LoginResponse loginData = LoginResponse.fromJson(response.data);
+
+        if (loginData.token != null) {
+          await CacheHelper.setData(key: "token", value: loginData.token);
+        }
+
+        if (loginData.role == 'kid' && loginData.kid != null) {
+          String kidJson = jsonEncode(loginData.kid!.toJson());
+          await CacheHelper.setData(key: "kid_data", value: kidJson);
+        } else if (loginData.role == 'instructor' &&
+            loginData.instructor != null) {
+          String instructorJson = jsonEncode(loginData.instructor!.toJson());
+          await CacheHelper.setData(
+              key: "instructor_data", value: instructorJson);
+        }
+
+        return loginData;
+      } else {
+        throw Exception('Failed to login: ${response.statusCode}');
+      }
     } catch (e) {
-      throw Exception('Error logging in as instructor: ${e.toString()}');
+      throw Exception('Error login new user ${e.toString()}');
     }
   }
 
@@ -341,58 +340,27 @@ class WebServices {
     }
   }
 
-//  Future<CartModel> getCart() async {
-//   try {
-//     String? token = CacheHelper.getData(key: "token");
-//     if (token == null) {
-//       throw Exception('Missing token');
-//     }
+  Future<CartModel> getCart() async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) throw Exception('Missing token');
 
-//     final response = await dio.get(
-//       'cart/',
-//       options: Options(
-//         headers: {
-//           'token': 'Bearer $token',
-//         },
-//       ),
-//     );
+      final response = await dio.get(
+        'cart/',
+        options: Options(headers: {'token': 'Bearer $token'}),
+      );
 
-//     final responseData = response.data;
-//         print('📦 Response Data: $responseData');
-//     if (responseData is Map<String, dynamic> &&
-//         responseData.containsKey('cart')) {
-//       return CartModel.fromJson(responseData['cart']);
-//     }
+      final responseData = response.data['cart'];
 
-//     throw Exception("Invalid response format: ${response.data}");
-//   } catch (e) {
-//     throw Exception('Error fetching cart data: ${e.toString()}');
-//   }
-// }
-Future<CartModel> getCart() async {
-  try {
-    String? token = CacheHelper.getData(key: "token");
-    if (token == null) throw Exception('Missing token');
+      if (responseData == null) {
+        throw Exception("Received null response data");
+      }
 
-    final response = await dio.get(
-      'cart/',
-      options: Options(headers: {'token': 'Bearer $token'}),
-    );
-print('FULL RESPONSE: ${response.data}');
-print('RESPONSE TYPE: ${response.data.runtimeType}');
-
-    final responseData = response.data['cart'];
-
-if (responseData == null) {
-  throw Exception("Received null response data");
-}
-
-return CartModel.fromJson(responseData);
-
-  } catch (e) {
-    throw Exception('Error fetching cart data: ${e.toString()}');
+      return CartModel.fromJson(responseData);
+    } catch (e) {
+      throw Exception('Error fetching cart data: ${e.toString()}');
+    }
   }
-}
 
   Future<PaymentResponse> processPayment(PaymentRequest paymentRequest) async {
     try {
@@ -420,6 +388,33 @@ return CartModel.fromJson(responseData);
       }
     } catch (e) {
       throw Exception('Error processing payment: ${e.toString()}');
+    }
+  }
+
+  Future<List<CourseData>> getAllCoursesByKid() async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+
+      final response = await dio.get(
+        'course/myPurchasedCourses',
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        final courses = data['purchasedCourses'] as List;
+        return courses.map((course) => CourseData.fromJson(course)).toList();
+      } else if (response.statusCode == 404) {
+        return [];
+      } else {
+        throw Exception("Unexpected error: ${response.statusMessage}");
+      }
+    } catch (e) {
+      throw Exception("Error fetching courses: ${e.toString()}");
     }
   }
 }

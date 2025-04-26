@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/injection/injection.dart';
 import '../../../../core/regex/app_regex.dart';
-import '../../../sign_up/ui/views/role_page.dart';
+import '../../../../core/routing/routes.dart';
 import '../../../sign_up/ui/widgets/auth_prompt.dart';
 import '../../../sign_up/ui/widgets/custom_button.dart';
 import '../../../sign_up/ui/widgets/custom_text_field.dart';
@@ -92,158 +93,283 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => loginCubit,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).unfocus();
-          },
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const UpperStickersPhoto(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Form(
-                    key: _formKey,
-                    autovalidateMode: isSubmitted
-                        ? AutovalidateMode.onUserInteraction
-                        : AutovalidateMode.disabled,
-                    child: Column(
-                      children: [
-                        const CustomTitle(text: 'Log In'),
-                        CustomTextField(
-                          width: 360,
-                          label: "Email",
-                          icon: Icons.email,
-                          hintText: "Your Email",
-                          controller: _emailController,
-                          validator: validateEmail,
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        const SizedBox(height: 24),
-                        CustomTextField(
-                          width: 360,
-                          label: "Password",
-                          icon: Icons.lock,
-                          hintText: "Password",
-                          isPasswordField: true,
-                          controller: _passwordController,
-                          validator: validatePassword,
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        RememberMeCheckbox(
-                          rememberMe: _rememberMe,
-                          onChanged: (bool? value) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const UpperStickersPhoto(),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Form(
+                  key: _formKey,
+                  autovalidateMode: isSubmitted
+                      ? AutovalidateMode.onUserInteraction
+                      : AutovalidateMode.disabled,
+                  child: Column(
+                    children: [
+                      const CustomTitle(text: 'Log In'),
+                      CustomTextField(
+                        width: 360,
+                        label: "Email",
+                        icon: Icons.email,
+                        hintText: "Your Email",
+                        controller: _emailController,
+                        validator: validateEmail,
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      const SizedBox(height: 24),
+                      CustomTextField(
+                        width: 360,
+                        label: "Password",
+                        icon: Icons.lock,
+                        hintText: "Password",
+                        isPasswordField: true,
+                        controller: _passwordController,
+                        validator: validatePassword,
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      RememberMeCheckbox(
+                        rememberMe: _rememberMe,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            _rememberMe = value ?? false;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      BlocListener<LoginCubit, LoginState>(
+                        listener: (context, state) {
+                          if (state is LoginInstructorSuccess) {
+                            context.read<RoleCubit>().selectRole('instructor');
+                            context.push(Routes.instructorProfilePage);
+                          } else if (state is LoginKidSuccess) {
+                            context.read<RoleCubit>().selectRole('kid');
+                            context.push(Routes.homePage);
+                          } else if (state is LoginFailure) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(state.error)),
+                            );
+                          }
+                        },
+                        child: CustomButton(
+                          onPressed: () async {
                             setState(() {
-                              _rememberMe = value ?? false;
+                              isSubmitted = true;
                             });
-                          },
-                        ),
-                        const SizedBox(height: 24),
-                        BlocListener<LoginCubit, MyState>(
-                          bloc: loginCubit,
-                          listener: (context, state) {
-                            if (state is LoginInstructorSuccess) {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const RoleSelectionPage(),
-                                ),
+                            if (_formKey.currentState!.validate()) {
+                              final email = _emailController.text.trim();
+                              final password = _passwordController.text.trim();
+
+                              final role = context.read<RoleCubit>().state;
+
+                              final user = User(
+                                email: email,
+                                password: password,
+                                role: role,
                               );
-                            } else if (state is LoginKidSuccess) {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const RoleSelectionPage(),
-                                ),
-                              );
-                            } else if (state is MyFailure) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(state.error)),
-                              );
+
+                              context.read<LoginCubit>().emitLoginUser(
+                                    user: user,
+                                  );
                             }
                           },
-                          child: CustomButton(
-                            onPressed: () async {
-                              setState(() {
-                                isSubmitted =
-                                    true; // تفعيل الفاليديشن عند الضغط
-                              });
-                              if (_formKey.currentState!.validate()) {
-                                final email = _emailController.text.trim();
-                                final password =
-                                    _passwordController.text.trim();
-
-                                final user =
-                                    User(email: email, password: password);
-                                String userType = await checkUserType(email);
-
-                                if (userType == 'instructor') {
-                                  context
-                                      .read<LoginCubit>()
-                                      .emitLoginUserInstructor(user);
-                                } else if (userType == 'kid') {
-                                  context
-                                      .read<LoginCubit>()
-                                      .emitLoginUserKid(user);
-                                }
-                              }
-                            },
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      const OrDivider(),
+                      const SizedBox(height: 28),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Iconbutton(
+                            assetPath: 'assets/images/Googleicon.webp',
+                            onPressed: () {},
                           ),
-                        ),
-                        const SizedBox(height: 28),
-                        const OrDivider(),
-                        const SizedBox(height: 28),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Iconbutton(
-                              assetPath: 'assets/images/Googleicon.webp',
-                              onPressed: () {},
-                            ),
-                            const SizedBox(width: 20),
-                            Iconbutton(
-                              assetPath: 'assets/images/facebookicon.png',
-                              onPressed: () {},
-                            ),
-                            const SizedBox(width: 20),
-                            Iconbutton(
-                              assetPath: 'assets/images/appstoreicon.png',
-                              onPressed: () {},
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 28),
-                        AuthPrompt(
-                          questionText: "Don’t have an account?",
-                          actionText: "Sign up",
-                          onActionPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const RoleSelectionPage()),
-                            ).then((_) {
-                              FocusScope.of(context).unfocus();
-                            });
-                          },
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: 20),
+                          Iconbutton(
+                            assetPath: 'assets/images/facebookicon.png',
+                            onPressed: () {},
+                          ),
+                          const SizedBox(width: 20),
+                          Iconbutton(
+                            assetPath: 'assets/images/appstoreicon.png',
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+                      AuthPrompt(
+                        questionText: "Don’t have an account?",
+                        actionText: "Sign up",
+                        onActionPressed: () {
+                          final role = context.read<RoleCubit>().state;
+
+                          if (role == 'kid') {
+                            context.read<RoleCubit>().selectRole('kid');
+                            context.push(Routes.authKidPage);
+                          } else if (role == 'instructor') {
+                            context.read<RoleCubit>().selectRole('instructor');
+                            context.push(Routes.authInstructorPage);
+                          }
+
+                          FocusScope.of(context).unfocus();
+                        },
+                      )
+                    ],
                   ),
-                )
-              ],
-            ),
+                ),
+              )
+            ],
           ),
         ),
       ),
     );
   }
-}
+} 
+
+// import 'package:flutter/material.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:go_router/go_router.dart';
+// import '../../../../core/injection/injection.dart';
+// import '../../../../core/routing/routes.dart';
+// import '../../../sign_up/ui/widgets/auth_prompt.dart';
+// import '../../../sign_up/ui/widgets/or_divider.dart';
+// import '../../../sign_up/ui/widgets/upper_stickers_photo.dart';
+// import '../../data/models/user.dart';
+// import '../../logic/cubit/my_cubit.dart';
+// import '../widgets/login_form.dart';
+// import '../widgets/social_login_buttons.dart';
+
+// class LoginPage extends StatefulWidget {
+//   const LoginPage({super.key});
+
+//   @override
+//   LoginPageState createState() => LoginPageState();
+// }
+
+// class LoginPageState extends State<LoginPage> {
+//   bool _rememberMe = false;
+//   bool isSubmitted = false;
+
+//   final _formKey = GlobalKey<FormState>();
+//   final TextEditingController _emailController = TextEditingController();
+//   final TextEditingController _passwordController = TextEditingController();
+//   LoginCubit loginCubit = getIt<LoginCubit>();
+
+//   @override
+//   void initState() {
+//     super.initState();
+
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       FocusScope.of(context).unfocus();
+//     });
+//   }
+
+//   void showErrorMessage(String message) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(
+//         content: Text(message),
+//         backgroundColor: Colors.red,
+//       ),
+//     );
+//   }
+
+//   @override
+//   void dispose() {
+//     _emailController.dispose();
+//     _passwordController.dispose();
+//     super.dispose();
+//   }
+
+//   Future<String> checkUserType(String email) async {
+//     if (email.contains('instructor')) {
+//       return 'instructor';
+//     } else {
+//       return 'kid';
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       body: GestureDetector(
+//         onTap: () {
+//           FocusScope.of(context).unfocus();
+//         },
+//         child: SingleChildScrollView(
+//           child: Column(
+//             children: [
+//               const UpperStickersPhoto(),
+//               Padding(
+//                 padding: const EdgeInsets.symmetric(horizontal: 16),
+//                 child: LoginForm(
+//                   formKey: _formKey,
+//                   emailController: _emailController,
+//                   passwordController: _passwordController,
+//                   rememberMe: _rememberMe,
+//                   onRememberMeChanged: (value) {
+//                     setState(() {
+//                       _rememberMe = value ?? false;
+//                     });
+//                   },
+//                   onSubmit: () async {
+//                     setState(() {
+//                       isSubmitted = true;
+//                     });
+//                     if (_formKey.currentState!.validate()) {
+//                       final email = _emailController.text.trim();
+//                       final password = _passwordController.text.trim();
+
+//                       final role = context.read<RoleCubit>().state;
+
+//                       final user = User(
+//                         email: email,
+//                         password: password,
+//                         role: role,
+//                       );
+
+//                       context.read<LoginCubit>().emitLoginUser(
+//                         user: user,
+//                       );
+//                     }
+//                   },
+//                 ),
+//               ),
+//               const SizedBox(height: 28),
+//               const OrDivider(),
+//               const SizedBox(height: 28),
+//               SocialLoginButtons(),
+//               const SizedBox(height: 28),
+//               AuthPrompt(
+//                 questionText: "Don’t have an account?",
+//                 actionText: "Sign up",
+//                 onActionPressed: () {
+//                   final role = context.read<RoleCubit>().state;
+
+//                   if (role == 'kid') {
+//                     context.read<RoleCubit>().selectRole('kid');
+//                     context.push(Routes.authKidPage);
+//                   } else if (role == 'instructor') {
+//                     context.read<RoleCubit>().selectRole('instructor');
+//                     context.push(Routes.authInstructorPage);
+//                   }
+
+//                   FocusScope.of(context).unfocus();
+//                 },
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+

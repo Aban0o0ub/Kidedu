@@ -1,26 +1,24 @@
 part of 'my_cubit.dart';
 
 @immutable
-sealed class MyState {}
+sealed class LoginState {}
 
-final class MyInitial extends MyState {}
+final class LoginInitial extends LoginState {}
 
-final class MyLoading extends MyState {}
+final class LoginLoading extends LoginState {}
 
-class LoginKidSuccess extends MyState {
-  final User loginkid;
-
-  LoginKidSuccess(this.loginkid);
+class LoginKidSuccess extends LoginState {
+  final LoginResponse loginResponse;
+  LoginKidSuccess(this.loginResponse);
 }
 
-class LoginInstructorSuccess extends MyState {
-  final User logininstructor;
-
-  LoginInstructorSuccess(this.logininstructor);
+class LoginInstructorSuccess extends LoginState {
+  final LoginResponse loginResponse;
+  LoginInstructorSuccess(this.loginResponse);
 }
 
-class MyFailure extends MyState {
+class LoginFailure extends LoginState {
   final String error;
 
-  MyFailure(this.error);
+  LoginFailure(this.error);
 }

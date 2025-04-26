@@ -70,7 +70,7 @@ Dio createAndSetupDio() {
   Dio dio = Dio();
 
   dio.options = BaseOptions(
-    baseUrl: 'http://192.168.1.4:3000/api/',
+    baseUrl: 'http://192.168.1.5:3000/api/',
     connectTimeout: const Duration(seconds: 30),
     receiveTimeout: const Duration(seconds: 30),
   );

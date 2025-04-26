@@ -17,3 +17,15 @@ final class GetCourseByCategoryFailure extends CourseCategoryState {
   final String error;
   GetCourseByCategoryFailure(this.error);
 }
+
+final class GetKidCoursesLoading extends CourseCategoryState {}
+
+final class GetKidCoursesSuccess extends CourseCategoryState {
+  final List<CourseData> kidCourses;
+  GetKidCoursesSuccess(this.kidCourses);
+}
+
+final class GetKidCoursesFailure extends CourseCategoryState {
+  final String error;
+  GetKidCoursesFailure(this.error);
+}

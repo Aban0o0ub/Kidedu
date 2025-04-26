@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 
 class KidResponse {
   String? status;
-  KidDataWrapper? data; 
+  KidDataWrapper? data;
 
   KidResponse({this.status, this.data});
 
@@ -21,7 +21,7 @@ class KidResponse {
   }
 }
 
-class KidDataWrapper {  
+class KidDataWrapper {
   KidData? newKid;
   String? token;
 
@@ -87,12 +87,12 @@ class KidData {
     data['_id'] = sId;
     data['Name'] = name;
     data['Email'] = email;
-    data['Password'] =password;
+    data['Password'] = password;
     data['Age'] = age;
     data['Gender'] = gender;
     data['Governorate'] = governorate;
-    data['PhoneNumber'] =phoneNumber;
-    data['createdAt'] =createdAt;
+    data['PhoneNumber'] = phoneNumber;
+    data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
     data['__v'] = iV;
     return data;
@@ -111,7 +111,7 @@ class KidData {
     try {
       final response = await dio.post(
         'user_kid',
-        data: newKid.toJson(), 
+        data: newKid.toJson(),
       );
       return KidResponse.fromJson(response.data);
     } catch (e) {
@@ -119,9 +119,6 @@ class KidData {
     }
   }
 }
-
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 class InstructorResponse {
@@ -132,7 +129,9 @@ class InstructorResponse {
 
   InstructorResponse.fromJson(Map<String, dynamic> json) {
     status = json['status'];
-    data = json['data'] != null ? InstructorDataWrapper.fromJson(json['data']) : null;
+    data = json['data'] != null
+        ? InstructorDataWrapper.fromJson(json['data'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -152,8 +151,9 @@ class InstructorDataWrapper {
   InstructorDataWrapper({this.newInstructor, this.token});
 
   InstructorDataWrapper.fromJson(Map<String, dynamic> json) {
-    newInstructor =
-        json['newInstructor'] != null ? InstructorData.fromJson(json['newInstructor']) : null;
+    newInstructor = json['newInstructor'] != null
+        ? InstructorData.fromJson(json['newInstructor'])
+        : null;
     token = json['token'];
   }
 
@@ -166,6 +166,7 @@ class InstructorDataWrapper {
     return data;
   }
 }
+
 class InstructorData {
   String? id;
   String? name;
@@ -198,21 +199,20 @@ class InstructorData {
   });
 
   InstructorData.fromJson(Map<String, dynamic> json) {
-  id = json['_id'];
-  name = json['Name'];
-  email = json['Email'];
-  password = json['Password'];
-  bio = json['Bio'];
-  governorate = json['Governorate'];
-  phoneNumber = json['PhoneNumber'];
-  createdAt = json['createdAt'];
-  updatedAt = json['updatedAt'];
-  v = json['__v'];
-  image = json['Image'];
-  title = json['Title'];
-  experience = json['Experience'];
-}
-
+    id = json['_id'];
+    name = json['Name'];
+    email = json['Email'];
+    password = json['Password'];
+    bio = json['Bio'];
+    governorate = json['Governorate'];
+    phoneNumber = json['PhoneNumber'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
+    v = json['__v'];
+    image = json['Image'];
+    title = json['Title'];
+    experience = json['Experience'];
+  }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
@@ -234,7 +234,8 @@ class InstructorData {
     return data;
   }
 
-  static Future<InstructorResponse> fetchInstructor(Dio dio, String instructorId) async {
+  static Future<InstructorResponse> fetchInstructor(
+      Dio dio, String instructorId) async {
     try {
       final response = await dio.get('user_instructor/$instructorId');
       return InstructorResponse.fromJson(response.data);
@@ -243,7 +244,8 @@ class InstructorData {
     }
   }
 
-  static Future<InstructorResponse> createInstructor(Dio dio, InstructorData newInstructor) async {
+  static Future<InstructorResponse> createInstructor(
+      Dio dio, InstructorData newInstructor) async {
     try {
       final response = await dio.post(
         'user_instructor',
@@ -253,5 +255,53 @@ class InstructorData {
     } catch (e) {
       throw Exception('Error creating new instructor: ${e.toString()}');
     }
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+class LoginResponse {
+  String? token;
+  String? userId;
+  String? role;
+  KidData? kid;
+  InstructorData? instructor;
+
+  LoginResponse({
+    this.token,
+    this.userId,
+    this.role,
+    this.kid,
+    this.instructor,
+  });
+
+  factory LoginResponse.fromJson(Map<String, dynamic> json) {
+    final role = json['role'];
+
+    return LoginResponse(
+      token: json['token'],
+      userId: json['userId'],
+      role: role,
+      kid: role == 'kid' && json['kid'] != null
+          ? KidData.fromJson(json['kid'])
+          : null,
+      instructor: role == 'instructor' && json['instructor'] != null
+          ? InstructorData.fromJson(json['instructor'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{};
+    data['token'] = token;
+    data['userId'] = userId;
+    data['role'] = role;
+
+    if (role == 'kid' && kid != null) {
+      data['kid'] = kid!.toJson();
+    } else if (role == 'instructor' && instructor != null) {
+      data['instructor'] = instructor!.toJson();
+    }
+
+    return data;
   }
 }

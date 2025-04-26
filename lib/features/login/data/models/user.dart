@@ -1,13 +1,15 @@
 class User {
   final String? email;
   final String? password;
+  final String? role; 
 
-  User({this.email, this.password});
+  User({this.email, this.password, this.role}); 
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       email: json['Email'],
       password: json['Password'],
+      role: json['role'], 
     );
   }
 
@@ -15,6 +17,7 @@ class User {
     return {
       'Email': email,
       'Password': password,
+      'role': role, 
     };
   }
 }

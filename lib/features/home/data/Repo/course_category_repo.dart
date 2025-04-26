@@ -13,5 +13,13 @@ Future<List<CourseData>> getCourseByCategory(String category) async {
       throw Exception("Error fetching courses: ${e.toString()}");
     }
   }
+
+  Future<List<CourseData>> getKidCourses() async {
+    try {
+      return await webServices.getAllCoursesByKid();
+    } catch (e) {
+      throw Exception("Error fetching courses: ${e.toString()}");
+    }
+  }
 }
 
