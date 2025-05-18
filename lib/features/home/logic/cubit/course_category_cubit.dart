@@ -29,4 +29,14 @@ class CourseCategoryCubit extends Cubit<CourseCategoryState> {
     emit(GetKidCoursesFailure(e.toString()));
   }
 }
+
+Future<void> emitGetTrendingCourses() async {
+  emit(TrendingCoursesLoading());
+  try {
+    final List<CourseData> trendCourses = await courseDetailsRepo.getKidCourses(); 
+    emit(GetTrendingCourseSuccess(trendCourses));
+  } catch (e) {
+    emit(GetTrendingCourseFailure(e.toString()));
+  }
+}
 }

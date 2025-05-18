@@ -39,17 +39,18 @@ class AdsPart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width, // يضمن أن الـ Slider يأخذ عرض الشاشة بالكامل
+      width: MediaQuery.of(context).size.width,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12), // تحسين الشكل العام
+        borderRadius: BorderRadius.circular(12), 
         child: CarouselSlider(
           options: CarouselOptions(
             autoPlay: true,
             enlargeCenterPage: true,
-            aspectRatio: 16 / 9,
+            //aspectRatio: 20 / 12,
+            aspectRatio: 18 / 9,
             enableInfiniteScroll: false,
-            viewportFraction: 0.9, // تقليل التمدد لمنع تجاوز الحدود
-            clipBehavior: Clip.hardEdge, // يمنع تجاوز الـ RenderFlex
+            viewportFraction: 0.9, 
+            clipBehavior: Clip.hardEdge,
           ),
           items: [const FirstCard(), const SecondCard()],
         ),

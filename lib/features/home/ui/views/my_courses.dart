@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loginpage/core/widgets/appbar.dart';
 import '../../../../core/injection/injection.dart';
 import '../../../../core/routing/routes.dart';
-import '../../../../core/widgets/arrow_back.dart';
 import '../../../add_course/data/models/Course_Model.dart';
 import '../../logic/cubit/course_category_cubit.dart';
+import '../widgets/nav_bar_visibility_controller.dart';
 import 'home_page.dart';
 
 class MyCourses extends StatefulWidget {
@@ -23,6 +24,9 @@ class _MyCoursesState extends State<MyCourses> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NavBarVisibilityController.showNavBar();
+    });
     courseCategoryCubit = getIt<CourseCategoryCubit>();
     courseCategoryCubit.emitGetKidCourses();
   }
@@ -32,9 +36,10 @@ class _MyCoursesState extends State<MyCourses> {
     return BlocProvider.value(
       value: courseCategoryCubit,
       child: Scaffold(
+        appBar: CustomAppBar(title: "My Courses"),
         body: Column(
           children: [
-            ArrowBack(),
+            //ArrowBack(),
             Expanded(
               child: BlocBuilder<CourseCategoryCubit, CourseCategoryState>(
                 builder: (context, state) {
@@ -238,26 +243,26 @@ class KidCourses extends StatelessWidget {
   }
 }
 
-class BottomNavBar extends StatelessWidget {
-  const BottomNavBar({super.key});
+// class BottomNavBar extends StatelessWidget {
+//   const BottomNavBar({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Color(0xFF02457A),
-      selectedItemColor: Color(0xFF02457A),
-      unselectedItemColor: Colors.white,
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
-      currentIndex: 3,
-      items: [
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
-        BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-        BottomNavigationBarItem(icon: Icon(Icons.play_circle_fill), label: ""),
-        BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: ""),
-      ],
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return BottomNavigationBar(
+//       type: BottomNavigationBarType.fixed,
+//       backgroundColor: Color(0xFF02457A),
+//       selectedItemColor: Color(0xFF02457A),
+//       unselectedItemColor: Colors.white,
+//       showSelectedLabels: false,
+//       showUnselectedLabels: false,
+//       currentIndex: 3,
+//       items: [
+//         BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
+//         BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
+//         BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
+//         BottomNavigationBarItem(icon: Icon(Icons.play_circle_fill), label: ""),
+//         BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: ""),
+//       ],
+//     );
+//   }
+// }

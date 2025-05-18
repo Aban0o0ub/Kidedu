@@ -7,23 +7,29 @@ import 'package:loginpage/features/instructor_profile/ui/widgets/course_box.dart
 import 'package:loginpage/features/instructor_profile/ui/widgets/review_card.dart';
 import '../../../../core/injection/injection.dart';
 import '../../../kid_profile/logic/cubit/kid_profile_cubit.dart';
+import '../../../sign_up/data/models/kid.dart';
 import 'arts_category.dart';
 import 'education_category.dart';
 import 'games_category.dart';
+import 'nav_bar_visibility_controller.dart';
 import 'skills_category.dart';
 import 'sports_category.dart';
 
 class Home extends StatefulWidget {
-  Home({
+  const Home({
     super.key,
     required this.courseTitles,
     required this.backgroundImages,
     required this.iconImages,
+    required this.kid,
+     this.onCategorySelected,
   });
 
   final List<String> courseTitles;
   final List<String> backgroundImages;
   final List<String> iconImages;
+  final KidData kid;
+  final Function(String)? onCategorySelected;
 
   @override
   State<Home> createState() => _HomeState();
@@ -38,10 +44,13 @@ class _HomeState extends State<Home> {
     "Games": (category) => GamesCategory(category: category),
     "Arts": (category) => ArtsCategory(category: category),
   };
+
   late KidProfileCubit kidProfileCubit;
+
   @override
   void initState() {
     super.initState();
+    NavBarVisibilityController.showNavBar();
     kidProfileCubit = getIt<KidProfileCubit>();
     kidProfileCubit.emitGetKidProfile();
   }
@@ -148,19 +157,22 @@ class _HomeState extends State<Home> {
                             iconImage: widget.iconImages[index],
                             title: widget.courseTitles[index],
                             onTap: () {
-                              Navigator.push(
-                                context,
+                              NavBarVisibilityController.showNavBar();
+                              Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      categoryPages[widget.courseTitles[index]]!(
-                                          widget.courseTitles[index]),
+                                  builder: (context) => categoryPages[
+                                      widget.courseTitles[index]]!(
+                                    widget.courseTitles[index],
+                                  ),
                                 ),
                               );
                             },
+                            onPressed: () {},
                           );
                         },
                       ),
-                    ),
+                    ), 
+
                     const SizedBox(height: 20),
 
                     // Recent Reviews Section
@@ -206,7 +218,7 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 120),
                   ],
                 ),
               ),

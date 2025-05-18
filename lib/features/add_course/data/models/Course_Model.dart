@@ -80,15 +80,24 @@ class CourseRequest {
 }
 
 class CourseResponse {
+  bool? success;
   String? status;
   CourseData? data;
   List<CourseData>? courses;
+  List<CourseData>? trendingCourses;
 
-  CourseResponse({this.status, this.data, this.courses});
+  CourseResponse({
+    this.status,
+    this.data,
+    this.courses,
+    this.trendingCourses,
+    this.success,
+  });
 
   factory CourseResponse.fromJson(Map<String, dynamic> json) {
     return CourseResponse(
-      status: json['status'],
+      status:
+          json['status'] ?? (json['success'] == true ? 'success' : 'failed'),
       data: json['data'] != null
           ? CourseData.fromJson(
               json['data']['new_course'] ?? json['data']['onlyCourse'] ?? {})
@@ -99,6 +108,11 @@ class CourseResponse {
           : json['data']?['onlyCourse'] != null
               ? [CourseData.fromJson(json['data']['onlyCourse'])]
               : [],
+      trendingCourses:
+          json['trendingCourses'] != null && json['trendingCourses'] is List
+              ? List<CourseData>.from(json['trendingCourses']
+                  .map((course) => CourseData.fromJson(course)))
+              : [],
     );
   }
 
@@ -108,6 +122,9 @@ class CourseResponse {
       'data': data != null ? data!.toJson() : null,
       'courses': courses != null
           ? courses!.map((course) => course.toJson()).toList()
+          : null,
+      'trendingCourses': trendingCourses != null
+          ? trendingCourses!.map((course) => course.toJson()).toList()
           : null,
     };
   }
@@ -132,33 +149,36 @@ class CourseData {
   String? createdAt;
   String? updatedAt;
   int? v;
-  int? ratingQuantity; // جديد
-  List<String>? lessons; // جديد
+  int? ratingQuantity;
+  List<String>? lessons;
   double? progress;
+  String? firstSection;
+  int? numKids;
 
-  CourseData({
-    this.id,
-    this.courseName,
-    this.courseId,
-    this.instructor,
-    this.kids,
-    this.level,
-    this.availability,
-    this.offer,
-    this.category,
-    this.description,
-    this.startDate,
-    this.endDate,
-    this.courseImage,
-    this.createdAt,
-    this.updatedAt,
-    this.priceAfterDiscount,
-    this.v,
-    this.price,
-    this.ratingQuantity, // جديد
-    this.lessons,
-    this.progress, // جديد
-  });
+  CourseData(
+      {this.id,
+      this.courseName,
+      this.courseId,
+      this.instructor,
+      this.kids,
+      this.level,
+      this.availability,
+      this.offer,
+      this.category,
+      this.description,
+      this.startDate,
+      this.endDate,
+      this.courseImage,
+      this.createdAt,
+      this.updatedAt,
+      this.priceAfterDiscount,
+      this.v,
+      this.price,
+      this.ratingQuantity,
+      this.lessons,
+      this.progress,
+      this.firstSection,
+      this.numKids});
 
   factory CourseData.fromJson(Map<String, dynamic> json) {
     return CourseData(
@@ -184,13 +204,14 @@ class CourseData {
       updatedAt: json['updatedAt'],
       v: json['__v'],
       price: json['price'],
-      priceAfterDiscount: json['price_after_offer'],
-      ratingQuantity: json['rating_quantity'], // جديد
+      priceAfterDiscount:
+          json['price_after_offer'] ?? json['price_after_discount'],
+      ratingQuantity: json['rating_quantity'],
       lessons:
           json['lessons'] != null ? List<String>.from(json['lessons']) : [],
-      progress: json['progress'] != null
-          ? json['progress'].toDouble()
-          : 0.0, // إضافة progress // جديد
+      progress: json['progress'] != null ? json['progress'].toDouble() : 0.0,
+      firstSection: json['first_section'],
+      numKids: json['numKids'],
     );
   }
 
@@ -214,9 +235,11 @@ class CourseData {
       '__v': v,
       "price": price,
       "price_after_offer": priceAfterDiscount,
-      'rating_quantity': ratingQuantity, // جديد
-      'lessons': lessons, 
-      'progress': progress,// جديد
+      'rating_quantity': ratingQuantity,
+      'lessons': lessons,
+      'progress': progress,
+      'first_section': firstSection,
+      'numKids': numKids,
     };
   }
 }

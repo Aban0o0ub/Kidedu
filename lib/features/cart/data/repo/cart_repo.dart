@@ -1,6 +1,5 @@
 import '../../../../core/helper/cache_helper.dart';
 import '../../../../core/networking/web_services.dart';
-import '../../../add_course/data/models/Course_Model.dart';
 import '../model/cart_model.dart';
 
 class CartRepo {
@@ -36,19 +35,17 @@ class CartRepo {
     return await webServices.getCart();
   }
 
-  Future<CourseData> addCourseToCartAndFetchDetails(
-      Map<String, dynamic> cartCourse) async {
-    try {
-      await addCart(cartCourse);
+  // Future<RemoveCartResponse> removeFromCart(Map<String, dynamic> cartCourseData) async {
+  //   return await webServices.removeFromCart(cartCourseData);
+  // }
 
-      // ثم استرجع تفاصيل الكورس
-      final courseId = cartCourse['courseIds'][0];
-      final courseDetails = await webServices.getCourseById(courseId);
+  Future<RemoveCartResponse> removeFromCart(Map<String, dynamic> cartCourseData) async {
+    String? token = await CacheHelper.getData(key: "token");
 
-      return courseDetails;
-    } catch (e) {
-      throw Exception(
-          'Error adding course to cart and fetching details: ${e.toString()}');
+    if (token == null) {
+      throw Exception('Token is missing');
     }
+
+    return await webServices.removeFromCart(cartCourseData);
   }
 }

@@ -17,7 +17,7 @@ final class GetCourseByCategoryFailure extends CourseCategoryState {
   final String error;
   GetCourseByCategoryFailure(this.error);
 }
-
+/////////////////////////////////////////////////////////////////////////////
 final class GetKidCoursesLoading extends CourseCategoryState {}
 
 final class GetKidCoursesSuccess extends CourseCategoryState {
@@ -28,4 +28,18 @@ final class GetKidCoursesSuccess extends CourseCategoryState {
 final class GetKidCoursesFailure extends CourseCategoryState {
   final String error;
   GetKidCoursesFailure(this.error);
+}
+//////////////////////////////////////////////////////////////////////////////
+
+final class TrendingCoursesLoading extends CourseCategoryState {}
+
+final class GetTrendingCourseSuccess extends CourseCategoryState {
+  final List<CourseData> courses;
+  GetTrendingCourseSuccess(this.courses);
+}
+
+
+final class GetTrendingCourseFailure extends CourseCategoryState {
+  final String error;
+  GetTrendingCourseFailure(this.error);
 }

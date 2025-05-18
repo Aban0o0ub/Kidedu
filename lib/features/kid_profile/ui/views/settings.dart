@@ -20,7 +20,7 @@ class _SettingsPageState extends State<SettingsPage> {
     //var themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Settings'),
+      appBar:  CustomAppBar(title: 'Settings',onBackPressed: () => Navigator.pop(context),),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16),

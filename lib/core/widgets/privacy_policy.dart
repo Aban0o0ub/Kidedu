@@ -40,7 +40,7 @@ class _PolicyPageState extends State<PolicyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'Privacy Policy',), // استخدام الـ AppBar المخصص
+      appBar: CustomAppBar(title: 'Privacy Policy',onBackPressed: () => Navigator.pop(context),), // استخدام الـ AppBar المخصص
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Markdown(

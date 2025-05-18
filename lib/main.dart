@@ -59,6 +59,13 @@ class KidEdu extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           routerConfig: router,
         );
+        // return MaterialApp(
+        //   theme: ThemeData(
+        //     fontFamily: 'Alegreya',
+        //   ),
+        //   debugShowCheckedModeBanner: false,
+        //   home: const ViewScreen(), 
+        // );
       },
     );
   }

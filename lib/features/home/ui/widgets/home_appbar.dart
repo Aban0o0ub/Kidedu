@@ -3,12 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeAppbar extends StatelessWidget {
   const HomeAppbar({super.key, required this.kidName});
-    final String kidName;
+  final String kidName;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 141.h,
+      height: 110.h,
       padding: EdgeInsets.symmetric(horizontal: 16.w), // تقليل التباعد الجانبي
       decoration: BoxDecoration(
         color: const Color(0XFF02457A),
@@ -17,17 +17,20 @@ class HomeAppbar extends StatelessWidget {
           bottomRight: Radius.circular(25.r),
         ),
       ),
+      
       child: Row(
         children: [
+                   
+
           ClipOval(
             child: Image.asset(
               'assets/images/kidprofile.jpeg',
-              height: 80.h, // تصغير الحجم قليلاً
-              width: 80.w,
-              fit: BoxFit.cover, // ضمان تناسب الصورة داخل الدائرة
+              height: 70.h, 
+              width: 70.w,
+              fit: BoxFit.cover, 
             ),
           ),
-          SizedBox(width: 12.w), // تباعد بين الصورة والنصوص
+          SizedBox(width: 15.w), 
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -56,10 +59,10 @@ class HomeAppbar extends StatelessWidget {
             onTap: () {
               // يمكن إضافة action هنا لفتح صفحة الإشعارات
             },
-            child: Image.asset(
-              "assets/images/notification.jpg",
-              height: 30.h, // تصغير حجم الأيقونة
-              width: 30.w,
+            child: Icon(
+              Icons.notifications,
+              size: 30, // حجم الأيقونة
+              color: const Color.fromARGB(255, 250, 205, 56), // أو أي لون تفضله
             ),
           ),
         ],

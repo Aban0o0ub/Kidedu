@@ -6,7 +6,7 @@ class CategoriesItem extends StatelessWidget {
     required this.backgroundImage,
     required this.iconImage,
     required this.title,
-    required this.onTap,
+    required this.onTap, required Null Function() onPressed,
   });
 
   final String backgroundImage;
@@ -22,25 +22,25 @@ class CategoriesItem extends StatelessWidget {
         height: 110,
         width: 120,
         child: Stack(
-          clipBehavior: Clip.hardEdge, // يمنع تجاوز المحتوى
+          clipBehavior: Clip.hardEdge,
           children: [
             Positioned.fill(
               child: Image.asset(
                 backgroundImage,
-                fit: BoxFit.cover, // يملأ الـ SizedBox بالكامل
+                fit: BoxFit.cover,
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 15.0, left: 5),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start, // محاذاة العناصر لليسار
+                crossAxisAlignment: CrossAxisAlignment.start, 
                 children: [
                   SizedBox(
                     height: 40,
                     width: 40,
                     child: Image.asset(
                       iconImage,
-                      fit: BoxFit.cover, // يجعل الأيقونة تتناسب مع الحجم المحدد
+                      fit: BoxFit.cover,
                     ),
                   ),
                   const Spacer(),
@@ -50,7 +50,7 @@ class CategoriesItem extends StatelessWidget {
                       title,
                       textAlign: TextAlign.end,
                       style: const TextStyle(
-                        fontSize: 18, // تصغير الحجم قليلاً ليكون أكثر توازناً
+                        fontSize: 18, 
                         color: Color(0xFF02457A),
                         fontWeight: FontWeight.bold,
                       ),

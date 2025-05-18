@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:loginpage/features/cart/logic/cubit/cart_cubit.dart';
-
-import '../../../../core/routing/routes.dart';
+import '../views/home_page.dart';
 
 // ignore: must_be_immutable
 class CourseCard extends StatefulWidget {
@@ -38,6 +36,7 @@ class _CourseCardState extends State<CourseCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -95,7 +94,14 @@ class _CourseCardState extends State<CourseCard> {
                 ? SizedBox(
                     width: 120,
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        final courseId = widget.id;
+                        if (courseId != null) {
+                          context.read<CartCubit>().emitRemoveFromCart({
+                            "cartCourseId": widget.id.toString(),
+                          });
+                        }
+                      },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.red),
                         backgroundColor: Colors.white,
@@ -122,7 +128,15 @@ class _CourseCardState extends State<CourseCard> {
                             ? null
                             : () {
                                 if (isAddedToCart) {
-                                  context.push(Routes.cartPage);
+                                  TabControllerHelper
+                                      .selectedIndexNotifier.value = 4;
+
+                                  WidgetsBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    if (Navigator.canPop(context)) {
+                                      Navigator.pop(context);
+                                    }
+                                  });
                                 } else {
                                   context
                                       .read<CartCubit>()

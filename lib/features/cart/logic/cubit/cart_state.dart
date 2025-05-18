@@ -28,3 +28,12 @@ final class GetCartFailure extends CartState {
 }
 class CartStatusChanged extends CartState {}
 
+final class RemoveCartSuccess extends CartState {
+  final CartModel cart;
+  RemoveCartSuccess(this.cart);
+}
+
+final class RemoveCartFailure extends CartState {
+  final String error;
+  RemoveCartFailure(this.error);
+}

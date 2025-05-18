@@ -151,7 +151,7 @@ class LoginPageState extends State<LoginPage> {
                             context.push(Routes.instructorProfilePage);
                           } else if (state is LoginKidSuccess) {
                             context.read<RoleCubit>().selectRole('kid');
-                            context.push(Routes.homePage);
+                            context.pushReplacement(Routes.homePage);
                           } else if (state is LoginFailure) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(state.error)),

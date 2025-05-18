@@ -40,7 +40,7 @@ class _ConditionsPageState extends State<ConditionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'Terms & Conditions',), // استخدام الـ AppBar المخصص
+      appBar: CustomAppBar(title: 'Terms & Conditions',onBackPressed: () => Navigator.pop(context),), // استخدام الـ AppBar المخصص
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Markdown(

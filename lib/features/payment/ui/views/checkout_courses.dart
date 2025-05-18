@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loginpage/core/widgets/arrow_back.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
 import 'package:loginpage/features/cart/logic/cubit/cart_cubit.dart';
+import '../../../../core/routing/routes.dart';
+import '../../../home/ui/widgets/nav_bar_visibility_controller.dart';
 import '../widgets/payment_card.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -17,6 +20,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     super.initState();
+        NavBarVisibilityController.showNavBar();
+
     cartCubit = context.read<CartCubit>();
   }
 
@@ -89,27 +94,26 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 23, vertical: 35),
                     child: CustomButton(
-                        text: "Checkout",
-                        width: 380,
-                        onPressed: () {
-                          // QuickAlert.show(
-                          //   context: context,
-                          //   type: QuickAlertType.success,
-                          //   title: 'Success',
-                          //   text: 'Transaction Completed Successfully!',
-                          //   confirmBtnText: 'My Courses',
-                          //   confirmBtnColor: Colors.green,
-                          //   onConfirmBtnTap: () {
-                          //     Navigator.pop(context);
-                          //      context.go(Routes.myCourses);
-                          //   },
-                          // );
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const PaymentScreen()),
-                          );
-                        }),
+                      text: "Checkout",
+                      width: 380,
+                      onPressed: () {
+                        // QuickAlert.show(
+                        //   context: context,
+                        //   type: QuickAlertType.success,
+                        //   title: 'Success',
+                        //   text: 'Transaction Completed Successfully!',
+                        //   confirmBtnText: 'My Courses',
+                        //   confirmBtnColor: Colors.green,
+                        //   onConfirmBtnTap: () {
+                        //     Navigator.pop(context);
+                        //      context.go(Routes.myCourses);
+                        //   },
+                        // );
+                        NavBarVisibilityController.hideNavBar();
+                        context.push(Routes.paymentDetailsView);
+
+                      },
+                    ),
                   ),
                   const SizedBox(height: 30),
                 ],

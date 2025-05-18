@@ -8,6 +8,7 @@ import '../../features/instructor_profile/ui/views/instructor_profile_page.dart'
 import '../../features/kid_profile/ui/views/achievments.dart';
 import '../../features/kid_profile/ui/views/edit_profile.dart';
 import '../../features/kid_profile/ui/views/settings.dart';
+import '../../features/lesson/ui/views/add_lesson.dart';
 import '../../features/login/ui/views/login_page.dart';
 import '../../features/onBoarding/ui/welcome_page.dart';
 import '../../features/payment/ui/views/checkout_courses.dart';
@@ -86,13 +87,16 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const PaymentDetailsView(),
     ),
     GoRoute(
-  path: Routes.cartPage,
-  builder: (context, state) => const Cart(), 
-),
-GoRoute(
-  path: Routes.myCourses,
-  builder: (context, state) => const MyCourses(),
-),
-
+      path: Routes.cartPage,
+      builder: (context, state) => const Cart(),
+    ),
+    GoRoute(
+      path: Routes.myCourses,
+      builder: (context, state) => const MyCourses(),
+    ),
+    GoRoute(
+      path: Routes.addLessonPage,
+      builder: (context, state) => const AddLessonPage(),
+    ),
   ],
 );

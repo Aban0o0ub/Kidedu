@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../../core/injection/injection.dart';
 import '../../../../core/widgets/appbar.dart';
 import '../../logic/cubit/payment_cubit.dart';
@@ -19,6 +18,7 @@ class _PaymentDetailsViewState extends State<PaymentDetailsView> {
   @override
   void initState() {
     super.initState();
+      //NavBarVisibilityController.hideNavBar();
     paymentCubit = getIt<PaymentCubit>();
   }
 
@@ -31,7 +31,7 @@ class _PaymentDetailsViewState extends State<PaymentDetailsView> {
       child: BlocProvider.value(
         value: paymentCubit,
         child: Scaffold(
-          appBar: CustomAppBar(title: 'Payment'),
+          appBar: CustomAppBar(title: 'Payment',onBackPressed: () => Navigator.pop(context),),
           body: PaymentDetailsViewBody(paymentCubit: paymentCubit),
         ),
       ),

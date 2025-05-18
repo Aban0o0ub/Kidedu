@@ -1,4 +1,3 @@
-
 import '../../../add_course/data/models/Course_Model.dart';
 
 class AddCartRequest {
@@ -96,6 +95,30 @@ class AddCartResponse {
 
   factory AddCartResponse.fromJson(Map<String, dynamic> json) {
     return AddCartResponse(
+      message: json['message'] ?? '',
+      cart: CartModel.fromJson(json['cart']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'cart': cart.toJson(),
+    };
+  }
+}
+
+class RemoveCartResponse {
+  final String message;
+  final CartModel cart;
+
+  RemoveCartResponse({
+    required this.message,
+    required this.cart,
+  });
+
+  factory RemoveCartResponse.fromJson(Map<String, dynamic> json) {
+    return RemoveCartResponse(
       message: json['message'] ?? '',
       cart: CartModel.fromJson(json['cart']),
     );

@@ -53,8 +53,6 @@ class WebServices {
 
   Future<LoginResponse> loginUser(User loginUser) async {
     try {
-      print('BaseUrl = ${dio.options.baseUrl}');
-
       final response = await dio.post(
         'authentication/login',
         data: loginUser.toJson(),
@@ -65,16 +63,16 @@ class WebServices {
 
         if (loginData.token != null) {
           await CacheHelper.setData(key: "token", value: loginData.token);
-        }
 
-        if (loginData.role == 'kid' && loginData.kid != null) {
-          String kidJson = jsonEncode(loginData.kid!.toJson());
-          await CacheHelper.setData(key: "kid_data", value: kidJson);
-        } else if (loginData.role == 'instructor' &&
-            loginData.instructor != null) {
-          String instructorJson = jsonEncode(loginData.instructor!.toJson());
-          await CacheHelper.setData(
-              key: "instructor_data", value: instructorJson);
+          if (response.data['role'] == 'kid') {
+            String kidJson = jsonEncode(response.data['kid']);
+            await CacheHelper.setData(key: "user_data", value: kidJson);
+            await CacheHelper.setData(key: "role", value: 'kid');
+          } else if (response.data['role'] == 'instructor') {
+            String instructorJson = jsonEncode(response.data['instructor']);
+            await CacheHelper.setData(key: "user_data", value: instructorJson);
+            await CacheHelper.setData(key: "role", value: 'instructor');
+          }
         }
 
         return loginData;
@@ -89,27 +87,21 @@ class WebServices {
   Future<KidData> getKidByToken() async {
     try {
       String? token = CacheHelper.getData(key: "token");
-      String? kidDataJson = CacheHelper.getData(key: "kid_data");
+      String? userJson = CacheHelper.getData(key: "user_data");
+      String? role = CacheHelper.getData(key: "role");
 
-      if (token == null || kidDataJson == null) {
-        throw Exception('Missing token or kid data');
+      if (token == null || userJson == null || role == null) {
+        throw Exception('Missing token, user data or role');
       }
 
-      Map<String, dynamic> kidMap = jsonDecode(kidDataJson);
-      KidData cachedKidData = KidData.fromJson(kidMap);
+      Map<String, dynamic> userMap = jsonDecode(userJson);
 
-      final response = await dio.get(
-        'user_kid/profile',
-        options: Options(
-          headers: {
-            'token': 'Bearer $token',
-          },
-        ),
-      );
+      if (role != 'kid') {
+        throw Exception('User is not a kid');
+      }
 
-      final kidResponse = KidResponse.fromJson(response.data);
-
-      return kidResponse.data?.newKid ?? cachedKidData;
+      KidData cachedKidData = KidData.fromJson(userMap);
+      return cachedKidData;
     } catch (e) {
       throw Exception('Error fetching kid: ${e.toString()}');
     }
@@ -136,26 +128,20 @@ class WebServices {
   Future<InstructorData> getInstructorByToken() async {
     try {
       String? token = CacheHelper.getData(key: "token");
-      String? instructorDataJson = CacheHelper.getData(key: "instructor_data");
-      if (token == null || instructorDataJson == null) {
-        throw Exception('Missing token or instructor data');
+      String? userJson = CacheHelper.getData(key: "user_data");
+      String? role = CacheHelper.getData(key: "role");
+
+      if (token == null || userJson == null || role == null) {
+        throw Exception('Missing token, user data or role');
       }
 
-      Map<String, dynamic> instructorMap = jsonDecode(instructorDataJson);
-      InstructorData cachedinstructorData =
-          InstructorData.fromJson(instructorMap);
+      Map<String, dynamic> userMap = jsonDecode(userJson);
 
-      final response = await dio.get(
-        'user_instructor/profile',
-        options: Options(
-          headers: {
-            'token': 'Bearer $token',
-          },
-        ),
-      );
-      final instructorResponse = InstructorResponse.fromJson(response.data);
-
-      return instructorResponse.data?.newInstructor ?? cachedinstructorData;
+      if (role != 'instructor') {
+        throw Exception('User is not a instructor');
+      }
+      InstructorData cachedinstructorData = InstructorData.fromJson(userMap);
+      return cachedinstructorData;
     } catch (e) {
       throw Exception('Error fetching instructor: ${e.toString()}');
     }
@@ -362,6 +348,38 @@ class WebServices {
     }
   }
 
+  Future<RemoveCartResponse> removeFromCart(
+      Map<String, dynamic> cartCourseData) async {
+    try {
+      String? token = await CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+
+      final response = await dio.delete(
+        'cart/remove',
+        data: cartCourseData,
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+        ),
+      );
+
+      final responseData = response.data;
+
+      if (responseData is Map<String, dynamic> &&
+          responseData.containsKey('cart')) {
+        final removeCartResponse = RemoveCartResponse.fromJson(responseData);
+        return removeCartResponse;
+      }
+
+      throw Exception("Invalid response format: ${response.data}");
+    } catch (e) {
+      throw Exception('Error removing course from cart: ${e.toString()}');
+    }
+  }
+
   Future<PaymentResponse> processPayment(PaymentRequest paymentRequest) async {
     try {
       String? token = await CacheHelper.getData(key: "token");
@@ -408,6 +426,41 @@ class WebServices {
         final data = response.data;
         final courses = data['purchasedCourses'] as List;
         return courses.map((course) => CourseData.fromJson(course)).toList();
+      } else if (response.statusCode == 404) {
+        return [];
+      } else {
+        throw Exception("Unexpected error: ${response.statusMessage}");
+      }
+    } catch (e) {
+      throw Exception("Error fetching courses: ${e.toString()}");
+    }
+  }
+
+  Future<List<CourseData>> getTrendingCourses() async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+
+      final response = await dio.get(
+        'course/trending',
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+          validateStatus: (status) => status! < 500,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+
+        if (data != null && data['trendingCourses'] != null) {
+          return List<CourseData>.from(
+            data['trendingCourses']
+                .map((course) => CourseData.fromJson(course)),
+          );
+        } else {
+          return [];
+        }
       } else if (response.statusCode == 404) {
         return [];
       } else {

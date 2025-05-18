@@ -17,4 +17,5 @@ class Routes {
   static const paymentDetailsView = '/paymentDetailsView';
   static const cartPage = '/cart';
   static const myCourses = '/myCourses';
+  static const addLessonPage = '/add-lesson';
 }

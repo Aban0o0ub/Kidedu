@@ -8,7 +8,8 @@ import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import '../../../../core/routing/routes.dart';
 
 class KidProfilePage extends StatefulWidget {
-  const KidProfilePage({super.key});
+  const KidProfilePage({super.key, required this.kid});
+    final KidData kid;
 
   @override
   State<KidProfilePage> createState() => _KidProfilePageState();
@@ -20,9 +21,16 @@ class _KidProfilePageState extends State<KidProfilePage> {
   void initState() {
     super.initState();
     kidProfileCubit = getIt<KidProfileCubit>();
+
+    // LoginResponse loginResponse = LoginResponse(
+    //   token: 'token',  
+    //   userId: 'userId',  
+    //   role: 'kid',  
+    //   kid: widget.kid, 
+    // );
+
     kidProfileCubit.emitGetKidProfile();
   }
-
   @override
   Widget build(BuildContext context) {
     //KidProfileCubit kidProfileCubit = getIt<KidProfileCubit>();

@@ -1,13 +1,19 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loginpage/features/search/ui/views/search.dart';
 import 'package:loginpage/features/home/ui/widgets/home.dart';
+import 'package:provider/provider.dart';
+import '../../../cart/logic/cubit/cart_cubit.dart';
 import '../../../cart/ui/views/cart.dart';
 import '../../../kid_profile/ui/views/kid_profile_page.dart';
+import '../../../sign_up/data/models/kid.dart';
+import '../widgets/nav_bar_visibility_controller.dart';
 import 'my_courses.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
   static List<String> backgroundImages = [
     "assets/images/yellow.jpg",
     "assets/images/pink.jpg",
@@ -36,44 +42,115 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+class TabControllerHelper {
+  static ValueNotifier<int> selectedIndexNotifier = ValueNotifier<int>(2);
+}
+
 class _HomePageState extends State<HomePage> {
   int selectedIndex = 2;
+  late List<Widget> _screens;
+  @override
+void dispose() {
+  TabControllerHelper.selectedIndexNotifier.removeListener(_onTabChanged);
+  super.dispose();
+}
+
+void _onTabChanged() {
+  if (!mounted) return;
+  setState(() {
+    selectedIndex = TabControllerHelper.selectedIndexNotifier.value;
+    if (selectedIndex == 4) {
+      context.read<CartCubit>().emitGetCart();
+    }
+  });
+}
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    _screens = [
+      KidProfilePage(kid: KidData()),
+      const SearchPage(),
+      Home(
+        courseTitles: HomePage.courseTitles,
+        backgroundImages: HomePage.backgroundImages,
+        iconImages: HomePage.iconImages,
+        kid: KidData(),
+      ),
+      MyCourses(),
+      Cart(),
+    ];
+     TabControllerHelper.selectedIndexNotifier.addListener(_onTabChanged);
+  }
+
+  @override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+
+  final tabParam = GoRouterState.of(context).uri.queryParameters['tab'];
+  if (tabParam != null) {
+    final tabIndex = int.tryParse(tabParam);
+    if (tabIndex != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          TabControllerHelper.selectedIndexNotifier.value = tabIndex;
+        }
+      });
+    }
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: screens[selectedIndex],
-      bottomNavigationBar: ConvexAppBar(
-        backgroundColor: Color(0xff02457A),
-        initialActiveIndex: selectedIndex,
-        color: Colors.white,
-        height: 65,
-        style: TabStyle.reactCircle,
-        items: const [
-          TabItem(icon: Icons.person),
-          TabItem(icon: Icons.search),
-          TabItem(icon: Icons.home),
-          TabItem(icon: Icons.ondemand_video_rounded),
-          TabItem(icon: Icons.shopping_cart_outlined),
+      body: Stack(
+        children: [
+          IndexedStack(
+            index: selectedIndex,
+            children: _screens,
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: NavBarVisibilityController.isNavBarVisible,
+            builder: (context, isVisible, child) {
+              return isVisible
+                  ? ValueListenableBuilder<int>(
+                      valueListenable:
+                          TabControllerHelper.selectedIndexNotifier,
+                      builder: (context, currentIndex, _) {
+                       // selectedIndex = currentIndex;
+                        return Align(
+                          alignment: Alignment.bottomCenter,
+                          child: ConvexAppBar(
+                            key: ValueKey(currentIndex),
+                            backgroundColor: const Color(0xff02457A),
+                            initialActiveIndex: currentIndex,
+                            color: Colors.white,
+                            height: 55,
+                            style: TabStyle.reactCircle,
+                            items: const [
+                              TabItem(icon: Icons.person),
+                              TabItem(icon: Icons.search),
+                              TabItem(icon: Icons.home),
+                              TabItem(icon: Icons.ondemand_video_rounded),
+                              TabItem(icon: Icons.shopping_cart_outlined),
+                            ],
+                            onTap: (index) {
+                              TabControllerHelper.selectedIndexNotifier.value =
+                                  index;
+                            },
+                          ),
+                        );
+                      },
+                    )
+                  : const SizedBox.shrink();
+            },
+          )
         ],
-        onTap: (index) {
-          setState(() {
-            selectedIndex = index;
-          });
-        },
       ),
     );
   }
-
-  List<Widget> screens = [
-    KidProfilePage(),
-    SearchPage(),
-    Home(
-        courseTitles: HomePage.courseTitles,
-        backgroundImages: HomePage.backgroundImages,
-        iconImages: HomePage.iconImages),
-    MyCourses(),
-    Cart(),
-  ];
 }
