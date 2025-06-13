@@ -1,21 +1,38 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-
-import '../widgets/clickable_container.dart';
+import 'package:loginpage/features/lesson/logic/cubit/section_cubit.dart';
+import '../../../../core/injection/injection.dart';
+import '../../../../core/routing/routes.dart';
+import '../../../../core/widgets/appbar.dart';
+import '../../data/models/lesson.dart';
+import '../../data/models/section.dart';
+import '../../logic/cubit/lesson_cubit.dart';
+import '../widgets/action_buttons.dart';
+import '../widgets/attachment_selector.dart';
+import '../widgets/caption_option_widget.dart';
+import '../widgets/link_option_widget.dart';
+import '../widgets/photo_option_widget.dart';
+import '../widgets/quiz_option_widget.dart';
+import '../widgets/section_input.dart';
 
 class AddLessonPage extends StatefulWidget {
-  const AddLessonPage({super.key});
+  const AddLessonPage({super.key, required this.courseId});
+  final String courseId;
 
   @override
   State<AddLessonPage> createState() => _AddLessonPageState();
 }
 
 class _AddLessonPageState extends State<AddLessonPage> {
+  late SectionCubit sectionCubit;
+  late LessonCubit lessonCubit;
   String? selectedSection;
-  final List<String> sections = ['Section A', 'Section B', 'Section C'];
+  List<SectionModel> sections = [];
   String? selectedAnswer;
-  final List<String> Answers = ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'];
+  final List<String> answers = ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'];
 
   final TextEditingController lessonNameController = TextEditingController();
   final TextEditingController captionController = TextEditingController();
@@ -39,12 +56,41 @@ class _AddLessonPageState extends State<AddLessonPage> {
   @override
   void initState() {
     super.initState();
+    sectionCubit = getIt<SectionCubit>();
+    lessonCubit = getIt<LessonCubit>();
+
+    sectionCubit.emitGetSection(widget.courseId);
+
     answerControllers = [
       answer1Controller,
       answer2Controller,
       answer3Controller,
       answer4Controller,
     ];
+    _loadSections();
+  }
+
+  void _loadSections() {
+    String courseId = widget.courseId;
+    sectionCubit.emitGetSection(courseId);
+  }
+
+  void _createNewSection(String sectionName) async {
+    String courseId = widget.courseId;
+    final request = CreateSectionRequest(courseId, title: sectionName);
+
+    try {
+      await sectionCubit.emitAddSection(request);
+      await Future.delayed(const Duration(milliseconds: 500));
+      await sectionCubit.emitGetSection(courseId);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('error adding section $e')),
+      );
+      setState(() {
+        selectedSection = null;
+      });
+    }
   }
 
   Future<void> _pickImage() async {
@@ -57,327 +103,292 @@ class _AddLessonPageState extends State<AddLessonPage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF02457A),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.grey),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          "Upload Lesson",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+  void _clearForm() {
+    setState(() {
+      selectedSection = null;
+      lessonNameController.clear();
+      captionController.clear();
+      linkController.clear();
+      _selectedImage = null;
+      showOptions1 = false;
+      showOptions2 = false;
+      showOptions3 = false;
+      showOptions4 = false;
+    });
+  }
+
+  void _handleUpload() {
+    if (_validateInputs()) {
+      final request = _buildLessonRequest();
+      lessonCubit.emitAddLesson(request);
+    }
+  }
+
+  bool _validateInputs() {
+    if (selectedSection == null || selectedSection!.isEmpty) {
+      _showErrorMessage('Please select a section');
+      return false;
+    }
+
+    if (lessonNameController.text.trim().isEmpty) {
+      _showErrorMessage('Please enter lesson name');
+      return false;
+    }
+
+    bool hasYoutubeLink = linkController.text.trim().isNotEmpty;
+    bool hasImage = _selectedImage != null;
+
+    if (!hasYoutubeLink && !hasImage) {
+      _showErrorMessage('Please add either a YouTube URL or upload an image');
+      return false;
+    }
+
+    if (hasYoutubeLink) {
+      String link = linkController.text.trim();
+      if (!_isValidYouTubeUrl(link)) {
+        _showErrorMessage('Please enter a valid YouTube URL');
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  bool _isValidYouTubeUrl(String url) {
+    final youtubeRegex = RegExp(
+      r'^https?://(www\.)?(youtube\.com/(watch\?v=|embed/)|youtu\.be/)',
+      caseSensitive: false,
+    );
+    return youtubeRegex.hasMatch(url);
+  }
+
+  LessonCreateRequest _buildLessonRequest() {
+    List<File> files = [];
+
+    if (_selectedImage != null) {
+      files.add(_selectedImage!);
+    }
+
+    return LessonCreateRequest(
+      sectionId: selectedSection!,
+      name: lessonNameController.text.trim(),
+      description: captionController.text.trim().isEmpty 
+          ? "" 
+          : captionController.text.trim(),
+      youtubeVideoUrl: linkController.text.trim().isEmpty 
+          ? "" 
+          : linkController.text.trim(),
+      files: files,
+    );
+  }
+
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Add to section:-',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF02457A),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    value: selectedSection,
-                    hint: const Text('Select a section'),
-                    items: sections.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        selectedSection = newValue;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Lesson Name :-',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF02457A),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: lessonNameController,
-                    decoration: InputDecoration(
-                      hintText: 'Enter lesson name',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Attachment :-',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF02457A),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ClickableContainer(title: 'Photos', index: 1, isActive: showOptions1, onTap: () {
-                        setState(() {
-                          showOptions1 = !showOptions1;
-                          showOptions2 = false;
-                          showOptions3 = false;
-                          showOptions4 = false;
-                        });
-                      }, icon: Icons.photo),
-                      ClickableContainer(title: 'Text', index: 2, isActive: showOptions2, onTap: () {
-                        setState(() {
-                          showOptions2 = !showOptions2;
-                          showOptions1 = false;
-                          showOptions3 = false;
-                          showOptions4 = false;
-                        });
-                      }, icon: Icons.text_fields),
-                      ClickableContainer(title: 'Quiz', index: 3, isActive: showOptions3, onTap: () {
-                        setState(() {
-                          showOptions3 = !showOptions3;
-                          showOptions1 = false;
-                          showOptions2 = false;
-                          showOptions4 = false;
-                        });
-                      }, icon: Icons.quiz),
-                      ClickableContainer(title: 'Link', index: 4, isActive: showOptions4, onTap: () {
-                        setState(() {
-                          showOptions4 = !showOptions4;
-                          showOptions1 = false;
-                          showOptions2 = false;
-                          showOptions3 = false;
-                        });
-                      }, icon: Icons.link),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  if (showOptions1) _buildOptionContent(1),
-                  if (showOptions2) _buildOptionContent(2),
-                  if (showOptions3) _buildOptionContent(3),
-                  if (showOptions4) _buildOptionContent(4),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 50, vertical: 20),
-                  ),
-                  onPressed: () {},
-                  child: const Text(
-                    'Upload',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 50, vertical: 20),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+    );
+  }
+
+  void _showSuccessMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
       ),
     );
   }
 
   Widget _buildOptionContent(int option) {
     switch (option) {
-      case 1:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Add Photo:',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF02457A),
-              ),
-            ),
-            const SizedBox(height: 15),
-            ElevatedButton(
-              onPressed: _pickImage,
-              child: const Text('Upload Photo'),
-            ),
-            const SizedBox(height: 10),
-            if (_selectedImage != null)
-              Image.file(
-                _selectedImage!,
-                height: 150,
-                width: 150,
-                fit: BoxFit.cover,
-              ),
-          ],
-        );
       case 2:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Caption:',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF02457A),
-              ),
-            ),
-            const SizedBox(height: 15),
-            TextField(
-              controller: captionController,
-              decoration: InputDecoration(
-                hintText: 'Enter caption',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ],
-        );
-      case 3:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Quiz:',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF02457A),
-              ),
-            ),
-            const SizedBox(height: 15),
-            TextField(
-              controller: quizQuestionController,
-              decoration: InputDecoration(
-                hintText: 'Enter question',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-            const Text(
-              'Answers :-',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF02457A),
-              ),
-            ),
-            const SizedBox(height: 15),
-            for (int i = 0; i < 4; i++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 15),
-                child: TextField(
-                  controller: answerControllers[i],
-                  decoration: InputDecoration(
-                    hintText: 'answer ${i + 1}',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-            const Text(
-              'Correct Answer :-',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 15),
-            DropdownButtonFormField<String>(
-              value: selectedAnswer,
-              hint: const Text('Select an answer'),
-              items: Answers.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  selectedAnswer = newValue;
-                });
-              },
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ],
+        return PhotoOptionWidget(
+          selectedImage: _selectedImage,
+          onPickImage: _pickImage,
         );
       case 4:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Link:',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF02457A),
-              ),
-            ),
-            const SizedBox(height: 15),
-            TextField(
-              controller: linkController,
-              decoration: InputDecoration(
-                hintText: 'add link',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ],
+        return CaptionOptionWidget(controller: captionController);
+      case 3:
+        return QuizOptionWidget(
+          questionController: quizQuestionController,
+          answerControllers: answerControllers,
+          answers: answers,
+          selectedAnswer: selectedAnswer,
+          onAnswerChanged: (newValue) {
+            setState(() {
+              selectedAnswer = newValue;
+            });
+          },
+        );
+      case 1:
+        return LinkOptionWidget(
+          controller: linkController,
         );
       default:
         return const SizedBox.shrink();
     }
   }
+
+  @override
+  void dispose() {
+    lessonNameController.dispose();
+    captionController.dispose();
+    linkController.dispose();
+    quizQuestionController.dispose();
+    answer1Controller.dispose();
+    answer2Controller.dispose();
+    answer3Controller.dispose();
+    answer4Controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: sectionCubit),
+        BlocProvider.value(value: lessonCubit),
+      ],
+      child: Scaffold(
+        appBar: CustomAppBar(
+          title: "Upload Lesson",
+          onBackPressed: () => Navigator.pop(context),
+        ),
+        body: MultiBlocListener(
+          listeners: [
+            // SectionCubit Listener
+            BlocListener<SectionCubit, SectionState>(
+              listener: (context, state) {
+                if (state is AddSectionSuccess) {
+                  _loadSections();
+                  setState(() {
+                    selectedSection = state.newSection.section.id;
+                  });
+                  _showSuccessMessage('Section added successfully!');
+                } else if (state is AddSectionFailure) {
+                  _showErrorMessage('Section Error: ${state.error}');
+                }
+              },
+            ),
+            // LessonCubit Listener
+            BlocListener<LessonCubit, LessonState>(
+              listener: (context, state) {
+                if (state is AddLessonSuccess) {
+                  _showSuccessMessage('Lesson uploaded successfully!');
+                  _clearForm();
+                  context.push(Routes.viewLesson);
+                } else if (state is AddLessonFailure) {
+                  _showErrorMessage('Upload Error: ${state.error}');
+                }
+              },
+            ),
+          ],
+          child: BlocBuilder<SectionCubit, SectionState>(
+            builder: (context, state) {
+              if (state is GetSectionLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is GetSectionSuccess) {
+                sections = state.response.sections;
+
+                return Column(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          FocusScope.of(context).unfocus();
+                        },
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SectionInput(
+                                selectedSection: selectedSection,
+                                sections: sections,
+                                lessonNameController: lessonNameController,
+                                onSectionChanged: (value) {
+                                  setState(() {
+                                    selectedSection = value;
+                                  });
+                                },
+                                onAddNewSection: (String sectionTitle) {
+                                  _createNewSection(sectionTitle);
+                                },
+                              ),
+                              const SizedBox(height: 24),
+                              AttachmentSelector(
+                                showOptions1: showOptions1,
+                                showOptions2: showOptions2,
+                                showOptions3: showOptions3,
+                                showOptions4: showOptions4,
+                                onOptionSelected: (index) {
+                                  setState(() {
+                                    showOptions1 =
+                                        index == 1 ? !showOptions1 : false;
+                                    showOptions2 =
+                                        index == 2 ? !showOptions2 : false;
+                                    showOptions3 =
+                                        index == 3 ? !showOptions3 : false;
+                                    showOptions4 =
+                                        index == 4 ? !showOptions4 : false;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 16),
+                              if (showOptions1) _buildOptionContent(1),
+                              if (showOptions2) _buildOptionContent(2),
+                              if (showOptions3) _buildOptionContent(3),
+                              if (showOptions4) _buildOptionContent(4),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Loading indicator للـ upload
+                    BlocBuilder<LessonCubit, LessonState>(
+                      builder: (context, lessonState) {
+                        if (lessonState is AddLessonLoading) {
+                          return const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(height: 8),
+                                  Text('Uploading lesson...'),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                        return ActionButtons(
+                          onUpload: _handleUpload,
+                          onCancel: () => Navigator.pop(context),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              } else if (state is GetSectionFailure) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Error: ${state.error}'),
+                      ElevatedButton(
+                        onPressed: _loadSections,
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return const Center(child: Text('No data available'));
+            },
+          ),
+        ),
+      ),
+    );
+  }
 }
-
-

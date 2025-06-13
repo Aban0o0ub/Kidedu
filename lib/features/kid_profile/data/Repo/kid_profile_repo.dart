@@ -21,11 +21,11 @@ class KidProfileRepo {
 }
 
 
-  Future<KidResponse> updateKidProfile(
-      String kidId, Map<String, dynamic> kidData) async {
-    var response = await webServices.updateKidProfile(
-        kidId, KidResponse(), 'Bearer THIS-IS-THE-SECRET-KEY(AMOORE)');
-    print(response);
-    return response;
-  }
+  // Future<KidResponse> updateKidProfile(
+  //     String kidId, Map<String, dynamic> kidData) async {
+  //   var response = await webServices.updateKidProfile(
+  //       kidId, KidResponse(), 'Bearer THIS-IS-THE-SECRET-KEY(AMOORE)');
+  //   print(response);
+  //   return response;
+  // }
 }

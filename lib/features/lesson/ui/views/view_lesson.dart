@@ -6,15 +6,15 @@ import '../widgets/my_button.dart';
 import '../widgets/quiz.dart';
 import '../widgets/video_screen.dart';
 
-class ViewScreen extends StatefulWidget {
-  const ViewScreen({super.key});
+class ViewLesson extends StatefulWidget {
+  const ViewLesson({super.key});
 
   @override
-  State<ViewScreen> createState() => _ViewScreenState();
+  State<ViewLesson> createState() => _ViewLessonState();
 }
 
-class _ViewScreenState extends State<ViewScreen> {
-  int selectedIndex = 0; // 0: Caption, 1: Quiz, 2: Links
+class _ViewLessonState extends State<ViewLesson> {
+  int selectedIndex = 0; 
   @override
   Widget build(BuildContext context) {
     return Scaffold(

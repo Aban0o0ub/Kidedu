@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:loginpage/features/lesson/ui/views/view_lesson.dart';
 import '../../features/add_course/ui/views/add_course_page.dart';
 import '../../features/cart/ui/views/cart.dart';
 import '../../features/course_details/ui/views/course_details.dart';
@@ -7,6 +8,7 @@ import '../../features/home/ui/views/my_courses.dart';
 import '../../features/instructor_profile/ui/views/instructor_profile_page.dart';
 import '../../features/kid_profile/ui/views/achievments.dart';
 import '../../features/kid_profile/ui/views/edit_profile.dart';
+import '../../features/kid_profile/ui/views/notification.dart';
 import '../../features/kid_profile/ui/views/settings.dart';
 import '../../features/lesson/ui/views/add_lesson.dart';
 import '../../features/login/ui/views/login_page.dart';
@@ -96,7 +98,18 @@ final GoRouter router = GoRouter(
     ),
     GoRoute(
       path: Routes.addLessonPage,
-      builder: (context, state) => const AddLessonPage(),
+      builder: (context, state) {
+        final String courseId = state.extra as String? ?? "";
+        return AddLessonPage(courseId: courseId);
+      },
+    ),
+    GoRoute(
+      path: Routes.notificationPage,
+      builder: (context, state) => const NotificationsPage(),
+    ),
+     GoRoute(
+      path: Routes.viewLesson,
+      builder: (context, state) => const ViewLesson(),
     ),
   ],
 );

@@ -38,12 +38,20 @@ class _AddCoursePageState extends State<AddCoursePage> {
     'Games'
   ];
   AddCourseCubit addCourseCubit = getIt<AddCourseCubit>();
+  @override
+  void initState() {
+    super.initState();
+    availabilitycontroller.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => addCourseCubit,
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();
@@ -187,51 +195,93 @@ class _AddCoursePageState extends State<AddCoursePage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 15),
-                      Visibility(
-                        visible: availabilitycontroller.text == 'Online' ||
-                            availabilitycontroller.text == 'Both',
-                        child: CustomTextField(
-                          label: "Section Name:-",
-                          hintText: 'Add Section Name',
-                          controller: sectioncontroller,
-                        ),
-                      ),
+                      // const SizedBox(height: 15),
+                      // Visibility(
+                      //   visible: availabilitycontroller.text == 'Online' ||
+                      //       availabilitycontroller.text == 'Both',
+                      //   child: CustomTextField(
+                      //     label: "Section Name:-",
+                      //     hintText: 'Add Section Name',
+                      //     controller: sectioncontroller,
+                      //   ),
+                      // ),
                       const SizedBox(height: 25),
                       BlocListener<AddCourseCubit, AddCourseState>(
                         listener: (context, state) {
-                          print("Current state: $state");
                         },
                         child: Align(
                           alignment: Alignment.center,
-                          child: CustomButton(
-                            onPressed: () {
-                              final price =
-                                  num.tryParse(pricecontroller.text) ?? 0;
-                              final startDate =
-                                  DateTime.tryParse(startcontroller.text);
-                              final endDate =
-                                  DateTime.tryParse(endcontroller.text);
+                          child: availabilitycontroller.text == "Offline"
+                              ? CustomButton(
+                                  onPressed: () {
+                                    final price =
+                                        num.tryParse(pricecontroller.text) ?? 0;
+                                    final startDate =
+                                        DateTime.tryParse(startcontroller.text);
+                                    final endDate =
+                                        DateTime.tryParse(endcontroller.text);
 
-                              context.read<AddCourseCubit>().emitAddCourse(
-                                    context, // ✅ تمرير `context` إلى `emitAddCourse`
-                                    CourseRequest(
-                                      courseName: addcourseController.text,
-                                      level: levelcontroller.text,
-                                      availability: availabilitycontroller.text,
-                                      category: categorycontroller.text,
-                                      description: descriptioncontroller.text,
-                                      price: price,
-                                      offer: offercontroller.text,
-                                      firstSection: sectioncontroller.text,
-                                      startDate: startDate,
-                                      endDate: endDate,
-                                    ),
-                                  );
-                            },
-                            text: "Save",
-                            width: 320,
-                          ),
+                                    context
+                                        .read<AddCourseCubit>()
+                                        .emitAddCourse(
+                                          goToLessons: false,
+                                          context,
+                                          CourseRequest(
+                                            courseName:
+                                                addcourseController.text,
+                                            level: levelcontroller.text,
+                                            availability:
+                                                availabilitycontroller.text,
+                                            category: categorycontroller.text,
+                                            description:
+                                                descriptioncontroller.text,
+                                            price: price,
+                                            offer: offercontroller.text,
+                                            firstSection:
+                                                sectioncontroller.text,
+                                            startDate: startDate,
+                                            endDate: endDate,
+                                          ),
+                                        );
+                                  },
+                                  text: "Save",
+                                  width: 320,
+                                )
+                              : CustomButton(
+                                  onPressed: () {
+                                    final price =
+                                        num.tryParse(pricecontroller.text) ?? 0;
+                                    final startDate =
+                                        DateTime.tryParse(startcontroller.text);
+                                    final endDate =
+                                        DateTime.tryParse(endcontroller.text);
+
+                                    context
+                                        .read<AddCourseCubit>()
+                                        .emitAddCourse(
+                                          goToLessons: true,
+                                          context,
+                                          CourseRequest(
+                                            courseName:
+                                                addcourseController.text,
+                                            level: levelcontroller.text,
+                                            availability:
+                                                availabilitycontroller.text,
+                                            category: categorycontroller.text,
+                                            description:
+                                                descriptioncontroller.text,
+                                            price: price,
+                                            offer: offercontroller.text,
+                                            firstSection:
+                                                sectioncontroller.text,
+                                            startDate: startDate,
+                                            endDate: endDate,
+                                          ),
+                                        );
+                                  },
+                                  text: "Save and Continue",
+                                  width: 320,
+                                ),
                         ),
                       ),
                       const SizedBox(height: 25),

@@ -1,11 +1,13 @@
-import 'dart:convert'; // ضروري لتحويل JSON
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:loginpage/core/helper/cache_helper.dart';
 import 'package:loginpage/features/add_course/data/models/Course_Model.dart';
 import 'package:loginpage/features/login/data/models/user.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
-
 import '../../features/cart/data/model/cart_model.dart';
+import '../../features/lesson/data/models/lesson.dart';
+import '../../features/lesson/data/models/quiz.dart';
+import '../../features/lesson/data/models/section.dart';
 import '../../features/payment/data/model/payment_model.dart';
 
 class WebServices {
@@ -107,23 +109,23 @@ class WebServices {
     }
   }
 
-  Future<KidResponse> updateKidProfile(
-      String kidId, KidResponse kidData, String token) async {
-    try {
-      final response = await dio.post(
-        'user_kid/$kidId',
-        data: kidData.toJson(),
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        ),
-      );
-      return KidResponse.fromJson(response.data);
-    } catch (e) {
-      throw Exception('Error updating kid profile: ${e.toString()}');
-    }
-  }
+  // Future<KidResponse> updateKidProfile(
+  //     String kidId, KidResponse kidData, String token) async {
+  //   try {
+  //     final response = await dio.post(
+  //       'user_kid/$kidId',
+  //       data: kidData.toJson(),
+  //       options: Options(
+  //         headers: {
+  //           'Authorization': 'Bearer $token',
+  //         },
+  //       ),
+  //     );
+  //     return KidResponse.fromJson(response.data);
+  //   } catch (e) {
+  //     throw Exception('Error updating kid profile: ${e.toString()}');
+  //   }
+  // }
 
   Future<InstructorData> getInstructorByToken() async {
     try {
@@ -468,6 +470,172 @@ class WebServices {
       }
     } catch (e) {
       throw Exception("Error fetching courses: ${e.toString()}");
+    }
+  }
+
+  Future<CreateSectionResponse> addSection(
+      CreateSectionRequest newSection) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+      final response = await dio.post(
+        'section/${newSection.courseId}',
+        data: {
+          'title': newSection.title,
+        },
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+        ),
+      );
+
+      final responseData = response.data;
+
+      return CreateSectionResponse.fromJson(responseData);
+    } catch (e) {
+      throw Exception('Error creating new section: ${e.toString()}');
+    }
+  }
+
+  Future<GetSectionsResponse> getSectionByCourseId(String courseId) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+
+      final response = await dio.get(
+        'section/course/$courseId',
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return GetSectionsResponse.fromJson(response.data);
+      } else if (response.statusCode == 404) {
+        return GetSectionsResponse.empty();
+      } else {
+        throw Exception("Unexpected error: ${response.statusMessage}");
+      }
+    } catch (e) {
+      throw Exception('Error getting sections: ${e.toString()}');
+    }
+  }
+
+  Future<LessonResponse> addLesson(LessonCreateRequest newLesson) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+
+      Map<String, dynamic> formDataMap = {
+        'name': newLesson.name,
+      };
+
+      final formData = FormData.fromMap(formDataMap);
+
+      print('Sending FormData: $formDataMap');
+
+      final response = await dio.post(
+        'lesson/${newLesson.sectionId}',
+        data: formData,
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
+
+      final responseData = response.data;
+      print('API Response: $responseData'); 
+
+      return LessonResponse.fromJson(responseData);
+    } catch (e) {
+      print('Error in addLesson: $e'); 
+      throw Exception('Error creating new lesson: ${e.toString()}');
+    }
+  }
+
+  Future<LessonListResponse> getLessonBySectionId(String sectionId) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+
+      final response = await dio.get(
+        'lesson/$sectionId',
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+        ),
+      );
+
+      final responseData = response.data;
+      return LessonListResponse.fromJson(responseData);
+    } catch (e) {
+      throw Exception('Error getting lessons: ${e.toString()}');
+    }
+  }
+
+  Future<AddQuizResponse> addQuiz(AddQuizRequest newQuiz) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+      final response = await dio.post(
+        'quiz/',
+        data: newQuiz.toJson(),
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      final responseData = response.data;
+
+      return AddQuizResponse.fromJson(responseData);
+    } catch (e) {
+      throw Exception('Error adding new quiz: ${e.toString()}');
+    }
+  }
+
+  Future<SubmitQuizResponse> submitQuiz(SubmitQuizRequest request) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception("Missing token");
+      }
+
+      final response = await dio.post(
+        'quiz/submit',
+        data: request.toJson(),
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      return SubmitQuizResponse.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Error submitting quiz: ${e.toString()}');
     }
   }
 }

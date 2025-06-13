@@ -1,0 +1,261 @@
+class AddQuizRequest {
+  final String lessonId;
+  final String title;
+  final int passingScore;
+  final int timeLimit;
+  final List<QuestionRequest> questions;
+
+  AddQuizRequest({
+    required this.lessonId,
+    required this.title,
+    required this.passingScore,
+    required this.timeLimit,
+    required this.questions,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'lessonId': lessonId,
+      'title': title,
+      'passingScore': passingScore,
+      'timeLimit': timeLimit,
+      'questions': questions.map((q) => q.toJson()).toList(),
+    };
+  }
+}
+
+class QuestionRequest {
+  final String questionText;
+  final String questionType;
+  final int points;
+  final List<OptionRequest> options;
+
+  QuestionRequest({
+    required this.questionText,
+    required this.questionType,
+    required this.points,
+    required this.options,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'questionText': questionText,
+      'questionType': questionType,
+      'points': points,
+      'options': options.map((o) => o.toJson()).toList(),
+    };
+  }
+}
+
+class OptionRequest {
+  final int id;
+  final String text;
+  final bool isCorrect;
+
+  OptionRequest({
+    required this.id,
+    required this.text,
+    required this.isCorrect,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'text': text,
+      'isCorrect': isCorrect,
+    };
+  }
+}
+class AddQuizResponse {
+  final String status;
+  final String message;
+  final Quiz quiz;
+
+  AddQuizResponse({
+    required this.status,
+    required this.message,
+    required this.quiz,
+  });
+
+  factory AddQuizResponse.fromJson(Map<String, dynamic> json) {
+    return AddQuizResponse(
+      status: json['status'],
+      message: json['message'],
+      quiz: Quiz.fromJson(json['data']['quiz']),
+    );
+  }
+}
+
+class Quiz {
+  final String quizId;
+  final String title;
+  final String lessonId;
+  final String instructorId;
+  final int passingScore;
+  final int timeLimit;
+  final List<Question> questions;
+
+  Quiz({
+    required this.quizId,
+    required this.title,
+    required this.lessonId,
+    required this.instructorId,
+    required this.passingScore,
+    required this.timeLimit,
+    required this.questions,
+  });
+
+  factory Quiz.fromJson(Map<String, dynamic> json) {
+    return Quiz(
+      quizId: json['quizId'],
+      title: json['title'],
+      lessonId: json['lessonId'],
+      instructorId: json['instructorId'],
+      passingScore: json['passingScore'],
+      timeLimit: json['timeLimit'],
+      questions: (json['questions'] as List)
+          .map((q) => Question.fromJson(q))
+          .toList(),
+    );
+  }
+}
+
+class Question {
+  final String questionId;
+  final String questionText;
+  final String questionType;
+  final int points;
+  final List<Option> options;
+
+  Question({
+    required this.questionId,
+    required this.questionText,
+    required this.questionType,
+    required this.points,
+    required this.options,
+  });
+
+  factory Question.fromJson(Map<String, dynamic> json) {
+    return Question(
+      questionId: json['questionId'],
+      questionText: json['questionText'],
+      questionType: json['questionType'],
+      points: json['points'],
+      options: (json['options'] as List)
+          .map((o) => Option.fromJson(o))
+          .toList(),
+    );
+  }
+}
+
+class Option {
+  final String optionId;
+  final int id;
+  final String text;
+  final bool isCorrect;
+
+  Option({
+    required this.optionId,
+    required this.id,
+    required this.text,
+    required this.isCorrect,
+  });
+
+  factory Option.fromJson(Map<String, dynamic> json) {
+    return Option(
+      optionId: json['optionId'],
+      id: json['id'],
+      text: json['text'],
+      isCorrect: json['isCorrect'],
+    );
+  }
+}
+////////////////////////////////////////////////////////////////////////
+class SubmitQuizRequest {
+  final String quizId;
+  final List<AnswerRequest> answers;
+
+  SubmitQuizRequest({
+    required this.quizId,
+    required this.answers,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'quizId': quizId,
+      'answers': answers.map((a) => a.toJson()).toList(),
+    };
+  }
+}
+
+class AnswerRequest {
+  final String questionId;
+  final int answer;
+
+  AnswerRequest({
+    required this.questionId,
+    required this.answer,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'questionId': questionId,
+      'answer': answer,
+    };
+  }
+}
+class SubmitQuizResponse {
+  final String status;
+  final SubmitQuizResult data;
+
+  SubmitQuizResponse({
+    required this.status,
+    required this.data,
+  });
+
+  factory SubmitQuizResponse.fromJson(Map<String, dynamic> json) {
+    return SubmitQuizResponse(
+      status: json['status'],
+      data: SubmitQuizResult.fromJson(json['data']),
+    );
+  }
+}
+
+class SubmitQuizResult {
+  final int score;
+  final bool passed;
+  final List<QuestionResult> results;
+
+  SubmitQuizResult({
+    required this.score,
+    required this.passed,
+    required this.results,
+  });
+
+  factory SubmitQuizResult.fromJson(Map<String, dynamic> json) {
+    return SubmitQuizResult(
+      score: json['score'],
+      passed: json['passed'],
+      results: (json['results'] as List)
+          .map((r) => QuestionResult.fromJson(r))
+          .toList(),
+    );
+  }
+}
+
+class QuestionResult {
+  final String questionId;
+  final bool isCorrect;
+
+  QuestionResult({
+    required this.questionId,
+    required this.isCorrect,
+  });
+
+  factory QuestionResult.fromJson(Map<String, dynamic> json) {
+    return QuestionResult(
+      questionId: json['questionId'],
+      isCorrect: json['isCorrect'],
+    );
+  }
+}

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loginpage/core/helper/cache_helper.dart';
 import 'package:loginpage/core/networking/web_services.dart';
@@ -11,15 +12,32 @@ import 'features/cart/logic/cubit/cart_cubit.dart';
 import 'features/login/data/repo/my_repo.dart';
 import 'features/login/logic/cubit/my_cubit.dart';
 
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await CacheHelper.cacheInitialization();
   initGetIt();
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  final InitializationSettings initializationSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
+
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse response) {
+    },
+  );
+
   runApp(
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
-            create: (_) => LoginRepo(WebServices(createAndSetupDio())))
+            create: (_) => LoginRepo(WebServices(createAndSetupDio()))),
       ],
       child: MultiProvider(
         providers: [
@@ -64,7 +82,7 @@ class KidEdu extends StatelessWidget {
         //     fontFamily: 'Alegreya',
         //   ),
         //   debugShowCheckedModeBanner: false,
-        //   home: const ViewScreen(), 
+        //   home: const ChangePasswordScreen(), 
         // );
       },
     );

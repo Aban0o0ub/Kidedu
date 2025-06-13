@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../cart/logic/cubit/cart_cubit.dart';
 import '../../../cart/ui/views/cart.dart';
 import '../../../kid_profile/ui/views/kid_profile_page.dart';
+import '../../../kid_profile/ui/widgets/notification_helper.dart';
 import '../../../sign_up/data/models/kid.dart';
 import '../widgets/nav_bar_visibility_controller.dart';
 import 'my_courses.dart';
@@ -50,26 +51,25 @@ class _HomePageState extends State<HomePage> {
   int selectedIndex = 2;
   late List<Widget> _screens;
   @override
-void dispose() {
-  TabControllerHelper.selectedIndexNotifier.removeListener(_onTabChanged);
-  super.dispose();
-}
+  void dispose() {
+    TabControllerHelper.selectedIndexNotifier.removeListener(_onTabChanged);
+    super.dispose();
+  }
 
-void _onTabChanged() {
-  if (!mounted) return;
-  setState(() {
-    selectedIndex = TabControllerHelper.selectedIndexNotifier.value;
-    if (selectedIndex == 4) {
-      context.read<CartCubit>().emitGetCart();
-    }
-  });
-}
-
+  void _onTabChanged() {
+    if (!mounted) return;
+    setState(() {
+      selectedIndex = TabControllerHelper.selectedIndexNotifier.value;
+      if (selectedIndex == 4) {
+        context.read<CartCubit>().emitGetCart();
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-
+    _showWelcomeNotificationOnLogin();
     _screens = [
       KidProfilePage(kid: KidData()),
       const SearchPage(),
@@ -82,26 +82,32 @@ void _onTabChanged() {
       MyCourses(),
       Cart(),
     ];
-     TabControllerHelper.selectedIndexNotifier.addListener(_onTabChanged);
+    TabControllerHelper.selectedIndexNotifier.addListener(_onTabChanged);
   }
+
+ Future<void> _showWelcomeNotificationOnLogin() async {
+    await Future.delayed(const Duration(seconds: 1));
+    
+    await NotificationHelper.showWelcomeNotification();
+  }
+
 
   @override
-void didChangeDependencies() {
-  super.didChangeDependencies();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-  final tabParam = GoRouterState.of(context).uri.queryParameters['tab'];
-  if (tabParam != null) {
-    final tabIndex = int.tryParse(tabParam);
-    if (tabIndex != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          TabControllerHelper.selectedIndexNotifier.value = tabIndex;
-        }
-      });
+    final tabParam = GoRouterState.of(context).uri.queryParameters['tab'];
+    if (tabParam != null) {
+      final tabIndex = int.tryParse(tabParam);
+      if (tabIndex != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            TabControllerHelper.selectedIndexNotifier.value = tabIndex;
+          }
+        });
+      }
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +127,7 @@ void didChangeDependencies() {
                       valueListenable:
                           TabControllerHelper.selectedIndexNotifier,
                       builder: (context, currentIndex, _) {
-                       // selectedIndex = currentIndex;
+                        // selectedIndex = currentIndex;
                         return Align(
                           alignment: Alignment.bottomCenter,
                           child: ConvexAppBar(

@@ -12,8 +12,8 @@ class CourseRequest {
   DateTime? endDate;
   String? courseImage;
   String? firstSection;
-  int? ratingQuantity; // جديد
-  List<String>? lessons; // جديد
+  int? ratingQuantity; 
+  List<String>? lessons; 
 
   CourseRequest({
     this.courseName,
@@ -29,8 +29,8 @@ class CourseRequest {
     this.endDate,
     this.courseImage,
     this.firstSection,
-    this.ratingQuantity, // جديد
-    this.lessons, // جديد
+    this.ratingQuantity, 
+    this.lessons,
   });
 
   factory CourseRequest.fromJson(Map<String, dynamic> json) {
@@ -51,10 +51,10 @@ class CourseRequest {
           json['end_date'] != null ? DateTime.parse(json['end_date']) : null,
       courseImage: json['course_image'],
       firstSection: json['first_section'],
-      ratingQuantity: json['rating_quantity'], // جديد
+      ratingQuantity: json['rating_quantity'], 
       lessons: json['lessons'] != null
           ? List<String>.from(json['lessons'])
-          : [], // جديد
+          : [], 
     );
   }
 
@@ -73,8 +73,8 @@ class CourseRequest {
       "end_date": endDate?.toIso8601String(),
       "course_image": courseImage,
       "first_section": firstSection,
-      "rating_quantity": ratingQuantity, // جديد
-      "lessons": lessons, // جديد
+      "rating_quantity": ratingQuantity,
+      "lessons": lessons,
     };
   }
 }
@@ -95,13 +95,25 @@ class CourseResponse {
   });
 
   factory CourseResponse.fromJson(Map<String, dynamic> json) {
+    bool hasDataWrapper = json['data'] != null;
+    Map<String, dynamic> courseData;
+    if (hasDataWrapper) {
+      courseData =
+          json['data']['new_course'] ?? json['data']['onlyCourse'] ?? {};
+    } else {
+      courseData = json;
+    }
     return CourseResponse(
       status:
           json['status'] ?? (json['success'] == true ? 'success' : 'failed'),
-      data: json['data'] != null
+      // data: json['data'] != null
+      //     ? CourseData.fromJson(
+      //         json['data']['new_course'] ?? json['data']['onlyCourse'] ?? {})
+      //     : null,
+      data: hasDataWrapper
           ? CourseData.fromJson(
               json['data']['new_course'] ?? json['data']['onlyCourse'] ?? {})
-          : null,
+          : CourseData.fromJson(courseData),
       courses: json['data'] != null && json['data']['new_course'] is List
           ? List<CourseData>.from(json['data']['new_course']
               .map((course) => CourseData.fromJson(course)))
@@ -181,8 +193,11 @@ class CourseData {
       this.numKids});
 
   factory CourseData.fromJson(Map<String, dynamic> json) {
+    final String parsedId =
+        json['_id']?.toString() ?? json['id']?.toString() ?? '';
+    print('Parsed ID to use: $parsedId');
     return CourseData(
-      id: json['_id'] ?? json['id'],
+      id: json['_id']?.toString() ?? json['id'],
       courseName: json['course_name'],
       courseId: json['course_id'],
       instructor: json['instructor'] is Map<String, dynamic>

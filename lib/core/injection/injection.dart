@@ -10,11 +10,14 @@ import 'package:loginpage/features/instructor_profile/data/Repo/ins_profile_repo
 import 'package:loginpage/features/instructor_profile/logic/cubit/instructor_profile_cubit.dart';
 import 'package:loginpage/features/kid_profile/data/Repo/kid_profile_repo.dart';
 import 'package:loginpage/features/kid_profile/logic/cubit/kid_profile_cubit.dart';
+import 'package:loginpage/features/lesson/data/repo/lesson_repo.dart';
+import 'package:loginpage/features/lesson/data/repo/section_repo.dart';
+import 'package:loginpage/features/lesson/logic/cubit/lesson_cubit.dart';
+import 'package:loginpage/features/lesson/logic/cubit/section_cubit.dart';
 import 'package:loginpage/features/login/data/repo/my_repo.dart';
 import 'package:loginpage/features/login/logic/cubit/my_cubit.dart';
 import 'package:loginpage/features/sign_up/data/repo/my_repo.dart';
 import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
-
 import '../../features/cart/logic/cubit/cart_cubit.dart';
 import '../../features/home/data/Repo/course_category_repo.dart';
 import '../../features/home/logic/cubit/course_category_cubit.dart';
@@ -43,8 +46,12 @@ void initGetIt() {
   getIt.registerLazySingleton<CourseCategoryRepo>(
       () => CourseCategoryRepo(getIt<WebServices>()));
   getIt.registerLazySingleton<CartRepo>(() => CartRepo(getIt<WebServices>()));
-    getIt.registerLazySingleton<PaymentRepo>(() => PaymentRepo(getIt<WebServices>()));
-
+  getIt.registerLazySingleton<PaymentRepo>(
+      () => PaymentRepo(getIt<WebServices>()));
+  getIt.registerLazySingleton<SectionRepo>(
+      () => SectionRepo(getIt<WebServices>()));
+   getIt.registerLazySingleton<LessonRepo>(
+      () => LessonRepo(getIt<WebServices>()));    
 
   //Cubits
   getIt.registerFactory<MyCubit>(() => MyCubit(getIt<MyRepo>()));
@@ -62,7 +69,9 @@ void initGetIt() {
   getIt.registerFactory<MyCoursesCubit>(
       () => MyCoursesCubit(getIt<InstructorProfileRepo>()));
   getIt.registerLazySingleton<CartCubit>(() => CartCubit(getIt<CartRepo>()));
-    getIt.registerFactory<PaymentCubit>(() => PaymentCubit(getIt<PaymentRepo>()));
+  getIt.registerFactory<PaymentCubit>(() => PaymentCubit(getIt<PaymentRepo>()));
+  getIt.registerFactory<SectionCubit>(() => SectionCubit(getIt<SectionRepo>()));
+  getIt.registerFactory<LessonCubit>(() => LessonCubit(getIt<LessonRepo>()));
 
 }
 
@@ -70,7 +79,7 @@ Dio createAndSetupDio() {
   Dio dio = Dio();
 
   dio.options = BaseOptions(
-    baseUrl: 'http://192.168.13.23:3000/api/',
+    baseUrl: 'http://192.168.1.5:3000/api/',
     connectTimeout: const Duration(seconds: 30),
     receiveTimeout: const Duration(seconds: 30),
   );

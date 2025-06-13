@@ -125,7 +125,10 @@ class _KidProfilePageState extends State<KidProfilePage> {
                     profileitem(
                       image: 'assets/images/notifications.jpeg',
                       title: 'Notifications',
-                      onTap: () {},
+                      onTap: () {
+                        FocusScope.of(context).unfocus();
+                        context.push(Routes.notificationPage);
+                      },
                     ),
                     const Divider(color: Color(0xFF02457A)),
                     profileitem(

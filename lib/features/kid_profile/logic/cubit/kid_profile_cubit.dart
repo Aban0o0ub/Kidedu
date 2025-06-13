@@ -22,14 +22,14 @@ class KidProfileCubit extends Cubit<KidProfileState> {
   }
 
 
-  Future<void> emitUpdateKidProfile(String kidId, KidResponse kid) async {
-    emit(MyLoading());
-    try {
-      final updatedKid =
-          await kidProfileRepo.updateKidProfile(kidId, kid.toJson());
-      emit(UpdateKidProfile(updatedKid));
-    } catch (e) {
-      emit(MyFailure(e.toString()));
-    }
-  }
+  // Future<void> emitUpdateKidProfile(String kidId, KidResponse kid) async {
+  //   emit(MyLoading());
+  //   try {
+  //     final updatedKid =
+  //         await kidProfileRepo.updateKidProfile(kidId, kid.toJson());
+  //     emit(UpdateKidProfile(updatedKid));
+  //   } catch (e) {
+  //     emit(MyFailure(e.toString()));
+  //   }
+  // }
 }

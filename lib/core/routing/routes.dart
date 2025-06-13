@@ -18,4 +18,6 @@ class Routes {
   static const cartPage = '/cart';
   static const myCourses = '/myCourses';
   static const addLessonPage = '/add-lesson';
+  static const notificationPage = '/notification';
+  static const viewLesson = '/viewLesson';
 }
