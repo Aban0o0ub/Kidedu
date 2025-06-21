@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
     _showWelcomeNotificationOnLogin();
     _screens = [
       KidProfilePage(kid: KidData()),
-      const SearchPage(),
+       SearchPage(),
       Home(
         courseTitles: HomePage.courseTitles,
         backgroundImages: HomePage.backgroundImages,

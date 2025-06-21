@@ -12,26 +12,61 @@ class InstructorProfileCubit extends Cubit<InstructorProfileState> {
       : super(InstructorProfileInitial());
 
   Future<void> emitGetInstructorProfile() async {
-    emit(MyLoading());
-    try {
-      final instructor =
-          await instructorProfileRepo.getInstructorProfile();
-                print("Fetched Instructor Data: ${instructor.toJson()}");
-
-      emit(GetSingleInstructor(instructor));
-    } catch (e) {
-      emit(MyFailure(e.toString()));
-    }
+  emit(InstructorProfileLoading());
+  try {
+    final instructor = await instructorProfileRepo.getInstructorProfile();
+    emit(InstructorProfileSuccess(instructor));
+  } catch (e) {
+    print('Cubit error: $e');
+    emit(InstructorProfileFailure('there is an error'));
   }
+}
 
-  // Future<void> emitUpdateKidProfile(NewInstructor instructor) async {
-  //   emit(MyLoading());
-  //   try {
-  //     final updatedInstructor = await instructorProfileRepo
-  //         .updateInstructorProfile(instructor.id!, instructor.toJson());
-  //     emit(UpdateInstructorProfile(updatedInstructor));
-  //   } catch (e) {
-  //     emit(MyFailure(e.toString()));
-  //   }
-  // }
+
+Future<void> emitUpdateInstructorProfile({
+  InstructorData? instructorData,
+  String? bio,
+  String? experience,
+  String? name,
+  String? phoneNumber,
+  String? email,
+  String? governorate,
+  String? title,
+}) async {
+  emit(UpdateInstructorLoading());
+  try {
+    InstructorData dataToUpdate;
+   
+    if (instructorData != null) {
+      dataToUpdate = instructorData;
+    } else {
+      final currentState = state;
+      InstructorData? currentData;
+     
+      if (currentState is InstructorProfileSuccess) {
+        currentData = currentState.instructor;
+      }
+     
+      dataToUpdate = InstructorData(
+        name: name ?? currentData?.name ?? '',
+        phoneNumber: phoneNumber ?? currentData?.phoneNumber ?? '',
+        email: email ?? currentData?.email ?? '',
+        governorate: governorate ?? currentData?.governorate ?? '',
+        title: title ?? currentData?.title ?? '',
+        bio: bio ?? currentData?.bio ?? '',
+        experience: experience ?? currentData?.experience ?? '',
+      );
+    }
+   
+    final updatedInstructor = await instructorProfileRepo.updateInstructorProfile(dataToUpdate);
+    
+    emit(UpdateInstructorSuccess(updatedInstructor));
+    
+    emit(InstructorProfileSuccess(updatedInstructor.data!.instructor!));
+    
+  } catch (e) {
+    emit(UpdateInstructorFailure(e.toString()));
+  }
+}
+
 }

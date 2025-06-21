@@ -13,7 +13,7 @@ class AddCartRequest {
 }
 
 class CartCourse {
-  final dynamic course; 
+  final dynamic course;
   final String id;
   final DateTime addedAt;
 
@@ -28,7 +28,9 @@ class CartCourse {
     return CartCourse(
       course: rawCourse is String ? rawCourse : CourseData.fromJson(rawCourse),
       id: json['_id'] ?? '',
-      addedAt: DateTime.parse(json['addedAt']),
+      addedAt: json['addedAt'] != null
+          ? DateTime.parse(json['addedAt'])
+          : DateTime.now(),
     );
   }
 
@@ -66,8 +68,12 @@ class CartModel {
               ?.map((e) => CartCourse.fromJson(e))
               .toList() ??
           [],
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : DateTime.now(),
       v: json['__v'] ?? 0,
     );
   }

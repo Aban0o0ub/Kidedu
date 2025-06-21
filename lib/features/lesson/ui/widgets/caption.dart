@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 class CaptionView extends StatelessWidget {
   final List<String> captions;
+  final String description;
 
   const CaptionView({
     Key? key,
-    required this.captions,
+    required this.captions, required this.description,
   }) : super(key: key);
 
   @override

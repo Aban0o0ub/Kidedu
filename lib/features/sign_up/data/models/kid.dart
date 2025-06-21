@@ -22,25 +22,32 @@ class KidResponse {
 }
 
 class KidDataWrapper {
-  KidData? newKid;
+  KidData? kid; 
   String? token;
 
-  KidDataWrapper({this.newKid, this.token});
+  KidDataWrapper({this.kid, this.token});
 
   KidDataWrapper.fromJson(Map<String, dynamic> json) {
-    newKid = json['newKid'] != null ? KidData.fromJson(json['newKid']) : null;
+    if (json['newKid'] != null) {
+      kid = KidData.fromJson(json['newKid']);
+    } else if (json['kidUpdated'] != null) {
+      kid = KidData.fromJson(json['kidUpdated']);
+    }
     token = json['token'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
-    if (newKid != null) {
-      data['newKid'] = newKid!.toJson();
+    if (kid != null) {
+      data['newKid'] = kid!.toJson();
     }
-    data['token'] = token;
+    if (token != null) {
+      data['token'] = token;
+    }
     return data;
   }
 }
+
 
 class KidData {
   String? sId;
@@ -54,6 +61,7 @@ class KidData {
   String? createdAt;
   String? updatedAt;
   int? iV;
+  String? image;
 
   KidData(
       {this.sId,
@@ -66,7 +74,8 @@ class KidData {
       this.phoneNumber,
       this.createdAt,
       this.updatedAt,
-      this.iV});
+      this.iV,
+      this.image,});
 
   KidData.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
@@ -80,6 +89,7 @@ class KidData {
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     iV = json['__v'];
+    image = json['Image'];
   }
 
   Map<String, dynamic> toJson() {
@@ -95,6 +105,7 @@ class KidData {
     data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
     data['__v'] = iV;
+    data['Image'] = image;
     return data;
   }
 
@@ -145,27 +156,32 @@ class InstructorResponse {
 }
 
 class InstructorDataWrapper {
-  InstructorData? newInstructor;
+  InstructorData? instructor;
   String? token;
 
-  InstructorDataWrapper({this.newInstructor, this.token});
+  InstructorDataWrapper({this.instructor, this.token});
 
   InstructorDataWrapper.fromJson(Map<String, dynamic> json) {
-    newInstructor = json['newInstructor'] != null
-        ? InstructorData.fromJson(json['newInstructor'])
-        : null;
+    if (json['newInstructor'] != null) {
+      instructor = InstructorData.fromJson(json['newInstructor']);
+    } else if (json['instructorUpdated'] != null) {
+      instructor = InstructorData.fromJson(json['instructorUpdated']);
+    }
     token = json['token'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
-    if (newInstructor != null) {
-      data['newInstructor'] = newInstructor!.toJson();
+    if (instructor != null) {
+      data['newInstructor'] = instructor!.toJson();
     }
-    data['token'] = token;
+    if (token != null) {
+      data['token'] = token;
+    }
     return data;
   }
 }
+
 
 class InstructorData {
   String? id;

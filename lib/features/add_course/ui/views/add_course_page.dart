@@ -4,6 +4,7 @@ import 'package:loginpage/core/injection/injection.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_dropdown.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import '../../data/models/Course_Model.dart';
 import '../../logic/cubit/add_course_cubit.dart';
 import '../widgets/header_image.dart';
@@ -28,7 +29,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
   final TextEditingController endcontroller = TextEditingController();
   final TextEditingController sectioncontroller = TextEditingController();
   final List<String> courseitems = ['Beginner', 'Intermediate', 'Advanced'];
-  final List<String> availabilityitems = ['Online', 'Offline', 'Both'];
+  final List<String> availabilityitems = ['Online', 'Offline'];
   final List<String> offeritems = ['10%', '20%', '30%', '50%'];
   final List<String> categoryitems = [
     'Sports',
@@ -37,6 +38,10 @@ class _AddCoursePageState extends State<AddCoursePage> {
     'Skills',
     'Games'
   ];
+  final List<String> ageitems =
+      List.generate(15, (index) => (index + 1).toString());
+
+  List<String> selectedAges = [];
   AddCourseCubit addCourseCubit = getIt<AddCourseCubit>();
   @override
   void initState() {
@@ -82,21 +87,69 @@ class _AddCoursePageState extends State<AddCoursePage> {
                       ),
                       const SizedBox(height: 15),
                       CustomDropdownField(
-                        label: 'Level:-  (optional)',
+                        label: 'Level:',
                         hintText: 'Select level',
                         controller: levelcontroller,
                         items: courseitems,
-                        //icon: Icons.school_outlined,
                         width: double.infinity,
+                        isRequired: false,
                       ),
                       const SizedBox(height: 15),
-                      CustomDropdownField(
-                        label: "Availability:-",
-                        hintText: 'Select',
-                        controller: availabilitycontroller,
-                        items: availabilityitems,
-                        //icon: Icons.event_available_outlined,
-                        width: double.infinity,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomDropdownField(
+                              label: "Availability:",
+                              hintText: 'Select',
+                              controller: availabilitycontroller,
+                              items: availabilityitems,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Age:',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF02457A),
+                                  ),
+                                ),
+                                MultiSelectDialogField(
+                                  items: ageitems
+                                      .map((e) => MultiSelectItem<String>(e, e))
+                                      .toList(),
+                                  title: const Text("Select Ages"),
+                                  selectedColor: const Color(0xFF02457A),
+                                  buttonText: const Text("Select age(s)"),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: const Color(0xFF02457A),
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  onConfirm: (results) {
+                                    setState(() {
+                                      selectedAges = results.cast<String>();
+                                    });
+                                  },
+                                  chipDisplay: MultiSelectChipDisplay(
+                                    onTap: (value) {
+                                      setState(() {
+                                        selectedAges.remove(value);
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 15),
                       CustomTextField(
@@ -111,38 +164,22 @@ class _AddCoursePageState extends State<AddCoursePage> {
                           Expanded(
                             flex: 2,
                             child: CustomTextField(
-                              label: 'Offer:- (optional)',
+                              label: 'Offer:',
                               hintText: 'Enter percent',
                               controller: offercontroller,
                               keyboardType: TextInputType.number,
-                              //icon: Icons.percent_outlined,
+                              isRequired: false,
                             ),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
                             flex: 2,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  "Till",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Color(0xFF02457A),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: CustomDropdownField(
-                                    label: '',
-                                    hintText: '',
-                                    controller: tillcontroller,
-                                    items: offeritems,
-                                    //icon: Icons.discount_outlined,
-                                    width: double.infinity,
-                                  ),
-                                ),
-                              ],
+                            child: CustomDropdownField(
+                              label: 'Till:',
+                              hintText: 'Select',
+                              controller: tillcontroller,
+                              items: offeritems,
+                              width: double.infinity,
                             ),
                           ),
                         ],
@@ -176,10 +213,22 @@ class _AddCoursePageState extends State<AddCoursePage> {
                             flex: 2,
                             child: CustomTextField(
                               label: 'Start date',
-                              hintText: '',
+                              hintText: 'Pick a date',
                               controller: startcontroller,
-                              keyboardType: TextInputType.number,
+                              readOnly: true,
                               suffixIcon: const Icon(Icons.date_range_outlined),
+                              onTap: () async {
+                                final DateTime? picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100),
+                                );
+                                if (picked != null) {
+                                  startcontroller.text =
+                                      picked.toIso8601String().split('T').first;
+                                }
+                              },
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -187,28 +236,29 @@ class _AddCoursePageState extends State<AddCoursePage> {
                             flex: 2,
                             child: CustomTextField(
                               label: 'End date',
-                              hintText: '',
+                              hintText: 'Pick a date',
                               controller: endcontroller,
+                              readOnly: true,
                               suffixIcon: const Icon(Icons.date_range_outlined),
-                              width: double.infinity,
+                              onTap: () async {
+                                final DateTime? picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100),
+                                );
+                                if (picked != null) {
+                                  endcontroller.text =
+                                      picked.toIso8601String().split('T').first;
+                                }
+                              },
                             ),
                           ),
                         ],
                       ),
-                      // const SizedBox(height: 15),
-                      // Visibility(
-                      //   visible: availabilitycontroller.text == 'Online' ||
-                      //       availabilitycontroller.text == 'Both',
-                      //   child: CustomTextField(
-                      //     label: "Section Name:-",
-                      //     hintText: 'Add Section Name',
-                      //     controller: sectioncontroller,
-                      //   ),
-                      // ),
                       const SizedBox(height: 25),
                       BlocListener<AddCourseCubit, AddCourseState>(
-                        listener: (context, state) {
-                        },
+                        listener: (context, state) {},
                         child: Align(
                           alignment: Alignment.center,
                           child: availabilitycontroller.text == "Offline"
@@ -220,6 +270,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                                         DateTime.tryParse(startcontroller.text);
                                     final endDate =
                                         DateTime.tryParse(endcontroller.text);
+                                    final offer =
+                                        num.tryParse(offercontroller.text) ?? 0;
 
                                     context
                                         .read<AddCourseCubit>()
@@ -236,7 +288,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                                             description:
                                                 descriptioncontroller.text,
                                             price: price,
-                                            offer: offercontroller.text,
+                                            offer: offer,
                                             firstSection:
                                                 sectioncontroller.text,
                                             startDate: startDate,
@@ -251,6 +303,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                                   onPressed: () {
                                     final price =
                                         num.tryParse(pricecontroller.text) ?? 0;
+                                    final offer =
+                                        num.tryParse(offercontroller.text) ?? 0;
                                     final startDate =
                                         DateTime.tryParse(startcontroller.text);
                                     final endDate =
@@ -271,7 +325,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                                             description:
                                                 descriptioncontroller.text,
                                             price: price,
-                                            offer: offercontroller.text,
+                                            offer: offer,
                                             firstSection:
                                                 sectioncontroller.text,
                                             startDate: startDate,

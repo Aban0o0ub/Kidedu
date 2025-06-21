@@ -5,22 +5,27 @@ sealed class InstructorProfileState {}
 
 final class InstructorProfileInitial extends InstructorProfileState {}
 
-final class MyLoading extends InstructorProfileState {}
+final class InstructorProfileLoading extends InstructorProfileState {}
 
-class GetSingleInstructor extends InstructorProfileState {
+class InstructorProfileSuccess extends InstructorProfileState {
   final InstructorData instructor;
-
-  GetSingleInstructor(this.instructor);
+  InstructorProfileSuccess(this.instructor);
 }
 
-class UpdateInstructorProfile extends InstructorProfileState {
-  final InstructorData instructor;
-
-  UpdateInstructorProfile(this.instructor);
-}
-
-class MyFailure extends InstructorProfileState {
+class InstructorProfileFailure extends InstructorProfileState {
   final String error;
-
-  MyFailure(this.error);
+  InstructorProfileFailure(this.error);
 }
+
+final class UpdateInstructorLoading extends InstructorProfileState {}
+
+class UpdateInstructorSuccess extends InstructorProfileState {
+  final InstructorResponse instructor;
+  UpdateInstructorSuccess(this.instructor);
+}
+
+class UpdateInstructorFailure extends InstructorProfileState {
+  final String error;
+  UpdateInstructorFailure(this.error);
+}
+

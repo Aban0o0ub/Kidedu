@@ -16,6 +16,9 @@ class CustomTextField extends StatefulWidget {
     this.minLines,
     this.keyboardType = TextInputType.text,
     this.hasIcon = true,
+    this.isRequired = true,
+    this.readOnly = false,
+    this.onTap,
   });
 
   final String label;
@@ -31,6 +34,9 @@ class CustomTextField extends StatefulWidget {
   final int? minLines;
   final TextInputType keyboardType;
   final bool hasIcon;
+   final bool isRequired;
+  final bool readOnly; 
+  final VoidCallback? onTap;
 
   @override
   CustomTextFieldState createState() => CustomTextFieldState();
@@ -67,7 +73,9 @@ class CustomTextFieldState extends State<CustomTextField> {
             keyboardType: widget.isPasswordField
                 ? TextInputType.visiblePassword
                 : widget.keyboardType,
-            validator: widget.validator, // ✅ هنا يمكن استخدام validator
+            validator: widget.validator, 
+            readOnly: widget.readOnly, 
+            onTap: widget.onTap, 
             decoration: InputDecoration(
               contentPadding: widget.hasIcon
                   ? widget.contentPadding

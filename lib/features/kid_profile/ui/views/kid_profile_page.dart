@@ -8,8 +8,8 @@ import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import '../../../../core/routing/routes.dart';
 
 class KidProfilePage extends StatefulWidget {
-  const KidProfilePage({super.key, required this.kid});
-    final KidData kid;
+  const KidProfilePage({super.key, this.kid});
+  final KidData? kid;
 
   @override
   State<KidProfilePage> createState() => _KidProfilePageState();
@@ -21,19 +21,15 @@ class _KidProfilePageState extends State<KidProfilePage> {
   void initState() {
     super.initState();
     kidProfileCubit = getIt<KidProfileCubit>();
-
-    // LoginResponse loginResponse = LoginResponse(
-    //   token: 'token',  
-    //   userId: 'userId',  
-    //   role: 'kid',  
-    //   kid: widget.kid, 
-    // );
-
     kidProfileCubit.emitGetKidProfile();
   }
+
+  void _refreshProfile() {
+    kidProfileCubit.emitGetKidProfile();
+  }
+
   @override
   Widget build(BuildContext context) {
-    //KidProfileCubit kidProfileCubit = getIt<KidProfileCubit>();
     return BlocProvider.value(
       value: kidProfileCubit,
       child: Scaffold(
@@ -70,7 +66,7 @@ class _KidProfilePageState extends State<KidProfilePage> {
                     //--------------------------------------------------------------------------
                     BlocBuilder<KidProfileCubit, KidProfileState>(
                       builder: (context, state) {
-                        if (state is GetSingleKid) {
+                        if (state is KidProfileSuccess) {
                           KidData? kid = state.kid;
 
                           if (kid.name == null || kid.name!.isEmpty) {
@@ -91,7 +87,7 @@ class _KidProfilePageState extends State<KidProfilePage> {
                               color: Color(0xFF02457A),
                             ),
                           );
-                        } else if (state is MyFailure) {
+                        } else if (state is KidProfileFailure) {
                           return Text(
                             "There is an error: ${state.error}",
                             style: const TextStyle(
@@ -114,11 +110,56 @@ class _KidProfilePageState extends State<KidProfilePage> {
               Expanded(
                 child: ListView(
                   children: [
-                    profileitem(
-                      image: 'assets/images/editprofile.jpeg',
-                      title: 'Edit profile',
-                      onTap: () {
-                        context.push(Routes.editProfilePage);
+                    BlocBuilder<KidProfileCubit, KidProfileState>(
+                      builder: (context, state) {
+                        return profileitem(
+                          image: 'assets/images/editprofile.jpeg',
+                          title: 'Edit profile',
+                          // onTap: () {
+                          //   if (state is KidProfileSuccess) {
+                          //     context.push(
+                          //       Routes.editProfilePage,
+                          //       extra: {
+                          //         'name': state.kid.name,
+                          //         'email': state.kid.email,
+                          //         'phone': state.kid.phoneNumber,
+                          //         'age': state.kid.age?.toString(),
+                          //         'governorate': state.kid.governorate,
+                          //         'gender': state.kid.gender,
+                          //         'image': state.kid.image,
+                          //       },
+                          //     );
+                          //   } else {
+                          //     context.push(Routes.editProfilePage);
+                          //   }
+                          // },
+                          onTap: () async {
+                            if (state is KidProfileSuccess) {
+                              final result = await context.push(
+                                Routes.editProfilePage,
+                                extra: {
+                                  'name': state.kid.name,
+                                  'email': state.kid.email,
+                                  'phone': state.kid.phoneNumber,
+                                  'age': state.kid.age?.toString(),
+                                  'governorate': state.kid.governorate,
+                                  'gender': state.kid.gender,
+                                  'image': state.kid.image,
+                                },
+                              );
+
+                              if (result == true) {
+                                _refreshProfile();
+                              }
+                            } else {
+                              final result =
+                                  await context.push(Routes.editProfilePage);
+                              if (result == true) {
+                                _refreshProfile();
+                              }
+                            }
+                          },
+                        );
                       },
                     ),
                     const Divider(color: Color(0xFF02457A)),
@@ -155,7 +196,12 @@ class _KidProfilePageState extends State<KidProfilePage> {
                     profileitem(
                       image: 'assets/images/bookmark.jpeg',
                       title: 'Bookmarks',
-                      onTap: () {},
+                      onTap: () {
+                        
+                        FocusScope.of(context).unfocus();
+                        context.push(Routes.bookmarkPage);
+                      
+                      },
                     ),
                     const Divider(color: Color(0xFF02457A)),
                     profileitem(

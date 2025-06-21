@@ -35,17 +35,8 @@ class CartRepo {
     return await webServices.getCart();
   }
 
-  // Future<RemoveCartResponse> removeFromCart(Map<String, dynamic> cartCourseData) async {
-  //   return await webServices.removeFromCart(cartCourseData);
-  // }
-
-  Future<RemoveCartResponse> removeFromCart(Map<String, dynamic> cartCourseData) async {
-    String? token = await CacheHelper.getData(key: "token");
-
-    if (token == null) {
-      throw Exception('Token is missing');
-    }
-
+  Future<RemoveCartResponse> removeFromCart(
+      Map<String, dynamic> cartCourseData) async {
     return await webServices.removeFromCart(cartCourseData);
   }
 }

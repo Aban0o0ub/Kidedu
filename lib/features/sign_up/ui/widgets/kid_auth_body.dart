@@ -237,7 +237,7 @@ class KidAuthBodyState extends State<KidAuthBody> {
                     setState(() {
                       _selectedGender = gender;
                     });
-                  },
+                  }, initialGender: '',
                 ),
                 const SizedBox(height: 20),
                 BlocListener<MyCubit, MyState>(

@@ -3,7 +3,7 @@ class CourseRequest {
   String? instructor;
   String? level;
   String? availability;
-  String? offer;
+  num? offer;
   String? category;
   String? description;
   num? price;
@@ -12,8 +12,8 @@ class CourseRequest {
   DateTime? endDate;
   String? courseImage;
   String? firstSection;
-  int? ratingQuantity; 
-  List<String>? lessons; 
+  int? ratingQuantity;
+  List<String>? lessons;
 
   CourseRequest({
     this.courseName,
@@ -29,7 +29,7 @@ class CourseRequest {
     this.endDate,
     this.courseImage,
     this.firstSection,
-    this.ratingQuantity, 
+    this.ratingQuantity,
     this.lessons,
   });
 
@@ -51,10 +51,9 @@ class CourseRequest {
           json['end_date'] != null ? DateTime.parse(json['end_date']) : null,
       courseImage: json['course_image'],
       firstSection: json['first_section'],
-      ratingQuantity: json['rating_quantity'], 
-      lessons: json['lessons'] != null
-          ? List<String>.from(json['lessons'])
-          : [], 
+      ratingQuantity: json['rating_quantity'],
+      lessons:
+          json['lessons'] != null ? List<String>.from(json['lessons']) : [],
     );
   }
 
@@ -150,7 +149,7 @@ class CourseData {
   List<dynamic>? kids;
   String? level;
   String? availability;
-  String? offer;
+  num? offer;
   num? price;
   num? priceAfterDiscount;
   String? category;
@@ -166,6 +165,7 @@ class CourseData {
   double? progress;
   String? firstSection;
   int? numKids;
+  List<int>? suitableAges;
 
   CourseData(
       {this.id,
@@ -190,12 +190,21 @@ class CourseData {
       this.lessons,
       this.progress,
       this.firstSection,
+      this.suitableAges,
       this.numKids});
 
   factory CourseData.fromJson(Map<String, dynamic> json) {
     final String parsedId =
         json['_id']?.toString() ?? json['id']?.toString() ?? '';
     print('Parsed ID to use: $parsedId');
+    num? parseNum(dynamic value) {
+    if (value == null) return null;
+    if (value is num) return value;
+    if (value is String) {
+      return num.tryParse(value);
+    }
+    return null;
+  }
     return CourseData(
       id: json['_id']?.toString() ?? json['id'],
       courseName: json['course_name'],
@@ -206,7 +215,7 @@ class CourseData {
       kids: json['kid'] != null ? List<dynamic>.from(json['kid']) : [],
       level: json['level'],
       availability: json['availability'],
-      offer: json['offer'],
+      offer: parseNum(json['offer']),
       category: json['category'],
       description: json['description'],
       startDate: json['start_date'] != null
@@ -218,15 +227,23 @@ class CourseData {
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
       v: json['__v'],
-      price: json['price'],
+      price: parseNum(json['price']),
       priceAfterDiscount:
-          json['price_after_offer'] ?? json['price_after_discount'],
-      ratingQuantity: json['rating_quantity'],
+        parseNum(json['price_after_offer']) ?? parseNum(json['price_after_discount']), // Fixed parsing
+    ratingQuantity: json['rating_quantity'] is String 
+        ? int.tryParse(json['rating_quantity']) 
+        : json['rating_quantity'],
+      
       lessons:
           json['lessons'] != null ? List<String>.from(json['lessons']) : [],
       progress: json['progress'] != null ? json['progress'].toDouble() : 0.0,
       firstSection: json['first_section'],
-      numKids: json['numKids'],
+     numKids: json['numKids'] is String 
+        ? int.tryParse(json['numKids']) 
+        : json['numKids'],
+      suitableAges: json['suitableAges'] != null
+          ? List<int>.from(json['suitableAges'])
+          : [],
     );
   }
 
@@ -255,6 +272,7 @@ class CourseData {
       'progress': progress,
       'first_section': firstSection,
       'numKids': numKids,
+      'suitableAges': suitableAges,
     };
   }
 }

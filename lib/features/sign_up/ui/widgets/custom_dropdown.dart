@@ -10,6 +10,7 @@ class CustomDropdownField extends StatelessWidget {
     this.icon,
     this.width = 180,
     this.height = 56,
+    this.isRequired = true,
     this.validator,
     String? errorText,
   });
@@ -21,6 +22,7 @@ class CustomDropdownField extends StatelessWidget {
   final IconData? icon;
   final double width;
   final double height;
+  final bool isRequired;
   final String? Function(String?)? validator;
 
   @override

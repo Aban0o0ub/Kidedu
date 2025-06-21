@@ -6,11 +6,13 @@ class CustomButton extends StatelessWidget {
     required this.onPressed,
     this.text = 'LogIn',
     this.width = 200,
+     this.child, 
   });
 
   final VoidCallback onPressed;
   final String text;
   final double? width;
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {

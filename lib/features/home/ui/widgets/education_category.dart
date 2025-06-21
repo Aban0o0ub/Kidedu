@@ -6,6 +6,7 @@ import 'package:loginpage/features/home/ui/widgets/course_card.dart';
 import '../../../../core/injection/injection.dart';
 import '../../../../core/widgets/fluttertoast.dart';
 import '../../../cart/logic/cubit/cart_cubit.dart';
+import '../../../kid_profile/ui/widgets/book_mark_manager.dart';
 import 'nav_bar_visibility_controller.dart';
 
 class EducationCategory extends StatefulWidget {
@@ -39,15 +40,20 @@ class _EducationCategoryState extends State<EducationCategory> {
       value: courseCategoryCubit,
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: CustomAppBar(title: "Education",onBackPressed: () => Navigator.pop(context),),
+        appBar: CustomAppBar(
+          title: "Education",
+          onBackPressed: () => Navigator.pop(context),
+        ),
         body: BlocProvider.value(
           value: cartCubit,
           child: BlocListener<CartCubit, CartState>(
             listener: (context, state) {
               if (state is AddCartSuccess) {
-                showCustomToast(context, "Course added to cart!", isSuccess: true);
+                showCustomToast(context, "Course added to cart!",
+                    isSuccess: true);
               } else if (state is AddCartFailure) {
-                showCustomToast(context, "Failed to add course!", isSuccess: false);
+                showCustomToast(context, "Failed to add course!",
+                    isSuccess: false);
               }
             },
             child: BlocBuilder<CourseCategoryCubit, CourseCategoryState>(
@@ -68,6 +74,21 @@ class _EducationCategoryState extends State<EducationCategory> {
                         availability: course.availability ?? "unavailable",
                         id: course.id,
                         fromCartPage: false,
+                        onBookmark: (courseData) async {
+                          await BookmarkManager.toggleBookmark(courseData);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    BookmarkManager.isCourseBookmarked(
+                                            courseData['id'])
+                                        ? 'Added to bookmarks ✓'
+                                        : 'Removed from bookmarks ✗'),
+                                duration: const Duration(seconds: 1),
+                              ),
+                            );
+                          }
+                        },
                       );
                     },
                   );

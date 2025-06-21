@@ -11,25 +11,25 @@ class KidProfileCubit extends Cubit<KidProfileState> {
   KidProfileCubit(this.kidProfileRepo) : super(KidProfileInitial());
 
   Future<void> emitGetKidProfile() async {
-    emit(MyLoading());
+    emit(KidProfileLoading());
     try {
       final kid = await kidProfileRepo.getKidProfile();
-      print("Fetched Kid Data: ${kid.toJson()}");
-      emit(GetSingleKid(kid));
+      emit(KidProfileSuccess(kid));
     } catch (e) {
-      emit(MyFailure(e.toString()));
+      print('Cubit error: $e');
+      emit(KidProfileFailure('فشل في تحميل بيانات الملف الشخصي'));
     }
   }
 
 
-  // Future<void> emitUpdateKidProfile(String kidId, KidResponse kid) async {
-  //   emit(MyLoading());
-  //   try {
-  //     final updatedKid =
-  //         await kidProfileRepo.updateKidProfile(kidId, kid.toJson());
-  //     emit(UpdateKidProfile(updatedKid));
-  //   } catch (e) {
-  //     emit(MyFailure(e.toString()));
-  //   }
-  // }
+ Future<void> emitUpdateKidProfile(KidData kidData) async {
+  emit(UpdateKidLoading());
+  try {
+    final updatedKid = await kidProfileRepo.updateKidProfile(kidData);
+    emit(UpdateKidProfile(updatedKid));
+  } catch (e) {
+    emit(UpdateKidFailure(e.toString()));
+  }
+}
+
 }

@@ -67,15 +67,15 @@ class _CourseDetailsState extends State<CourseDetails> {
                       right: 10,
                       child: Row(
                         children: [
-                          InkWell(
-                            onTap: () {},
-                            child: const Icon(
-                              Icons.monetization_on,
-                              size: 24,
-                              color: Color(0xFF02457A),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
+                          // InkWell(
+                          //   onTap: () {},
+                          //   child: const Icon(
+                          //     Icons.monetization_on,
+                          //     size: 24,
+                          //     color: Color(0xFF02457A),
+                          //   ),
+                          // ),
+                          // const SizedBox(width: 10),
                           InkWell(
                             onTap: () {},
                             child: const Icon(
@@ -172,13 +172,14 @@ class _CourseDetailsState extends State<CourseDetails> {
                                     icon1: Icons.monetization_on,
                                     text1: (course.price ?? "800").toString(),
                                     icon2: Icons.discount,
-                                    text2: course.offer ?? "20%",
+                                    text2: (course.offer ?? "20%").toString(),
                                   ),
                                 ],
                               ),
                             ),
                             const SizedBox(height: 15),
                             buildInfoContainer(
+                              context: context,
                               header: "Description",
                               text: course.description ??
                                   "No description available",

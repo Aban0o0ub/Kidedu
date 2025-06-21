@@ -5,13 +5,19 @@ sealed class KidProfileState {}
 
 final class KidProfileInitial extends KidProfileState {}
 
-final class MyLoading extends KidProfileState {}
+final class KidProfileLoading extends KidProfileState {}
 
-class GetSingleKid extends KidProfileState {
+class KidProfileSuccess extends KidProfileState {
   final KidData kid;
-
-  GetSingleKid(this.kid);
+  KidProfileSuccess(this.kid);
 }
+
+class KidProfileFailure extends KidProfileState {
+  final String error;
+  KidProfileFailure(this.error);
+}
+
+final class UpdateKidLoading extends KidProfileState {}
 
 class UpdateKidProfile extends KidProfileState {
   final KidResponse kid;
@@ -19,8 +25,7 @@ class UpdateKidProfile extends KidProfileState {
   UpdateKidProfile(this.kid);
 }
 
-class MyFailure extends KidProfileState {
+class UpdateKidFailure extends KidProfileState {
   final String error;
-
-  MyFailure(this.error);
+  UpdateKidFailure(this.error);
 }

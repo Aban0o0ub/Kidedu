@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
-Widget buildCourseBox(
-    {required String imagePath, required String courseName}) {
+Widget buildCourseBox({
+  required String courseName,
+  required String imagePath,
+  //CourseData? course,
+}) {
   return Container(
-    width: 148.05, // width of the box
-    height: 165, // height of the box
-    margin: const EdgeInsets.only(left: 20), // gap between boxes
+    width: 148.05,
+    height: 165,
+    margin: const EdgeInsets.only(left: 20),
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: const BorderRadius.all(

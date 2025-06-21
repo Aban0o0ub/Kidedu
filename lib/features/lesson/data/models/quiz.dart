@@ -259,3 +259,48 @@ class QuestionResult {
     );
   }
 }
+class QuestionFormData {
+  String questionText;
+  String questionType;
+  int points;
+  List<OptionFormData> options;
+
+  QuestionFormData({
+    this.questionText = '',
+    this.questionType = 'multiple-choice',
+    this.points = 1,
+    List<OptionFormData>? options,
+  }) : options = options ?? [
+    OptionFormData(id: 1),
+    OptionFormData(id: 2),
+  ];
+
+  QuestionRequest toQuestionRequest() {
+    return QuestionRequest(
+      questionText: questionText,
+      questionType: questionType,
+      points: points,
+      options: options.map((o) => o.toOptionRequest()).toList(),
+    );
+  }
+}
+
+class OptionFormData {
+  int id;
+  String text;
+  bool isCorrect;
+
+  OptionFormData({
+    required this.id,
+    this.text = '',
+    this.isCorrect = false,
+  });
+
+  OptionRequest toOptionRequest() {
+    return OptionRequest(
+      id: id,
+      text: text,
+      isCorrect: isCorrect,
+    );
+  }
+}

@@ -6,13 +6,17 @@ import 'package:loginpage/features/add_course/logic/cubit/add_course_cubit.dart'
 import 'package:loginpage/features/cart/data/repo/cart_repo.dart';
 import 'package:loginpage/features/course_details/data/repo/course_details_repo.dart';
 import 'package:loginpage/features/course_details/logic/cubit/course_details_cubit.dart';
+import 'package:loginpage/features/earnings/data/repo/earnings_repo.dart';
+import 'package:loginpage/features/earnings/logic/cubit/earnings_cubit.dart';
 import 'package:loginpage/features/instructor_profile/data/Repo/ins_profile_repo.dart';
 import 'package:loginpage/features/instructor_profile/logic/cubit/instructor_profile_cubit.dart';
 import 'package:loginpage/features/kid_profile/data/Repo/kid_profile_repo.dart';
 import 'package:loginpage/features/kid_profile/logic/cubit/kid_profile_cubit.dart';
 import 'package:loginpage/features/lesson/data/repo/lesson_repo.dart';
+import 'package:loginpage/features/lesson/data/repo/quiz_repo.dart';
 import 'package:loginpage/features/lesson/data/repo/section_repo.dart';
 import 'package:loginpage/features/lesson/logic/cubit/lesson_cubit.dart';
+import 'package:loginpage/features/lesson/logic/cubit/quiz_cubit.dart';
 import 'package:loginpage/features/lesson/logic/cubit/section_cubit.dart';
 import 'package:loginpage/features/login/data/repo/my_repo.dart';
 import 'package:loginpage/features/login/logic/cubit/my_cubit.dart';
@@ -50,8 +54,11 @@ void initGetIt() {
       () => PaymentRepo(getIt<WebServices>()));
   getIt.registerLazySingleton<SectionRepo>(
       () => SectionRepo(getIt<WebServices>()));
-   getIt.registerLazySingleton<LessonRepo>(
-      () => LessonRepo(getIt<WebServices>()));    
+  getIt.registerLazySingleton<LessonRepo>(
+      () => LessonRepo(getIt<WebServices>()));
+  getIt.registerLazySingleton<QuizRepo>(() => QuizRepo(getIt<WebServices>()));
+  getIt.registerLazySingleton<EarningsRepo>(
+      () => EarningsRepo(getIt<WebServices>()));
 
   //Cubits
   getIt.registerFactory<MyCubit>(() => MyCubit(getIt<MyRepo>()));
@@ -72,7 +79,9 @@ void initGetIt() {
   getIt.registerFactory<PaymentCubit>(() => PaymentCubit(getIt<PaymentRepo>()));
   getIt.registerFactory<SectionCubit>(() => SectionCubit(getIt<SectionRepo>()));
   getIt.registerFactory<LessonCubit>(() => LessonCubit(getIt<LessonRepo>()));
-
+  getIt.registerFactory<QuizCubit>(() => QuizCubit(getIt<QuizRepo>()));
+  getIt.registerFactory<EarningsCubit>(
+      () => EarningsCubit(getIt<EarningsRepo>()));
 }
 
 Dio createAndSetupDio() {

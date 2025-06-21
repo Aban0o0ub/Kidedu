@@ -8,12 +8,6 @@ class QuizRepo {
   QuizRepo(this.webServices);
 
   Future<AddQuizResponse> addQuiz(AddQuizRequest newQuiz) async {
-    String? token = await CacheHelper.getData(key: "token");
-
-    if (token == null) {
-      throw Exception('Token is missing');
-    }
-
     return await webServices.addQuiz(newQuiz);
   }
 

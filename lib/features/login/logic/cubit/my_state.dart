@@ -22,3 +22,29 @@ class LoginFailure extends LoginState {
 
   LoginFailure(this.error);
 }
+
+//////////////////////////////////////////////////////
+final class ForgetPasswordLoading extends LoginState {}
+
+class ForgetPasswordSuccess extends LoginState {
+  final ForgetPasswordResponse response;
+  ForgetPasswordSuccess(this.response);
+}
+
+class ForgetPasswordFailure extends LoginState {
+  final String error;
+  ForgetPasswordFailure(this.error);
+}
+
+//////////////////////////////////////////////////////
+final class ResetPasswordLoading extends LoginState {}
+
+class ResetPasswordSuccess extends LoginState {
+  final ForgetPasswordResponse response;
+  ResetPasswordSuccess(this.response);
+}
+
+class ResetPasswordFailure extends LoginState {
+  final String error;
+  ResetPasswordFailure(this.error);
+}

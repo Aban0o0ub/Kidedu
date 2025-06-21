@@ -1,23 +1,28 @@
+import 'dart:async';
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loginpage/core/helper/cache_helper.dart';
 import 'package:loginpage/core/networking/web_services.dart';
 import 'package:provider/provider.dart';
 import 'core/injection/injection.dart';
 import 'core/routing/app_router.dart';
+import 'core/routing/routes.dart';
 import 'features/add_course/logic/cubit/add_course_cubit.dart';
 import 'features/cart/logic/cubit/cart_cubit.dart';
+import 'features/kid_profile/ui/widgets/book_mark_manager.dart';
 import 'features/login/data/repo/my_repo.dart';
 import 'features/login/logic/cubit/my_cubit.dart';
-
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await BookmarkManager.loadBookmarks();
   await CacheHelper.cacheInitialization();
   initGetIt();
 
@@ -29,8 +34,7 @@ void main() async {
 
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
-    onDidReceiveNotificationResponse: (NotificationResponse response) {
-    },
+    onDidReceiveNotificationResponse: (NotificationResponse response) {},
   );
 
   runApp(
@@ -60,8 +64,62 @@ void main() async {
   );
 }
 
-class KidEdu extends StatelessWidget {
+class KidEdu extends StatefulWidget {
   const KidEdu({super.key});
+
+  @override
+  State<KidEdu> createState() => _KidEduState();
+}
+
+class _KidEduState extends State<KidEdu> {
+  late AppLinks _appLinks;
+  StreamSubscription<Uri>? _linkSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _initAppLinks();
+  }
+
+  void _initAppLinks() async {
+    _appLinks = AppLinks();
+
+    final Uri? initialUri = await _appLinks.getInitialAppLink();
+    if (initialUri != null) {
+      _handleLink(initialUri);
+    }
+
+    _linkSubscription = _appLinks.uriLinkStream.listen(
+      (Uri uri) {
+        _handleLink(uri);
+      },
+      onError: (err) {},
+    );
+  }
+
+  void _handleLink(Uri uri) {
+    if (uri.path.contains('reset-password') ||
+        uri.toString().contains('reset-password')) {
+      final token = uri.queryParameters['token'];
+      final role = uri.queryParameters['role'];
+
+      if (mounted) {
+        GoRouter.of(context).go(
+          Routes.resetPassword,
+          extra: {
+            'token': token,
+            'role': role,
+          },
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _linkSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +140,7 @@ class KidEdu extends StatelessWidget {
         //     fontFamily: 'Alegreya',
         //   ),
         //   debugShowCheckedModeBanner: false,
-        //   home: const ChangePasswordScreen(), 
+        //   home: const ResetPasswordPage(),
         // );
       },
     );

@@ -3,15 +3,21 @@ import 'package:loginpage/features/lesson/ui/views/view_lesson.dart';
 import '../../features/add_course/ui/views/add_course_page.dart';
 import '../../features/cart/ui/views/cart.dart';
 import '../../features/course_details/ui/views/course_details.dart';
+import '../../features/earnings/ui/views/earning_page.dart';
 import '../../features/home/ui/views/home_page.dart';
 import '../../features/home/ui/views/my_courses.dart';
 import '../../features/instructor_profile/ui/views/instructor_profile_page.dart';
 import '../../features/kid_profile/ui/views/achievments.dart';
+import '../../features/kid_profile/ui/views/boohmark.dart';
 import '../../features/kid_profile/ui/views/edit_profile.dart';
+import '../../features/kid_profile/ui/views/kid_profile_page.dart';
 import '../../features/kid_profile/ui/views/notification.dart';
 import '../../features/kid_profile/ui/views/settings.dart';
+import '../../features/kid_profile/ui/widgets/book_mark_manager.dart';
 import '../../features/lesson/ui/views/add_lesson.dart';
 import '../../features/login/ui/views/login_page.dart';
+import '../../features/login/ui/views/reset_password.dart';
+import '../../features/login/ui/views/send_reset_link.dart';
 import '../../features/onBoarding/ui/welcome_page.dart';
 import '../../features/payment/ui/views/checkout_courses.dart';
 import '../../features/payment/ui/views/payment_page.dart';
@@ -43,6 +49,10 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: Routes.homePage,
       builder: (context, state) => const HomePage(),
+    ),
+    GoRoute(
+      path: Routes.kidProfilePage,
+      builder: (context, state) => const KidProfilePage(),
     ),
     GoRoute(
       path: Routes.instructorProfilePage,
@@ -107,9 +117,39 @@ final GoRouter router = GoRouter(
       path: Routes.notificationPage,
       builder: (context, state) => const NotificationsPage(),
     ),
-     GoRoute(
+    GoRoute(
       path: Routes.viewLesson,
-      builder: (context, state) => const ViewLesson(),
+      builder: (context, state) {
+        final String sectionId = state.extra as String? ?? "";
+        return ViewLesson(sectionId: sectionId);
+      },
     ),
+    GoRoute(
+      path: Routes.earningsScreen,
+      builder: (context, state) => const EarningsScreen(),
+    ),
+    GoRoute(
+      path: Routes.forgetPassword,
+      builder: (context, state) => const SendResetLinkPage(),
+    ),
+    GoRoute(
+      path: Routes.resetPassword, // أو '/resetPassword'
+      builder: (context, state) {
+        final Map<String, String?> data =
+            state.extra as Map<String, String?>? ?? {};
+        final String? token = data['token'];
+        final String? role = data['role'];
+        return ResetPasswordPage(token: token, role: role);
+      },
+    ),
+    GoRoute(
+      path: Routes.bookmarkPage,
+      builder: (context, state) => BookmarkedCoursesPage(
+        bookmarkedCourses: BookmarkManager.bookmarkedCourses,
+        onUpdate: (course) async {
+          await BookmarkManager.removeFromBookmark(course['id']);
+        },
+      ),
+    )
   ],
 );

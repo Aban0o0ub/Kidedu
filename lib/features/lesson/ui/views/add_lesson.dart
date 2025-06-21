@@ -8,8 +8,10 @@ import '../../../../core/injection/injection.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/widgets/appbar.dart';
 import '../../data/models/lesson.dart';
+import '../../data/models/quiz.dart';
 import '../../data/models/section.dart';
 import '../../logic/cubit/lesson_cubit.dart';
+import '../../logic/cubit/quiz_cubit.dart';
 import '../widgets/action_buttons.dart';
 import '../widgets/attachment_selector.dart';
 import '../widgets/caption_option_widget.dart';
@@ -27,6 +29,8 @@ class AddLessonPage extends StatefulWidget {
 }
 
 class _AddLessonPageState extends State<AddLessonPage> {
+  String? sectionId;
+  late QuizCubit quizCubit;
   late SectionCubit sectionCubit;
   late LessonCubit lessonCubit;
   String? selectedSection;
@@ -42,8 +46,12 @@ class _AddLessonPageState extends State<AddLessonPage> {
   final TextEditingController answer2Controller = TextEditingController();
   final TextEditingController answer3Controller = TextEditingController();
   final TextEditingController answer4Controller = TextEditingController();
+  final TextEditingController quizTitleController = TextEditingController();
+  final TextEditingController passingScoreController = TextEditingController();
+  final TextEditingController timeLimitController = TextEditingController();
 
   late final List<TextEditingController> answerControllers;
+  List<QuestionFormData> questions = [QuestionFormData()];
 
   bool showOptions1 = false;
   bool showOptions2 = false;
@@ -58,6 +66,7 @@ class _AddLessonPageState extends State<AddLessonPage> {
     super.initState();
     sectionCubit = getIt<SectionCubit>();
     lessonCubit = getIt<LessonCubit>();
+    quizCubit = getIt<QuizCubit>();
 
     sectionCubit.emitGetSection(widget.courseId);
 
@@ -110,6 +119,12 @@ class _AddLessonPageState extends State<AddLessonPage> {
       captionController.clear();
       linkController.clear();
       _selectedImage = null;
+
+      quizTitleController.clear();
+      passingScoreController.clear();
+      timeLimitController.clear();
+      questions = [QuestionFormData()];
+
       showOptions1 = false;
       showOptions2 = false;
       showOptions3 = false;
@@ -117,11 +132,107 @@ class _AddLessonPageState extends State<AddLessonPage> {
     });
   }
 
-  void _handleUpload() {
-    if (_validateInputs()) {
-      final request = _buildLessonRequest();
-      lessonCubit.emitAddLesson(request);
+ void _handleUpload() async {
+  print("🚀 Starting upload process...");
+  
+  if (_validateInputs()) {
+    try {
+      final lessonRequest = _buildLessonRequest();
+      print("📝 Lesson request built, uploading lesson...");
+      
+      await lessonCubit.emitAddLesson(lessonRequest);
+      print("✅ Lesson upload initiated");
+
+      await _handleLessonCreationAndQuiz();
+    } catch (e) {
+      print("❌ Upload Error: $e");
+      _showErrorMessage('Error: $e');
     }
+  }
+}
+
+Future<void> _handleLessonCreationAndQuiz() async {
+  print("🎯 Waiting for lesson creation result...");
+  
+  await for (final state in lessonCubit.stream) {
+    print("📊 Lesson state: $state");
+    
+    if (state is AddLessonSuccess) {
+      final lessonId = state.newLesson.lesson.id;
+      print("✅ Lesson created successfully with ID: $lessonId");
+
+      if (_hasQuizData()) {
+        print("🧠 Quiz data found, creating quiz...");
+        await _createQuiz(lessonId);
+      } else {
+        print("ℹ️ No quiz data, finishing without quiz");
+        _showSuccessMessage('Lesson uploaded successfully!');
+        _clearForm();
+        context.push(Routes.viewLesson,
+            extra: state.newLesson.lesson.sectionId);
+      }
+      break;
+    } else if (state is AddLessonFailure) {
+      print("❌ Lesson creation failed: ${state.error}");
+      _showErrorMessage('Lesson Upload Error: ${state.error}');
+      break;
+    }
+  }
+}
+
+Future<void> _createQuiz(String lessonId) async {
+  try {
+    final quizRequest = _buildQuizRequest(lessonId);
+    print("🧠 Quiz request built: ${quizRequest.title}");
+    print("🧠 Questions count: ${quizRequest.questions.length}");
+    
+    await quizCubit.emitAddQuiz(quizRequest);
+    print("✅ Quiz upload initiated");
+
+    await for (final state in quizCubit.stream) {
+      print("📊 Quiz state: $state");
+      
+      if (state is AddQuizSuccess) {
+        print("✅ Quiz created successfully!");
+        _showSuccessMessage('Lesson and Quiz uploaded successfully!');
+        _clearForm();
+        Navigator.pop(context);
+        break;
+      } else if (state is AddQuizFailure) {
+        print("❌ Quiz creation failed: ${state.error}");
+        _showErrorMessage('Quiz Upload Error: ${state.error}');
+        break;
+      }
+    }
+  } catch (e) {
+    print("❌ Quiz Error: $e");
+    _showErrorMessage('Quiz Error: $e');
+  }
+}
+
+bool _hasQuizData() {
+  bool hasQuizTitle = quizTitleController.text.trim().isNotEmpty;
+  bool hasQuestions = questions.any((q) => q.questionText.trim().isNotEmpty);
+  
+  print("🧠 Has quiz title: $hasQuizTitle");
+  print("🧠 Has questions: $hasQuestions");
+  print("🧠 Quiz title: '${quizTitleController.text.trim()}'");
+  print("🧠 Questions: ${questions.map((q) => q.questionText.trim()).toList()}");
+  
+  return hasQuizTitle && hasQuestions;
+}
+
+  AddQuizRequest _buildQuizRequest(String lessonId) {
+    return AddQuizRequest(
+      lessonId: lessonId,
+      title: quizTitleController.text.trim(),
+      passingScore: int.tryParse(passingScoreController.text) ?? 70,
+      timeLimit: int.tryParse(timeLimitController.text) ?? 30,
+      questions: questions
+          .where((q) => q.questionText.trim().isNotEmpty)
+          .map((q) => q.toQuestionRequest())
+          .toList(),
+    );
   }
 
   bool _validateInputs() {
@@ -143,23 +254,7 @@ class _AddLessonPageState extends State<AddLessonPage> {
       return false;
     }
 
-    if (hasYoutubeLink) {
-      String link = linkController.text.trim();
-      if (!_isValidYouTubeUrl(link)) {
-        _showErrorMessage('Please enter a valid YouTube URL');
-        return false;
-      }
-    }
-
     return true;
-  }
-
-  bool _isValidYouTubeUrl(String url) {
-    final youtubeRegex = RegExp(
-      r'^https?://(www\.)?(youtube\.com/(watch\?v=|embed/)|youtu\.be/)',
-      caseSensitive: false,
-    );
-    return youtubeRegex.hasMatch(url);
   }
 
   LessonCreateRequest _buildLessonRequest() {
@@ -172,12 +267,11 @@ class _AddLessonPageState extends State<AddLessonPage> {
     return LessonCreateRequest(
       sectionId: selectedSection!,
       name: lessonNameController.text.trim(),
-      description: captionController.text.trim().isEmpty 
-          ? "" 
+      description: captionController.text.trim().isEmpty
+          ? ""
           : captionController.text.trim(),
-      youtubeVideoUrl: linkController.text.trim().isEmpty 
-          ? "" 
-          : linkController.text.trim(),
+      youtubeVideoUrl:
+          linkController.text.trim().isEmpty ? "" : linkController.text.trim(),
       files: files,
     );
   }
@@ -211,13 +305,13 @@ class _AddLessonPageState extends State<AddLessonPage> {
         return CaptionOptionWidget(controller: captionController);
       case 3:
         return QuizOptionWidget(
-          questionController: quizQuestionController,
-          answerControllers: answerControllers,
-          answers: answers,
-          selectedAnswer: selectedAnswer,
-          onAnswerChanged: (newValue) {
+          quizTitleController: quizTitleController,
+          passingScoreController: passingScoreController,
+          timeLimitController: timeLimitController,
+          questions: questions,
+          onQuestionsChanged: (updatedQuestions) {
             setState(() {
-              selectedAnswer = newValue;
+              questions = updatedQuestions;
             });
           },
         );
@@ -240,6 +334,10 @@ class _AddLessonPageState extends State<AddLessonPage> {
     answer2Controller.dispose();
     answer3Controller.dispose();
     answer4Controller.dispose();
+    quizTitleController.dispose();
+    passingScoreController.dispose();
+    timeLimitController.dispose();
+
     super.dispose();
   }
 
@@ -249,6 +347,7 @@ class _AddLessonPageState extends State<AddLessonPage> {
       providers: [
         BlocProvider.value(value: sectionCubit),
         BlocProvider.value(value: lessonCubit),
+        BlocProvider.value(value: quizCubit),
       ],
       child: Scaffold(
         appBar: CustomAppBar(
@@ -272,17 +371,27 @@ class _AddLessonPageState extends State<AddLessonPage> {
               },
             ),
             // LessonCubit Listener
-            BlocListener<LessonCubit, LessonState>(
-              listener: (context, state) {
-                if (state is AddLessonSuccess) {
-                  _showSuccessMessage('Lesson uploaded successfully!');
-                  _clearForm();
-                  context.push(Routes.viewLesson);
-                } else if (state is AddLessonFailure) {
-                  _showErrorMessage('Upload Error: ${state.error}');
-                }
-              },
-            ),
+            // BlocListener<LessonCubit, LessonState>(
+            //   listener: (context, state) {
+            //     if (state is AddLessonSuccess) {
+            //       _showSuccessMessage('Lesson uploaded successfully!');
+            //       _clearForm();
+            //       context.push(Routes.viewLesson,
+            //           extra: state.newLesson.lesson.sectionId);
+            //     } else if (state is AddLessonFailure) {
+            //       _showErrorMessage('Upload Error: ${state.error}');
+            //     }
+            //   },
+            // ),
+            // BlocListener<QuizCubit, QuizState>(
+            //   listener: (context, state) {
+            //     if (state is AddQuizSuccess) {
+            //       _showSuccessMessage('Quiz added successfully!');
+            //     } else if (state is AddQuizFailure) {
+            //       _showErrorMessage('Quiz Error: ${state.error}');
+            //     }
+            //   },
+            // ),
           ],
           child: BlocBuilder<SectionCubit, SectionState>(
             builder: (context, state) {

@@ -6,29 +6,102 @@ import 'package:loginpage/features/login/data/repo/my_repo.dart';
 import '../../../sign_up/data/models/kid.dart';
 
 part 'my_state.dart';
+
 class LoginCubit extends Cubit<LoginState> {
   final LoginRepo myRepo;
 
   LoginCubit(this.myRepo) : super(LoginInitial());
 
   Future<void> emitLoginUser({required User user}) async {
-  emit(LoginLoading());
+    emit(LoginLoading());
 
-  try {
-    LoginResponse response = await myRepo.loginUser(user);
+    try {
+      LoginResponse response = await myRepo.loginUser(user);
 
-    if (response.role == 'kid') {
-      emit(LoginKidSuccess(response));
-    } else if (response.role == 'instructor') {
-      emit(LoginInstructorSuccess(response));
-    } else {
-      emit(LoginFailure('role is incorrect ${response.role}'));
+      if (response.role == 'kid') {
+        emit(LoginKidSuccess(response));
+      } else if (response.role == 'instructor') {
+        emit(LoginInstructorSuccess(response));
+      } else {
+        emit(LoginFailure('role is incorrect ${response.role}'));
+      }
+    } catch (e) {
+      emit(LoginFailure('error: ${e.toString()}'));
     }
+  }
+
+  Future<void> emitForgetPassword({
+    required String email,
+    required String? role,
+  }) async {
+    emit(ForgetPasswordLoading());
+
+    if (role == null || role.isEmpty) {
+      emit(ForgetPasswordFailure('Please select a role.'));
+      return;
+    }
+    if (email.isEmpty) {
+      emit(ForgetPasswordFailure('Please enter your email.'));
+      return;
+    }
+
+    try {
+      final request = ForgetPasswordRequest(email: email, role: role);
+      final response = await myRepo.forgetPassword(request);
+      emit(ForgetPasswordSuccess(response));
+    } catch (e) {
+      // Parse error message better
+      String errorMessage = 'Something went wrong. Please try again.';
+      if (e.toString().contains('Server error:')) {
+        errorMessage =
+            e.toString().replaceFirst('Exception: Server error: ', '');
+      }
+      emit(ForgetPasswordFailure(errorMessage));
+    }
+  }
+
+  Future<void> emitResetPassword({
+  required String newPassword,
+  required String token,
+}) async {
+  emit(ResetPasswordLoading());
+  
+  try {
+    if (newPassword.isEmpty) {
+      emit(ResetPasswordFailure('Password cannot be empty'));
+      return;
+    }
+    if (token.isEmpty) {
+      emit(ResetPasswordFailure('Invalid reset token'));
+      return;
+    }
+    
+    final request = ResetPasswordRequest(newPassword: newPassword);
+    
+    final response = await myRepo.resetPassword(
+      token: token,
+      resetPassword: request,
+    );
+    
+    emit(ResetPasswordSuccess(response));
+    
   } catch (e) {
-    emit(LoginFailure('error: ${e.toString()}'));
+    String errorMessage = _extractErrorMessage(e.toString());
+    emit(ResetPasswordFailure(errorMessage));
   }
 }
+
+String _extractErrorMessage(String error) {
+  if (error.contains('Server error:')) {
+    return error.replaceFirst('Exception: Server error: ', '');
+  } else if (error.contains('Network error:')) {
+    return 'Network connection failed. Please check your internet.';
+  }
+  return 'Something went wrong. Please try again.';
 }
+
+}
+
 class RoleCubit extends Cubit<String?> {
   RoleCubit() : super(null);
 
@@ -39,4 +112,9 @@ class RoleCubit extends Cubit<String?> {
   void clearRole() {
     emit(null);
   }
+
+  // Helper method
+  bool get hasRole => state != null && state!.isNotEmpty;
 }
+
+

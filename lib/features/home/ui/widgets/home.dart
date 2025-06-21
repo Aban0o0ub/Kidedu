@@ -8,6 +8,7 @@ import 'package:loginpage/features/instructor_profile/ui/widgets/review_card.dar
 import '../../../../core/injection/injection.dart';
 import '../../../kid_profile/logic/cubit/kid_profile_cubit.dart';
 import '../../../sign_up/data/models/kid.dart';
+import '../../logic/cubit/course_category_cubit.dart';
 import 'arts_category.dart';
 import 'education_category.dart';
 import 'games_category.dart';
@@ -22,7 +23,7 @@ class Home extends StatefulWidget {
     required this.backgroundImages,
     required this.iconImages,
     required this.kid,
-     this.onCategorySelected,
+    this.onCategorySelected,
   });
 
   final List<String> courseTitles;
@@ -46,19 +47,26 @@ class _HomeState extends State<Home> {
   };
 
   late KidProfileCubit kidProfileCubit;
+  late CourseCategoryCubit courseCategoryCubit;
 
   @override
   void initState() {
     super.initState();
     NavBarVisibilityController.showNavBar();
     kidProfileCubit = getIt<KidProfileCubit>();
+    courseCategoryCubit = getIt<CourseCategoryCubit>();
+
     kidProfileCubit.emitGetKidProfile();
+    courseCategoryCubit.emitGetTrendingCourses();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: kidProfileCubit,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: kidProfileCubit),
+        BlocProvider.value(value: courseCategoryCubit),
+      ],
       child: Scaffold(
         body: Column(
           children: [
@@ -66,7 +74,7 @@ class _HomeState extends State<Home> {
               builder: (context, state) {
                 String kidName = "Kid";
 
-                if (state is GetSingleKid &&
+                if (state is KidProfileSuccess &&
                     state.kid.name != null &&
                     state.kid.name!.isNotEmpty) {
                   kidName = state.kid.name!;
@@ -99,25 +107,107 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     const SizedBox(height: 7),
-                    SizedBox(
-                      height: 180,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          buildCourseBox(
-                            courseName: "Swimming for toddlers",
-                            imagePath: "assets/images/swimming.jpg",
+                   BlocBuilder<CourseCategoryCubit, CourseCategoryState>(
+                      builder: (context, state) {
+                        print('🔥 Current State: $state');
+                        if (state is TrendingCoursesLoading) {
+                          return const SizedBox(
+                            height: 180,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: Color(0xFF02457A),
+                              ),
+                            ),
+                          );
+                        } else if (state is GetTrendingCourseSuccess) {
+                          if (state.courses.isEmpty) {
+        return const SizedBox(
+          height: 180,
+          child: Center(
+            child: Text(
+              "No trending courses available",
+              style: TextStyle(
+                color: Color(0xFF02457A),
+                fontSize: 16,
+              ),
+            ),
+          ),
+        );
+      }
+      
+      return SizedBox(
+        height: 180,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: state.courses.length,
+          itemBuilder: (context, index) {
+            final course = state.courses[index];
+            return buildCourseBox(
+  courseName: course.courseName ?? "Unknown Course",
+  imagePath: (course.courseImage == null ||
+              course.courseImage!.isEmpty ||
+              !course.courseImage!.startsWith("assets/"))
+      ? "assets/images/CourseDefaultPhoto.jpeg"
+      : course.courseImage!,
+);
+
+          },
+        ),
+      );
+                        } else if (state is GetTrendingCourseFailure) {
+                          return SizedBox(
+                            height: 180,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.error_outline,
+                                    color: Colors.red,
+                                    size: 40,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "Failed to load trending courses",
+                                    style: TextStyle(
+                                      color: Colors.red[700],
+                                      fontSize: 14,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      context
+                                          .read<CourseCategoryCubit>()
+                                          .emitGetTrendingCourses();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF02457A),
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    child: const Text("Retry"),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
+                        // Default empty state
+                        return const SizedBox(
+                          height: 180,
+                          child: Center(
+                            child: Text(
+                              "No trending courses available",
+                              style: TextStyle(
+                                color: Color(0xFF02457A),
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
-                          buildCourseBox(
-                            courseName: "Sciences",
-                            imagePath: "assets/images/science.jpg",
-                          ),
-                          buildCourseBox(
-                            courseName: "Mathematics",
-                            imagePath: "assets/images/maths.jpg",
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 20),
 
@@ -171,7 +261,7 @@ class _HomeState extends State<Home> {
                           );
                         },
                       ),
-                    ), 
+                    ),
 
                     const SizedBox(height: 20),
 

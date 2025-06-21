@@ -35,7 +35,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         padding: const EdgeInsets.all(20),
         child: BlocBuilder<InstructorProfileCubit, InstructorProfileState>(
           builder: (context, state) {
-            if (state is GetSingleInstructor) {
+            if (state is InstructorProfileSuccess) {
               var instructor = state.instructor;
               return Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -58,11 +58,13 @@ class _ProfileBodyState extends State<ProfileBody> {
                     ),
                     const SizedBox(height: 30),
                     buildInfoContainer(
+                      context: context,
                       header: "Bio",
                       text: instructor.bio ?? "No bio available",
                     ),
                     const SizedBox(height: 20),
                     buildInfoContainer(
+                       context: context,
                       header: "Personal Information",
                       name: instructor.name ?? "Instructor Name",
                       phone: instructor.phoneNumber ?? "No phone available",
@@ -73,6 +75,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                     ),
                     const SizedBox(height: 20),
                     buildInfoContainer(
+                       context: context,
                       header: "Experience",
                       text: instructor.experience ?? "No experience available",
                     ),
@@ -254,7 +257,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                           ]),
                     )
                   ]);
-            } else if (state is MyFailure) {
+            } else if (state is InstructorProfileFailure) {
               return Center(
                 child: Text(
                   "There is an error: ${state.error}",

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/routing/routes.dart';
 
 class RememberMeCheckbox extends StatelessWidget {
   const RememberMeCheckbox({
@@ -29,14 +32,7 @@ class RememberMeCheckbox extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => const ForgetPassword(),
-            //   ),
-            // ).then((_) {
-            //   FocusScope.of(context).unfocus();
-            // });
+             context.push(Routes.forgetPassword);
           },
           child: const Text(
             'Forget Password?',

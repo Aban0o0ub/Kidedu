@@ -30,15 +30,7 @@ class _CartState extends State<Cart> {
         child: Column(
           children: [
             Expanded(child: CartDetails()),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-            //   child: CustomButton(
-            //     text: "Proceed to Payment",
-            //     onPressed: () {
-            //       context.push(Routes.paymentScreen);
-            //     },
-            //   ),
-            // ),
+           
           ],
         ),
       ),

@@ -24,17 +24,18 @@ class LessonModel {
 
   factory LessonModel.fromJson(Map<String, dynamic> json) {
     return LessonModel(
-      id: json['_id'] as String,
-      name: json['name'] as String,
-      sectionId: json['sectionId'] as String,
-      instructorId: json['instructorId'] as String,
-      description: json['description'] as String?,
-      youtubeVideoUrl: json['youtubeVideoUrl'] as String?,
-      quiz: json['quiz']?.toString(),
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      sectionId: json['sectionId'] ?? '',
+      instructorId: json['instructorId'] ?? '',
+      description: json['description'],
+      youtubeVideoUrl: json['youtubeVideoUrl'],
+      quiz: json['quiz'],
+      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
     );
   }
 }
+
 
 class LessonResponse {
   final LessonModel lesson;

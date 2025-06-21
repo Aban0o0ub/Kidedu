@@ -4,6 +4,7 @@ class Routes {
   static const authKidPage = '/authKid';
   static const authInstructorPage = '/authInstructor';
   static const homePage = '/home';
+  static const kidProfilePage = '/kidProfile';
   static const instructorProfilePage = '/instructorProfile';
   static const addCoursePage = '/addCourse';
   static const loginPage = '/login';
@@ -20,4 +21,8 @@ class Routes {
   static const addLessonPage = '/add-lesson';
   static const notificationPage = '/notification';
   static const viewLesson = '/viewLesson';
+  static const earningsScreen = '/earningsScreen';
+  static const forgetPassword = '/forgetPassword';
+  static const resetPassword = '/resetPassword';
+  static const bookmarkPage = '/bookmarkPage';
 }

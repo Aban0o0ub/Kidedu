@@ -31,11 +31,15 @@ class CourseCategoryCubit extends Cubit<CourseCategoryState> {
 }
 
 Future<void> emitGetTrendingCourses() async {
+  print('🔥 Starting trending courses fetch...');
   emit(TrendingCoursesLoading());
   try {
-    final List<CourseData> trendCourses = await courseDetailsRepo.getKidCourses(); 
+    final List<CourseData> trendCourses = await courseDetailsRepo.getTrendingCourses();
+    print('🔥 Cubit received ${trendCourses.length} courses');
     emit(GetTrendingCourseSuccess(trendCourses));
+    print('🔥 Emitted GetTrendingCourseSuccess');
   } catch (e) {
+    print('🔥 Cubit Error: ${e.toString()}');
     emit(GetTrendingCourseFailure(e.toString()));
   }
 }

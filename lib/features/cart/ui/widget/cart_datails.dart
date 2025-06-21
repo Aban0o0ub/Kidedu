@@ -38,7 +38,7 @@ class CartDetails extends StatelessWidget {
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.only(bottom: 32),
-                  itemCount: cartCourses.length + 1, 
+                  itemCount: cartCourses.length + 1,
                   itemBuilder: (context, index) {
                     if (index < cartCourses.length) {
                       final course = cartCourses[index];
@@ -46,14 +46,27 @@ class CartDetails extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16.0, vertical: 8),
                         child: CourseCard(
-                          courseImage: course.course.courseImage,
-                          courseName: course.course.courseName ?? "",
-                          instructor: course.course.courseName ?? "",
-                          description: course.course.description ?? '',
-                          price: course.course.price ?? 0,
-                          availability:
-                              course.course.availability ?? 'Available',
-                          id: course.id,
+                          courseImage: course.course is String
+                              ? ''
+                              : course.course.courseImage,
+                          courseName: course.course is String
+                              ? 'Course Name'
+                              : (course.course.courseName ?? ""),
+                          instructor: course.course is String
+                              ? 'Instructor'
+                              : (course.course.courseName ?? ""),
+                          description: course.course is String
+                              ? 'Description'
+                              : (course.course.description ?? ''),
+                          price: course.course is String
+                              ? 0
+                              : (course.course.price ?? 0),
+                          availability: course.course is String
+                              ? 'Available'
+                              : (course.course.availability ?? 'Available'),
+                          id: course.course is String
+                              ? course.course
+                              : course.course.id,
                           fromCartPage: true,
                         ),
                       );
@@ -79,7 +92,7 @@ class CartDetails extends StatelessWidget {
             ],
           );
         } else if (state is GetCartFailure) {
-         return const EmptyCart();
+          return const EmptyCart();
         } else {
           return const Center(child: Text('Something went wrong.'));
         }

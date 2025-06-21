@@ -249,29 +249,23 @@ class LoginPageState extends State<LoginPage> {
 
 // class LoginPage extends StatefulWidget {
 //   const LoginPage({super.key});
-
 //   @override
 //   LoginPageState createState() => LoginPageState();
 // }
-
 // class LoginPageState extends State<LoginPage> {
 //   bool _rememberMe = false;
 //   bool isSubmitted = false;
-
 //   final _formKey = GlobalKey<FormState>();
 //   final TextEditingController _emailController = TextEditingController();
 //   final TextEditingController _passwordController = TextEditingController();
 //   LoginCubit loginCubit = getIt<LoginCubit>();
-
 //   @override
 //   void initState() {
 //     super.initState();
-
 //     WidgetsBinding.instance.addPostFrameCallback((_) {
 //       FocusScope.of(context).unfocus();
 //     });
 //   }
-
 //   void showErrorMessage(String message) {
 //     ScaffoldMessenger.of(context).showSnackBar(
 //       SnackBar(
@@ -280,14 +274,12 @@ class LoginPageState extends State<LoginPage> {
 //       ),
 //     );
 //   }
-
 //   @override
 //   void dispose() {
 //     _emailController.dispose();
 //     _passwordController.dispose();
 //     super.dispose();
 //   }
-
 //   Future<String> checkUserType(String email) async {
 //     if (email.contains('instructor')) {
 //       return 'instructor';
@@ -295,7 +287,6 @@ class LoginPageState extends State<LoginPage> {
 //       return 'kid';
 //     }
 //   }
-
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
@@ -327,15 +318,12 @@ class LoginPageState extends State<LoginPage> {
 //                     if (_formKey.currentState!.validate()) {
 //                       final email = _emailController.text.trim();
 //                       final password = _passwordController.text.trim();
-
 //                       final role = context.read<RoleCubit>().state;
-
 //                       final user = User(
 //                         email: email,
 //                         password: password,
 //                         role: role,
 //                       );
-
 //                       context.read<LoginCubit>().emitLoginUser(
 //                         user: user,
 //                       );
@@ -353,7 +341,6 @@ class LoginPageState extends State<LoginPage> {
 //                 actionText: "Sign up",
 //                 onActionPressed: () {
 //                   final role = context.read<RoleCubit>().state;
-
 //                   if (role == 'kid') {
 //                     context.read<RoleCubit>().selectRole('kid');
 //                     context.push(Routes.authKidPage);
@@ -361,7 +348,6 @@ class LoginPageState extends State<LoginPage> {
 //                     context.read<RoleCubit>().selectRole('instructor');
 //                     context.push(Routes.authInstructorPage);
 //                   }
-
 //                   FocusScope.of(context).unfocus();
 //                 },
 //               ),

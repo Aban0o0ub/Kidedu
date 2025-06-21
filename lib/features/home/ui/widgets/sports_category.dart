@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:loginpage/core/widgets/arrow_back.dart';
 import 'package:loginpage/features/home/logic/cubit/course_category_cubit.dart';
 import 'package:loginpage/features/home/ui/widgets/course_card.dart';
-
 import '../../../../core/injection/injection.dart';
+import '../../../../core/widgets/appbar.dart';
+import '../../../../core/widgets/fluttertoast.dart';
+import '../../../cart/logic/cubit/cart_cubit.dart';
+import 'nav_bar_visibility_controller.dart';
 
 class SportsCategory extends StatefulWidget {
   final String category; 
@@ -17,11 +19,14 @@ class SportsCategory extends StatefulWidget {
 
 class _SportsCategoryState extends State<SportsCategory> {
   late CourseCategoryCubit courseCategoryCubit;
+ late CartCubit cartCubit;
 
   @override
   void initState() {
     super.initState();
+    NavBarVisibilityController.showNavBar();
     courseCategoryCubit = getIt<CourseCategoryCubit>();
+    cartCubit = getIt<CartCubit>();
 
     Future.microtask(() {
       courseCategoryCubit.emitGetCourseByCategory(widget.category);
@@ -33,56 +38,54 @@ class _SportsCategoryState extends State<SportsCategory> {
     return BlocProvider.value(
       value: courseCategoryCubit,
       child: Scaffold(
-        body: Column(
-          children: [
-            ArrowBack(),
-            SizedBox(height: 35),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                'assets/images/sports.jpg',
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              ),
+        backgroundColor: Colors.white,
+        appBar: CustomAppBar(
+          title: "Sports",
+          onBackPressed: () => Navigator.pop(context),
+        ),
+        body: BlocProvider.value(
+          value: cartCubit,
+          child: BlocListener<CartCubit, CartState>(
+            listener: (context, state) {
+              if (state is AddCartSuccess) {
+                showCustomToast(context, "Course added to cart!",
+                    isSuccess: true);
+              } else if (state is AddCartFailure) {
+                showCustomToast(context, "Failed to add course!",
+                    isSuccess: false);
+              }
+            },
+            child: BlocBuilder<CourseCategoryCubit, CourseCategoryState>(
+              builder: (context, state) {
+                if (state is CourseCategoryLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is GetCourseByCategorySuccess) {
+                  return ListView.builder(
+                    itemCount: state.courses.length,
+                    itemBuilder: (context, index) {
+                      final course = state.courses[index];
+                      return CourseCard(
+                        courseImage: course.courseImage,
+                        courseName: course.courseName ?? "Unknown Course",
+                        instructor: course.instructor?['Name'],
+                        description: course.description ?? "",
+                        price: course.price ?? 0,
+                        availability: course.availability ?? "unavailable",
+                        id: course.id,
+                        fromCartPage: false,
+                      );
+                    },
+                  );
+                } else if (state is GetCourseByCategoryFailure) {
+                  return Center(
+                    child: Text("Error: ${state.error}",
+                        style: const TextStyle(color: Colors.red)),
+                  );
+                }
+                return const Center(child: Text("No courses available."));
+              },
             ),
-            SizedBox(height: 8),
-            Text(
-              "Sports",
-              style: TextStyle(fontSize: 46, fontWeight: FontWeight.bold),
-            ),
-            //SizedBox(height: 16),
-            Expanded(
-              child: BlocBuilder<CourseCategoryCubit, CourseCategoryState>(
-                builder: (context, state) {
-                  if (state is CourseCategoryLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (state is GetCourseByCategorySuccess) {
-                    return ListView.builder(
-                      itemCount: state.courses.length,
-                      itemBuilder: (context, index) {
-                        final course = state.courses[index];
-                        return CourseCard(
-                          courseImage: course.courseImage,
-                          courseName: course.courseName ?? "Unknown Course",
-                          instructor: course.instructor?['Name'],
-                          description: course.description ?? "",
-                          price: course.price ?? 0,
-                          availability: course.availability ?? "unavailable",
-                        );
-                      },
-                    );
-                  } else if (state is GetCourseByCategoryFailure) {
-                    return Center(
-                      child: Text("Error: ${state.error}",
-                          style: const TextStyle(color: Colors.red)),
-                    );
-                  }
-                  return const Center(child: Text("No courses available."));
-                },
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
