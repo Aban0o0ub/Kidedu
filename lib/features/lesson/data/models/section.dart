@@ -20,21 +20,24 @@ class SectionModel {
   });
 
   factory SectionModel.fromJson(Map<String, dynamic> json) {
-    final lessonsList = json['lessons'] as List<dynamic>? ?? [];
-    return SectionModel(
-      id: json['id'] as String? ?? json['_id'] as String? ?? '',
-      title: json['title'] ?? '',
-      courseId: json['courseId'] as String?,
-      instructorId: json['instructorId'] as String?,
-      createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt'])
-          : null,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.tryParse(json['updatedAt'])
-          : null,
-      lessons: lessonsList.map((e) => LessonModel.fromJson(e)).toList(),
-    );
-  }
+  final lessonsList = json['lessons'] as List<dynamic>? ?? [];
+  return SectionModel(
+    id: json['id']?.toString() ?? json['_id']?.toString() ?? '', // إزالة as String
+    title: json['title']?.toString() ?? '', // إضافة null safety
+    courseId: json['courseId']?.toString(), // إزالة as String
+    instructorId: json['instructorId']?.toString(), // إزالة as String
+    createdAt: json['createdAt'] != null
+        ? DateTime.tryParse(json['createdAt'].toString()) // إضافة toString()
+        : null,
+    updatedAt: json['updatedAt'] != null
+        ? DateTime.tryParse(json['updatedAt'].toString()) // إضافة toString()
+        : null,
+    lessons: lessonsList
+        .where((e) => e != null) // تصفية الـ null values
+        .map((e) => LessonModel.fromJson(e as Map<String, dynamic>))
+        .toList(),
+  );
+}
 }
 
 

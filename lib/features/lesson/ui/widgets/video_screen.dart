@@ -39,11 +39,19 @@ class _VideoLessonState extends State<VideoLesson> {
     }
   }
 
-   @override
-  void dispose() {
-    _controller?.dispose(); // استخدم ?. للـ null safety
-    super.dispose();
+ // في VideoLesson
+@override
+void dispose() {
+  if (_controller != null) {
+    try {
+      _controller!.dispose();
+    } catch (e) {
+      print('Controller already disposed: $e');
+    }
+    _controller = null;
   }
+  super.dispose();
+}
 
  @override
 Widget build(BuildContext context) {

@@ -107,7 +107,7 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     const SizedBox(height: 7),
-                   BlocBuilder<CourseCategoryCubit, CourseCategoryState>(
+                    BlocBuilder<CourseCategoryCubit, CourseCategoryState>(
                       builder: (context, state) {
                         print('🔥 Current State: $state');
                         if (state is TrendingCoursesLoading) {
@@ -121,39 +121,40 @@ class _HomeState extends State<Home> {
                           );
                         } else if (state is GetTrendingCourseSuccess) {
                           if (state.courses.isEmpty) {
-        return const SizedBox(
-          height: 180,
-          child: Center(
-            child: Text(
-              "No trending courses available",
-              style: TextStyle(
-                color: Color(0xFF02457A),
-                fontSize: 16,
-              ),
-            ),
-          ),
-        );
-      }
-      
-      return SizedBox(
-        height: 180,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: state.courses.length,
-          itemBuilder: (context, index) {
-            final course = state.courses[index];
-            return buildCourseBox(
-  courseName: course.courseName ?? "Unknown Course",
-  imagePath: (course.courseImage == null ||
-              course.courseImage!.isEmpty ||
-              !course.courseImage!.startsWith("assets/"))
-      ? "assets/images/CourseDefaultPhoto.jpeg"
-      : course.courseImage!,
-);
+                            return const SizedBox(
+                              height: 180,
+                              child: Center(
+                                child: Text(
+                                  "No trending courses available",
+                                  style: TextStyle(
+                                    color: Color(0xFF02457A),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
 
-          },
-        ),
-      );
+                          return SizedBox(
+                            height: 180,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: state.courses.length,
+                              itemBuilder: (context, index) {
+                                final course = state.courses[index];
+                                return buildCourseBox(
+                                  courseName:
+                                      course.courseName ?? "Unknown Course",
+                                  imagePath: (course.courseImage == null ||
+                                          course.courseImage!.isEmpty ||
+                                          !course.courseImage!
+                                              .startsWith("assets/"))
+                                      ? "assets/images/CourseDefaultPhoto.jpeg"
+                                      : course.courseImage!,
+                                );
+                              },
+                            ),
+                          );
                         } else if (state is GetTrendingCourseFailure) {
                           return SizedBox(
                             height: 180,

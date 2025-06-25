@@ -1,3 +1,5 @@
+import '../../../lesson/data/models/section.dart';
+
 class CourseRequest {
   String? courseName;
   String? instructor;
@@ -84,6 +86,8 @@ class CourseResponse {
   CourseData? data;
   List<CourseData>? courses;
   List<CourseData>? trendingCourses;
+  List<CourseData>? allCourses;
+  List<CourseData>? purchasedCourses;
 
   CourseResponse({
     this.status,
@@ -91,6 +95,8 @@ class CourseResponse {
     this.courses,
     this.trendingCourses,
     this.success,
+    this.allCourses,
+    this.purchasedCourses,
   });
 
   factory CourseResponse.fromJson(Map<String, dynamic> json) {
@@ -105,10 +111,6 @@ class CourseResponse {
     return CourseResponse(
       status:
           json['status'] ?? (json['success'] == true ? 'success' : 'failed'),
-      // data: json['data'] != null
-      //     ? CourseData.fromJson(
-      //         json['data']['new_course'] ?? json['data']['onlyCourse'] ?? {})
-      //     : null,
       data: hasDataWrapper
           ? CourseData.fromJson(
               json['data']['new_course'] ?? json['data']['onlyCourse'] ?? {})
@@ -124,6 +126,17 @@ class CourseResponse {
               ? List<CourseData>.from(json['trendingCourses']
                   .map((course) => CourseData.fromJson(course)))
               : [],
+      allCourses: json['data'] != null &&
+              json['data']['allCourses'] != null &&
+              json['data']['allCourses'] is List
+          ? List<CourseData>.from(json['data']['allCourses']
+              .map((course) => CourseData.fromJson(course)))
+          : [],
+      purchasedCourses:
+          json['purchasedCourses'] != null && json['purchasedCourses'] is List
+              ? List<CourseData>.from(json['purchasedCourses']
+                  .map((course) => CourseData.fromJson(course)))
+              : [],
     );
   }
 
@@ -136,6 +149,9 @@ class CourseResponse {
           : null,
       'trendingCourses': trendingCourses != null
           ? trendingCourses!.map((course) => course.toJson()).toList()
+          : null,
+      'allCourses': allCourses != null
+          ? allCourses!.map((course) => course.toJson()).toList()
           : null,
     };
   }
@@ -166,85 +182,182 @@ class CourseData {
   String? firstSection;
   int? numKids;
   List<int>? suitableAges;
+  num? earnings;
+  bool? purchased;
+  List<SectionModel>? sections;
+  String? governorate;
 
-  CourseData(
-      {this.id,
-      this.courseName,
-      this.courseId,
-      this.instructor,
-      this.kids,
-      this.level,
-      this.availability,
-      this.offer,
-      this.category,
-      this.description,
-      this.startDate,
-      this.endDate,
-      this.courseImage,
-      this.createdAt,
-      this.updatedAt,
-      this.priceAfterDiscount,
-      this.v,
-      this.price,
-      this.ratingQuantity,
-      this.lessons,
-      this.progress,
-      this.firstSection,
-      this.suitableAges,
-      this.numKids});
+  CourseData({
+    this.id,
+    this.courseName,
+    this.courseId,
+    this.instructor,
+    this.kids,
+    this.level,
+    this.availability,
+    this.offer,
+    this.category,
+    this.description,
+    this.startDate,
+    this.endDate,
+    this.courseImage,
+    this.createdAt,
+    this.updatedAt,
+    this.priceAfterDiscount,
+    this.v,
+    this.price,
+    this.ratingQuantity,
+    this.lessons,
+    this.progress,
+    this.firstSection,
+    this.suitableAges,
+    this.numKids,
+    this.earnings,
+    this.purchased,
+    this.sections,
+    this.governorate,
+  });
 
-  factory CourseData.fromJson(Map<String, dynamic> json) {
+factory CourseData.fromJson(Map<String, dynamic> json) {
+  try {
     final String parsedId =
         json['_id']?.toString() ?? json['id']?.toString() ?? '';
-    print('Parsed ID to use: $parsedId');
-    num? parseNum(dynamic value) {
+
+    final instructor = _parseInstructor(json['instructor']);
+    final governorate = instructor is Map<String, dynamic> 
+        ? instructor['Governorate']?.toString() 
+        : null;
+
+    return CourseData(
+      id: parsedId,
+      courseName: json['course_name']?.toString(),
+      courseId: json['course_id']?.toString(),
+      instructor: instructor,
+      kids: _parseKids(json['kid']),
+      level: json['level']?.toString(),
+      availability: json['availability']?.toString(),
+      offer: _parseNum(json['offer']),
+      category: json['category']?.toString(),
+      description: json['description']?.toString(),
+      startDate: _parseDateTime(json['start_date']),
+      endDate: _parseDateTime(json['end_date']),
+      courseImage: json['course_image']?.toString(),
+      createdAt: json['createdAt']?.toString(),
+      updatedAt: json['updatedAt']?.toString(),
+      v: _parseInt(json['__v']),
+      price: _parseNum(json['price']),
+      priceAfterDiscount: _parseNum(json['price_after_offer']) ??
+          _parseNum(json['price_after_discount']),
+      ratingQuantity: _parseInt(json['rating_quantity']),
+      lessons: _parseLessons(json['lessons']),
+      progress: _parseDouble(json['progress']),
+      firstSection: json['first_section']?.toString(),
+      numKids: _parseInt(json['numKids']),
+      suitableAges: _parseSuitableAges(json['suitableAges']),
+      earnings: _parseNum(json['earnings']),
+      purchased: json['purchased'] is bool ? json['purchased'] : null,
+      sections: _parseSections(json['sections']),
+      governorate: governorate,
+    );
+  } catch (e) {
+    print('Error parsing CourseData: $e');
+    print('JSON data: $json');
+    rethrow;
+  }
+}
+
+  static Map<String, dynamic>? _parseInstructor(dynamic instructor) {
+    if (instructor == null) return null;
+
+    if (instructor is Map<String, dynamic>) {
+      return instructor;
+    } else if (instructor is String) {
+      return {'_id': instructor};
+    } else {
+      return {'_id': instructor.toString()};
+    }
+  }
+
+  static List<dynamic> _parseKids(dynamic kids) {
+    if (kids == null) return [];
+    if (kids is List) return kids;
+    return [kids];
+  }
+
+  static num? _parseNum(dynamic value) {
     if (value == null) return null;
     if (value is num) return value;
     if (value is String) {
-      return num.tryParse(value);
+      String cleanValue = value.replaceAll('%', '').trim();
+      return num.tryParse(cleanValue);
     }
     return null;
   }
-    return CourseData(
-      id: json['_id']?.toString() ?? json['id'],
-      courseName: json['course_name'],
-      courseId: json['course_id'],
-      instructor: json['instructor'] is Map<String, dynamic>
-          ? json['instructor']
-          : {'_id': json['instructor']},
-      kids: json['kid'] != null ? List<dynamic>.from(json['kid']) : [],
-      level: json['level'],
-      availability: json['availability'],
-      offer: parseNum(json['offer']),
-      category: json['category'],
-      description: json['description'],
-      startDate: json['start_date'] != null
-          ? DateTime.parse(json['start_date'])
-          : null,
-      endDate:
-          json['end_date'] != null ? DateTime.parse(json['end_date']) : null,
-      courseImage: json['course_image'],
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
-      v: json['__v'],
-      price: parseNum(json['price']),
-      priceAfterDiscount:
-        parseNum(json['price_after_offer']) ?? parseNum(json['price_after_discount']), // Fixed parsing
-    ratingQuantity: json['rating_quantity'] is String 
-        ? int.tryParse(json['rating_quantity']) 
-        : json['rating_quantity'],
-      
-      lessons:
-          json['lessons'] != null ? List<String>.from(json['lessons']) : [],
-      progress: json['progress'] != null ? json['progress'].toDouble() : 0.0,
-      firstSection: json['first_section'],
-     numKids: json['numKids'] is String 
-        ? int.tryParse(json['numKids']) 
-        : json['numKids'],
-      suitableAges: json['suitableAges'] != null
-          ? List<int>.from(json['suitableAges'])
-          : [],
-    );
+
+  static int? _parseInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value);
+    if (value is double) return value.toInt();
+    return null;
+  }
+
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
+
+  static DateTime? _parseDateTime(dynamic value) {
+    if (value == null) return null;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
+
+  static List<String> _parseLessons(dynamic lessons) {
+    if (lessons == null || lessons is! List) return [];
+    return lessons.map((e) => e.toString()).toList();
+  }
+
+  static List<int> _parseSuitableAges(dynamic ages) {
+    if (ages == null || ages is! List) return [];
+    return ages
+        .map((e) => e is String ? int.tryParse(e) ?? 0 : (e as int? ?? 0))
+        .toList();
+  }
+
+  static List<SectionModel> _parseSections(dynamic sections) {
+    if (sections == null) return [];
+
+    if (sections is String) {
+      print('Warning: sections is a String, returning empty list');
+      return [];
+    }
+
+    if (sections is! List) {
+      print('Warning: sections is not a List, returning empty list');
+      return [];
+    }
+
+    try {
+      List<SectionModel> result = [];
+      for (var section in sections) {
+        if (section is Map<String, dynamic>) {
+          result.add(SectionModel.fromJson(section));
+        } else if (section is String) {
+          print('Warning: section is just an ID, skipping: $section');
+        } else {
+          print(
+              'Warning: section is neither Map nor String, skipping: $section');
+        }
+      }
+      return result;
+    } catch (e) {
+      print('Error parsing sections: $e');
+      return [];
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -273,6 +386,29 @@ class CourseData {
       'first_section': firstSection,
       'numKids': numKids,
       'suitableAges': suitableAges,
+      'earnings': earnings,
+      'purchased': purchased,
+      'governorate': governorate,
     };
+  }
+}
+
+class EndCourseRequest {
+  final String courseId;
+
+  EndCourseRequest({required this.courseId});
+
+  Map<String, dynamic> toJson() => {
+        'courseId': courseId,
+      };
+}
+
+class EndCourseResponse {
+  final String message;
+
+  EndCourseResponse({required this.message});
+
+  factory EndCourseResponse.fromJson(Map<String, dynamic> json) {
+    return EndCourseResponse(message: json['message']);
   }
 }

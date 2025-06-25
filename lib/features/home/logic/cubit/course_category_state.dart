@@ -1,4 +1,4 @@
-part of 'course_category_cubit.dart'; // ✅ يجب أن يكون السطر الوحيد
+part of 'course_category_cubit.dart';
 
 @immutable
 sealed class CourseCategoryState {}
@@ -11,7 +11,6 @@ final class GetCourseByCategorySuccess extends CourseCategoryState {
   final List<CourseData> courses;
   GetCourseByCategorySuccess(this.courses);
 }
-
 
 final class GetCourseByCategoryFailure extends CourseCategoryState {
   final String error;
@@ -38,8 +37,20 @@ final class GetTrendingCourseSuccess extends CourseCategoryState {
   GetTrendingCourseSuccess(this.courses);
 }
 
-
 final class GetTrendingCourseFailure extends CourseCategoryState {
   final String error;
   GetTrendingCourseFailure(this.error);
+}
+/////////////////////////////////////////////////////////////////////////////
+
+final class AllCoursesLoading extends CourseCategoryState {}
+
+final class GetAllCourseSuccess extends CourseCategoryState {
+  final List<CourseData> allCourses;
+  GetAllCourseSuccess(this.allCourses);
+}
+
+final class GetAllCourseFailure extends CourseCategoryState {
+  final String error;
+  GetAllCourseFailure(this.error);
 }

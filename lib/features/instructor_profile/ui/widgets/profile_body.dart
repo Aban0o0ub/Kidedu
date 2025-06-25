@@ -64,7 +64,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                     ),
                     const SizedBox(height: 20),
                     buildInfoContainer(
-                       context: context,
+                      context: context,
                       header: "Personal Information",
                       name: instructor.name ?? "Instructor Name",
                       phone: instructor.phoneNumber ?? "No phone available",
@@ -75,7 +75,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                     ),
                     const SizedBox(height: 20),
                     buildInfoContainer(
-                       context: context,
+                      context: context,
                       header: "Experience",
                       text: instructor.experience ?? "No experience available",
                     ),
@@ -134,8 +134,11 @@ class _ProfileBodyState extends State<ProfileBody> {
                                     }
                                   },
                                   child: buildCourseBox(
-                                    imagePath: courses[index].courseImage !=
-                                            null
+                                    imagePath: (courses[index].courseImage !=
+                                                null &&
+                                            courses[index]
+                                                .courseImage!
+                                                .isNotEmpty)
                                         ? "assets/images/${courses[index].courseImage}"
                                         : "assets/images/CourseDefaultPhoto.jpeg",
                                     courseName: courses[index].courseName ??

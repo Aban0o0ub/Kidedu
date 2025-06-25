@@ -4,7 +4,6 @@ import 'package:loginpage/core/helper/cache_helper.dart';
 import 'package:loginpage/features/add_course/data/models/Course_Model.dart';
 import 'package:loginpage/features/login/data/models/user.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/cart/data/model/cart_model.dart';
 import '../../features/earnings/data/model/earnings_model.dart';
 import '../../features/lesson/data/models/lesson.dart';
@@ -401,26 +400,38 @@ class WebServices {
           },
         ),
       );
+
       if (response.data == null ||
           response.data["data"] == null ||
           response.data["data"]["new_course"] == null) {
-        throw Exception("No course data found for this category");
+        throw Exception("No courses available");
       }
-      var newCourse = response.data["data"]["new_course"];
 
+      var newCourse = response.data["data"]["new_course"];
       List<CourseData> courses = [];
 
       if (newCourse is List) {
+        if (newCourse.isEmpty) {
+          throw Exception("No courses available");
+        }
         courses =
             newCourse.map((course) => CourseData.fromJson(course)).toList();
       } else if (newCourse is Map<String, dynamic>) {
         courses.add(CourseData.fromJson(newCourse));
       } else {
-        throw Exception("Unexpected format of course data");
+        throw Exception("No courses available");
       }
 
       return courses;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        throw Exception("No courses available");
+      }
+      throw Exception('Error fetching course by category: ${e.toString()}');
     } catch (e) {
+      if (e.toString().contains("No courses available")) {
+        throw Exception("No courses available");
+      }
       throw Exception('Error fetching course by category: ${e.toString()}');
     }
   }
@@ -599,7 +610,7 @@ class WebServices {
     }
   }
 
- Future<List<CourseData>> getTrendingCourses() async {
+  Future<List<CourseData>> getTrendingCourses() async {
     try {
       String? token = CacheHelper.getData(key: "token");
       final response = await dio.get(
@@ -729,15 +740,16 @@ class WebServices {
       if (token == null) {
         throw Exception('Missing token');
       }
+
       final response = await dio.get(
-        'lesson/section',
-        queryParameters: {'sectionId': sectionId},
+        'lesson/$sectionId',
         options: Options(
           headers: {
             'token': 'Bearer $token',
           },
         ),
       );
+
       final responseData = response.data;
       return LessonListResponse.fromJson(responseData);
     } catch (e) {
@@ -941,110 +953,138 @@ class WebServices {
     }
   }
 
- Future<EarningsResponseModel> getInstructorEarnings() async {
-  try {
-    String? token = CacheHelper.getData(key: "token");
-    if (token == null) throw Exception('Missing token');
-    
-    final response = await dio.get(
-      'user_instructor/earnings',
-      options: Options(headers: {'token': 'Bearer $token'}),
-    );
-    
-    if (response.statusCode == 500) {
-      throw Exception('Server error: Please try again later');
-    }
-    
-    if (response.data == null) {
-      throw Exception('No data returned from API');
-    }
-    
-    return EarningsResponseModel.fromJson(response.data);
-  } on DioException catch (e) {
-    if (e.response?.statusCode == 500) {
-      throw Exception('Server error: Earnings calculation failed');
-    }
-    throw Exception('Network error: ${e.message}');
-  } catch (e) {
-    throw Exception('Error fetching earnings data: ${e.toString()}');
-  }
-}
-
-Future<List<CourseData>> getAllCourses() async {
+  Future<EarningsResponseModel> getInstructorEarnings() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) throw Exception('Missing token');
 
+      final response = await dio.get(
+        'user_instructor/earnings',
+        options: Options(headers: {'token': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 500) {
+        throw Exception('Server error: Please try again later');
+      }
+
+      if (response.data == null) {
+        throw Exception('No data returned from API');
+      }
+
+      return EarningsResponseModel.fromJson(response.data);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 500) {
+        throw Exception('Server error: Earnings calculation failed');
+      }
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Error fetching earnings data: ${e.toString()}');
+    }
+  }
+
+  Future<List<CourseData>> getAllCourses() async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
       final response = await dio.get(
         'course',
         options: Options(
           headers: {
-            'Token': 'Bearer $token',
+            'token': 'Bearer $token',
           },
+          validateStatus: (status) => status! < 500,
         ),
       );
 
-      print('Response Data: ${response.data}');
-
-      final courseResponse = CourseResponse.fromJson(response.data);
-      return courseResponse.courses ?? [];
+      if (response.statusCode == 200) {
+        final courseResponse = CourseResponse.fromJson(response.data);
+        return courseResponse.allCourses ?? [];
+      } else if (response.statusCode == 404) {
+        return [];
+      } else {
+        throw Exception(
+            "Unexpected error: ${response.statusCode} - ${response.statusMessage}");
+      }
     } catch (e) {
-      print('Error fetching all courses: $e');
-      return [];
+      throw Exception("Error fetching courses: ${e.toString()}");
     }
   }
 
-Future<ForgetPasswordResponse> forgetPassword(ForgetPasswordRequest forgetPassword) async {
-  try {
-    final response = await dio.post(
-      'authentication/forgot-password',
-      data: forgetPassword.toJson(),
-    );
-    
-    // Check if response is successful
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return ForgetPasswordResponse.fromJson(response.data);
-    } else {
-      throw Exception('Server returned status: ${response.statusCode}');
+  Future<ForgetPasswordResponse> forgetPassword(
+      ForgetPasswordRequest forgetPassword) async {
+    try {
+      final response = await dio.post(
+        'authentication/forgot-password',
+        data: forgetPassword.toJson(),
+      );
+
+      // Check if response is successful
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return ForgetPasswordResponse.fromJson(response.data);
+      } else {
+        throw Exception('Server returned status: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      // Handle different types of errors
+      if (e.response != null) {
+        throw Exception(
+            'Server error: ${e.response?.data['message'] ?? e.message}');
+      } else {
+        throw Exception('Network error: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Unexpected error: ${e.toString()}');
     }
-  } on DioException catch (e) {
-    // Handle different types of errors
-    if (e.response != null) {
-      throw Exception('Server error: ${e.response?.data['message'] ?? e.message}');
-    } else {
-      throw Exception('Network error: ${e.message}');
-    }
-  } catch (e) {
-    throw Exception('Unexpected error: ${e.toString()}');
   }
-}
 
-Future<ForgetPasswordResponse> resetPassword({required String token,required ResetPasswordRequest resetPassword,
-}) async {
-  try {
-    final response = await dio.post(
-      'authentication/reset-password/$token',
-      data: resetPassword.toJson(),
-    );
-   
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return ForgetPasswordResponse.fromJson(response.data);
-    } else {
-      throw Exception('Server returned status: ${response.statusCode}');
+  Future<ForgetPasswordResponse> resetPassword({
+    required String token,
+    required ResetPasswordRequest resetPassword,
+  }) async {
+    try {
+      final response = await dio.post(
+        'authentication/reset-password/$token',
+        data: resetPassword.toJson(),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return ForgetPasswordResponse.fromJson(response.data);
+      } else {
+        throw Exception('Server returned status: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final errorMessage = e.response?.data is Map
+            ? e.response?.data['message'] ?? 'Unknown server error'
+            : 'Server error occurred';
+        throw Exception('Server error: $errorMessage');
+      } else {
+        throw Exception('Network error: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Unexpected error: ${e.toString()}');
     }
-  } on DioException catch (e) {
-    if (e.response != null) {
-      final errorMessage = e.response?.data is Map 
-          ? e.response?.data['message'] ?? 'Unknown server error'
-          : 'Server error occurred';
-      throw Exception('Server error: $errorMessage');
-    } else {
-      throw Exception('Network error: ${e.message}');
-    }
-  } catch (e) {
-    throw Exception('Unexpected error: ${e.toString()}');
   }
-}
 
-
+  Future<EndCourseResponse> instructorEndCourse(
+      EndCourseRequest endCourse) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+      final response = await dio.post(
+        'user_instructor/complete-course',
+        data: endCourse.toJson(),
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+        ),
+      );
+      final responseData = response.data;
+      return EndCourseResponse.fromJson(responseData);
+    } catch (e) {
+      throw Exception('Error completing course: ${e.toString()}');
+    }
+  }
 }

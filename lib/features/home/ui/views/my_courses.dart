@@ -13,13 +13,11 @@ class MyCourses extends StatefulWidget {
   const MyCourses({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _MyCoursesState createState() => _MyCoursesState();
 }
 
 class _MyCoursesState extends State<MyCourses> {
   late CourseCategoryCubit courseCategoryCubit;
-  // List<CourseData> kidCourses = [];
 
   @override
   void initState() {
@@ -39,7 +37,6 @@ class _MyCoursesState extends State<MyCourses> {
         appBar: CustomAppBar(title: "My Courses"),
         body: Column(
           children: [
-            //ArrowBack(),
             Expanded(
               child: BlocBuilder<CourseCategoryCubit, CourseCategoryState>(
                 builder: (context, state) {
@@ -47,14 +44,14 @@ class _MyCoursesState extends State<MyCourses> {
                     final courses = state.kidCourses;
                     print(courses);
                     return courses.isEmpty
-                        ? EmptyCourses()
+                        ? const EmptyCourses()
                         : KidCourses(courses: courses);
                   } else if (state is CourseCategoryLoading) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   } else if (state is GetKidCoursesFailure) {
-                    return EmptyCourses();
+                    return const EmptyCourses();
                   }
-                  return SizedBox(); // Default empty view
+                  return const SizedBox(); // Default empty view
                 },
               ),
             ),
@@ -74,9 +71,9 @@ class EmptyCourses extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(height: 25),
+          const SizedBox(height: 25),
           Image.asset("assets/images/emptycourse.jpg", width: 400, height: 400),
-          Text(
+          const Text(
             "You haven't joined a course yet",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -84,7 +81,7 @@ class EmptyCourses extends StatelessWidget {
                 fontWeight: FontWeight.w700,
                 color: Color(0xFF02457A)),
           ),
-          SizedBox(height: 120),
+          const SizedBox(height: 120),
           TextButton(
             onPressed: () {
               FocusScope.of(context).unfocus();
@@ -94,7 +91,7 @@ class EmptyCourses extends StatelessWidget {
                 'iconImages': HomePage.iconImages,
               });
             },
-            child: Text(
+            child: const Text(
               "Explore now",
               style: TextStyle(
                 fontSize: 24,
@@ -110,159 +107,217 @@ class EmptyCourses extends StatelessWidget {
   }
 }
 
-class Course {
-  final String title;
-  final String author;
-  final double progress;
-  final String image;
-
-  Course({
-    required this.title,
-    required this.author,
-    required this.progress,
-    required this.image,
-  });
-}
-
 class KidCourses extends StatelessWidget {
   final List<CourseData> courses;
   const KidCourses({super.key, required this.courses});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: courses.length,
-      itemBuilder: (context, index) {
-        CourseData course = courses[index];
-        return Card(
-          margin: EdgeInsets.only(bottom: 20),
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: (course.courseImage != null &&
-                              course.courseImage!.isNotEmpty)
-                          ? Image.network(
-                              course.courseImage!,
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Image.asset(
-                                  'assets/images/CourseDefaultPhoto.jpeg',
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                );
-                              },
-                            )
-                          : Image.asset(
-                              'assets/images/CourseDefaultPhoto.jpeg',
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            ),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            course.courseName ?? '',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF02457A),
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            course.instructor?['name'] ?? 'No Instructor',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF02457A),
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ListView.builder(
+        itemCount: courses.length,
+        itemBuilder: (context, index) {
+          CourseData course = courses[index];
+          // تحويل progress من 0-100 إلى 0-1 إذا كان أكبر من 1
+          double progressValue = (course.progress ?? 0.0);
+          if (progressValue > 1.0) {
+            progressValue = progressValue / 100.0;
+          }
+          
+          return Card(
+            margin: const EdgeInsets.only(bottom: 20),
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: (course.courseImage != null &&
+                                course.courseImage!.isNotEmpty)
+                            ? Image.network(
+                                course.courseImage!,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/CourseDefaultPhoto.jpeg',
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                            : Image.asset(
+                                'assets/images/CourseDefaultPhoto.jpeg',
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Stack(
-                  alignment: Alignment.centerLeft,
-                  children: [
-                    LinearProgressIndicator(
-                      value: course.progress ?? 0.0,
-                      backgroundColor: Colors.grey[300],
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        course.progress == 1.0
-                            ? Color(0xFF198038)
-                            : Color(0xFF0043CE),
-                      ),
-                    ),
-                    if (course.progress == 1.0)
-                      Positioned(
-                        left: -5,
-                        child: Icon(
-                          Icons.check_circle,
-                          color: Color(0xFF198038),
-                          size: 24,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              course.courseName ?? 'Unknown Course',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF02457A),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              course.instructor?['Name'] ?? 
+                              course.instructor?['name'] ?? 
+                              'No Instructor',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFF666666),
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            // Level Badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF02457A).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                course.level ?? 'Unknown',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF02457A),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                  ],
-                ),
-                SizedBox(height: 5),
-                Text(
-                  "${(course.progress! * 100).toInt()}% Completed",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: course.progress == 1.0
-                        ? Color(0xFF198038)
-                        : Color(0xFF02457A),
-                    fontWeight: FontWeight.bold,
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  
+                  // Progress Section
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Progress',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF02457A),
+                        ),
+                      ),
+                      Text(
+                        "${(progressValue * 100).toInt()}%",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: progressValue >= 1.0
+                              ? const Color(0xFF198038)
+                              : const Color(0xFF02457A),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Progress Bar
+                  Container(
+                    height: 8,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      color: Colors.grey[300],
+                    ),
+                    child: Stack(
+                      children: [
+                        FractionallySizedBox(
+                          widthFactor: progressValue.clamp(0.0, 1.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              gradient: LinearGradient(
+                                colors: progressValue >= 1.0
+                                    ? [const Color(0xFF198038), const Color(0xFF22C55E)]
+                                    : [const Color(0xFF0043CE), const Color(0xFF3B82F6)],
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Completion checkmark
+                        if (progressValue >= 1.0)
+                          Positioned(
+                            right: 4,
+                            top: -8,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF198038),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 12,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // Status Text
+                  Row(
+                    children: [
+                      Icon(
+                        progressValue >= 1.0 
+                            ? Icons.check_circle 
+                            : Icons.play_circle_outline,
+                        color: progressValue >= 1.0
+                            ? const Color(0xFF198038)
+                            : const Color(0xFF02457A),
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        progressValue >= 1.0 
+                            ? "Course Completed!" 
+                            : "In Progress",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: progressValue >= 1.0
+                              ? const Color(0xFF198038)
+                              : const Color(0xFF02457A),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
-
-// class BottomNavBar extends StatelessWidget {
-//   const BottomNavBar({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return BottomNavigationBar(
-//       type: BottomNavigationBarType.fixed,
-//       backgroundColor: Color(0xFF02457A),
-//       selectedItemColor: Color(0xFF02457A),
-//       unselectedItemColor: Colors.white,
-//       showSelectedLabels: false,
-//       showUnselectedLabels: false,
-//       currentIndex: 3,
-//       items: [
-//         BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
-//         BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-//         BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-//         BottomNavigationBarItem(icon: Icon(Icons.play_circle_fill), label: ""),
-//         BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: ""),
-//       ],
-//     );
-//   }
-// }

@@ -19,4 +19,9 @@ class CourseDetailsRepo {
           "Error fetching course details for ID: $id. ${e.toString()}");
     }
   }
+
+  Future<EndCourseResponse> instructorEndCourse(
+      EndCourseRequest endCourse) async {
+    return await webServices.instructorEndCourse(endCourse);
+  }
 }

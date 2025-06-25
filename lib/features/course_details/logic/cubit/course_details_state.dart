@@ -17,3 +17,16 @@ class GetCourseFailure extends CourseDetailsState {
 
   GetCourseFailure(this.error);
 }
+//////////////////////////////////////////////////////////////////////
+final class EndCourseLoading extends CourseDetailsState {}
+
+class EndCourseSuccess extends CourseDetailsState {
+final EndCourseResponse endcourse;
+  EndCourseSuccess(this.endcourse);
+}
+
+class EndCourseFailure extends CourseDetailsState {
+  final String error;
+
+  EndCourseFailure(this.error);
+}

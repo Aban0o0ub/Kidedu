@@ -92,18 +92,33 @@ class _EducationCategoryState extends State<EducationCategory> {
                       );
                     },
                   );
-                } else if (state is GetCourseByCategoryFailure) {
+                }  else if (state is GetCourseByCategoryFailure) {
+                if (state.error.contains("No courses available")) {
+                  return const Center(
+                    child: Text(
+                      "No courses available",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
+                } else {
                   return Center(
-                    child: Text("Error: ${state.error}",
-                        style: const TextStyle(color: Colors.red)),
+                    child: Text(
+                      "Error: ${state.error}",
+                      style: const TextStyle(color: Colors.red),
+                    ),
                   );
                 }
-                return const Center(child: Text("No courses available."));
-              },
-            ),
+              }
+              return const Center(child: Text("No courses available"));
+            },
           ),
         ),
       ),
-    );
+    ),
+  );
   }
-}
+  }

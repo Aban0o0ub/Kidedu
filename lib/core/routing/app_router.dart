@@ -109,7 +109,8 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: Routes.addLessonPage,
       builder: (context, state) {
-        final String courseId = state.extra as String? ?? "";
+        final arguments = state.extra as Map<String, dynamic>?;
+        final String courseId = arguments?['courseId'] ?? "";
         return AddLessonPage(courseId: courseId);
       },
     ),
@@ -120,8 +121,15 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: Routes.viewLesson,
       builder: (context, state) {
-        final String sectionId = state.extra as String? ?? "";
-        return ViewLesson(sectionId: sectionId);
+        final Map<String, dynamic>? params =
+            state.extra as Map<String, dynamic>?;
+        final String sectionId = params?['sectionId'] ?? "";
+        final String? lessonId = params?['lessonId'];
+
+        return ViewLesson(
+          sectionId: sectionId,
+          initialLessonId: lessonId,
+        );
       },
     ),
     GoRoute(

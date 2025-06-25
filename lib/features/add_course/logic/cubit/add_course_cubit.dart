@@ -22,7 +22,7 @@ class AddCourseCubit extends Cubit<AddCourseState> {
       if (goToLessons) {
         context.go(
           Routes.addLessonPage,
-          extra: courseResponse.data?.id,
+          extra: {'courseId': courseResponse.data?.id},
         );
       } else {
         context.go(Routes.instructorProfilePage);

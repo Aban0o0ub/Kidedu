@@ -20,27 +20,36 @@ class CourseCategoryCubit extends Cubit<CourseCategoryState> {
     }
   }
 
-   Future<void> emitGetKidCourses() async {
-  emit(GetKidCoursesLoading());
-  try {
-    final List<CourseData> myCourses = await courseDetailsRepo.getKidCourses(); 
-    emit(GetKidCoursesSuccess(myCourses));
-  } catch (e) {
-    emit(GetKidCoursesFailure(e.toString()));
+  Future<void> emitGetKidCourses() async {
+    emit(GetKidCoursesLoading());
+    try {
+      final List<CourseData> myCourses =
+          await courseDetailsRepo.getKidCourses();
+      emit(GetKidCoursesSuccess(myCourses));
+    } catch (e) {
+      emit(GetKidCoursesFailure(e.toString()));
+    }
   }
-}
 
-Future<void> emitGetTrendingCourses() async {
-  print('🔥 Starting trending courses fetch...');
-  emit(TrendingCoursesLoading());
-  try {
-    final List<CourseData> trendCourses = await courseDetailsRepo.getTrendingCourses();
-    print('🔥 Cubit received ${trendCourses.length} courses');
-    emit(GetTrendingCourseSuccess(trendCourses));
-    print('🔥 Emitted GetTrendingCourseSuccess');
-  } catch (e) {
-    print('🔥 Cubit Error: ${e.toString()}');
-    emit(GetTrendingCourseFailure(e.toString()));
+  Future<void> emitGetTrendingCourses() async {
+    emit(TrendingCoursesLoading());
+    try {
+      final List<CourseData> trendCourses =
+          await courseDetailsRepo.getTrendingCourses();
+      emit(GetTrendingCourseSuccess(trendCourses));
+    } catch (e) {
+      emit(GetTrendingCourseFailure(e.toString()));
+    }
   }
-}
+
+  Future<void> emitGetAllCourses() async {
+    emit(AllCoursesLoading());
+    try {
+      final List<CourseData> allCourses =
+          await courseDetailsRepo.getAllCourses();
+      emit(GetAllCourseSuccess(allCourses));
+    } catch (e) {
+      emit(GetAllCourseFailure(e.toString()));
+    }
+  }
 }
