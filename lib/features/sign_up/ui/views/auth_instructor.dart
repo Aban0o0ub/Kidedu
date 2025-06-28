@@ -123,7 +123,7 @@ class AuthInstructorState extends State<AuthInstructor> {
     return null;
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => getIt<MyCubit>(),
@@ -138,19 +138,77 @@ class AuthInstructorState extends State<AuthInstructor> {
               children: [
                 const UpperStickersPhoto(),
                 const ArrowBack(),
-                InstructorAuthBody(
-                  nameController: _nameController,
-                  governmentController: _governmentController,
-                  emailController: _emailController,
-                  passwordController: _passwordController,
-                  confirmPasswordController: _confirmPasswordController,
-                  phoneNumberController: _phoneNumberController,
-                  bioController: _bioController,
-                  obscurePassword: _obscurePassword,
-                  togglePasswordVisibility: togglePasswordVisibility,
-                  egyptianGovernorates: egyptianGovernorates,
-                  validateEmail: validateEmail,
-                  validatePassword: validatePassword,
+                BlocConsumer<MyCubit, MyState>(
+                  listener: (context, state) {
+                    if (state is MyFailure) {
+                      String message = "Something went wrong";
+                      if (state.error == "SIGN_UP_FAILED") {
+                        message = "This email is already used";
+                      }
+
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Row(
+                            children: const [
+                              Icon(Icons.warning, color: Colors.amber),
+                              SizedBox(width: 8),
+                              Text(
+                                'Sign Up Failed',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          content: Text(
+                            message,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: const Color(0xFF02457A),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    if (state is CreateNewInstructorSuccess) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Account created successfully"),
+                        ),
+                      );
+                    }
+                  },
+                  builder: (context, state) {
+                    return InstructorAuthBody(
+                      nameController: _nameController,
+                      governmentController: _governmentController,
+                      emailController: _emailController,
+                      passwordController: _passwordController,
+                      confirmPasswordController: _confirmPasswordController,
+                      phoneNumberController: _phoneNumberController,
+                      bioController: _bioController,
+                      obscurePassword: _obscurePassword,
+                      togglePasswordVisibility: togglePasswordVisibility,
+                      egyptianGovernorates: egyptianGovernorates,
+                      validateEmail: validateEmail,
+                      validatePassword: validatePassword,
+                    );
+                  },
                 )
               ],
             ),

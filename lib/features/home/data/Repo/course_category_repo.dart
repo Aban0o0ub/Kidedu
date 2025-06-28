@@ -40,5 +40,14 @@ Future<List<CourseData>> getCourseByCategory(String category) async {
     throw Exception("Repository error fetching courses: ${e.toString()}");
   }
 }
+
+Future<List<CourseData>> getTopDiscounts() async {
+    try {
+      return await webServices.getTopDiscountedCourses();
+    } catch (e) {
+      throw Exception("Error fetching courses: ${e.toString()}");
+    }
+  }
+
 }
 

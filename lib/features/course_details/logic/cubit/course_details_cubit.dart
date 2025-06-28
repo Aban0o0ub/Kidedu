@@ -32,4 +32,14 @@ class CourseDetailsCubit extends Cubit<CourseDetailsState> {
       emit(EndCourseFailure(e.toString()));
     }
   }
+
+  Future<void> emitKidEndCourse(EndCourseRequest request) async {
+    emit(EndCourseLoading());
+    try {
+      final response = await courseDetailsRepo.kidEndCourse(request);
+      emit(EndCourseSuccess(response));
+    } catch (e) {
+      emit(EndCourseFailure(e.toString()));
+    }
+  }
 }

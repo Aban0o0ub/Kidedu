@@ -26,7 +26,21 @@ class LoginCubit extends Cubit<LoginState> {
         emit(LoginFailure('role is incorrect ${response.role}'));
       }
     } catch (e) {
-      emit(LoginFailure('error: ${e.toString()}'));
+      final errorString = e.toString();
+      String errorMessage;
+
+      if (errorString.contains('kid not found')) {
+        errorMessage =
+            "This kid user isn't found. Please make sure of your email and password.";
+      } else if (errorString.contains('instructor not found')) {
+        errorMessage =
+            "This instructor user isn't found. Please make sure of your email and password.";
+      } else {
+        errorMessage =
+            "This user isn't found. Please make sure of your email and password.";
+      }
+
+      emit(LoginFailure(errorMessage));
     }
   }
 
@@ -92,13 +106,13 @@ class LoginCubit extends Cubit<LoginState> {
 }
 
 String _extractErrorMessage(String error) {
-  if (error.contains('Server error:')) {
-    return error.replaceFirst('Exception: Server error: ', '');
-  } else if (error.contains('Network error:')) {
-    return 'Network connection failed. Please check your internet.';
+    if (error.contains('Server error:')) {
+      return error.replaceFirst('Exception: Server error: ', '');
+    } else if (error.contains('Network error:')) {
+      return 'Network connection failed. Please check your internet.';
+    }
+    return 'This user isn\'t found. Please make sure of your email and password.';
   }
-  return 'Something went wrong. Please try again.';
-}
 
 }
 

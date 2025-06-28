@@ -33,203 +33,169 @@ class _KidProfilePageState extends State<KidProfilePage> {
     return BlocProvider.value(
       value: kidProfileCubit,
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-              ),
-              Center(
-                child: Column(
-                  children: [
-                    Stack(
-                      alignment: Alignment.bottomRight,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 100), // مساحة تحت عشان الناف بار
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  // صورة واسم الطفل
+                  Center(
+                    child: Column(
                       children: [
-                        const CircleAvatar(
-                          radius: 60,
-                          backgroundImage:
-                              AssetImage('assets/images/kidprofile.jpeg'),
+                        Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            const CircleAvatar(
+                              radius: 60,
+                              backgroundImage:
+                                  AssetImage('assets/images/kidprofile.jpeg'),
+                            ),
+                            CircleAvatar(
+                              radius: 16,
+                              backgroundColor: Colors.grey.withOpacity(0.3),
+                              child: const Icon(
+                                Icons.camera_alt,
+                                size: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
-                        CircleAvatar(
-                          radius: 16,
-                          backgroundColor: Colors.grey.withOpacity(0.3),
-                          child: const Icon(
-                            Icons.camera_alt,
-                            size: 18,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    //--------------------------------------------------------------------------
-                    BlocBuilder<KidProfileCubit, KidProfileState>(
-                      builder: (context, state) {
-                        if (state is KidProfileSuccess) {
-                          KidData? kid = state.kid;
-
-                          if (kid.name == null || kid.name!.isEmpty) {
-                            return const Text(
-                              "Kid name not available",
-                              style: TextStyle(
-                                fontSize: 35,
-                                fontWeight: FontWeight.bold,
+                        const SizedBox(height: 15),
+                        BlocBuilder<KidProfileCubit, KidProfileState>(
+                          builder: (context, state) {
+                            if (state is KidProfileSuccess) {
+                              KidData? kid = state.kid;
+          
+                              if (kid.name == null || kid.name!.isEmpty) {
+                                return const Text(
+                                  "Kid name not available",
+                                  style: TextStyle(
+                                    fontSize: 35,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF02457A),
+                                  ),
+                                );
+                              }
+                              return Text(
+                                kid.name!,
+                                style: const TextStyle(
+                                  fontSize: 35,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF02457A),
+                                ),
+                              );
+                            } else if (state is KidProfileFailure) {
+                              return Text(
+                                "There is an error: ${state.error}",
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.red,
+                                ),
+                              );
+                            }
+                            return const Center(
+                              child: CircularProgressIndicator(
                                 color: Color(0xFF02457A),
                               ),
                             );
-                          }
-                          return Text(
-                            kid.name!,
-                            style: const TextStyle(
-                              fontSize: 35,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF02457A),
-                            ),
-                          );
-                        } else if (state is KidProfileFailure) {
-                          return Text(
-                            "There is an error: ${state.error}",
-                            style: const TextStyle(
-                              fontSize: 20,
-                              color: Colors.red,
-                            ),
-                          );
-                        }
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xFF02457A),
-                          ),
-                        );
-                      },
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: ListView(
-                  children: [
-                    BlocBuilder<KidProfileCubit, KidProfileState>(
-                      builder: (context, state) {
-                        return profileitem(
-                          image: 'assets/images/editprofile.jpeg',
-                          title: 'Edit profile',
-                          // onTap: () {
-                          //   if (state is KidProfileSuccess) {
-                          //     context.push(
-                          //       Routes.editProfilePage,
-                          //       extra: {
-                          //         'name': state.kid.name,
-                          //         'email': state.kid.email,
-                          //         'phone': state.kid.phoneNumber,
-                          //         'age': state.kid.age?.toString(),
-                          //         'governorate': state.kid.governorate,
-                          //         'gender': state.kid.gender,
-                          //         'image': state.kid.image,
-                          //       },
-                          //     );
-                          //   } else {
-                          //     context.push(Routes.editProfilePage);
-                          //   }
-                          // },
-                          onTap: () async {
-                            if (state is KidProfileSuccess) {
-                              final result = await context.push(
-                                Routes.editProfilePage,
-                                extra: {
-                                  'name': state.kid.name,
-                                  'email': state.kid.email,
-                                  'phone': state.kid.phoneNumber,
-                                  'age': state.kid.age?.toString(),
-                                  'governorate': state.kid.governorate,
-                                  'gender': state.kid.gender,
-                                  'image': state.kid.image,
-                                },
-                              );
-
-                              if (result == true) {
-                                _refreshProfile();
-                              }
-                            } else {
-                              final result =
-                                  await context.push(Routes.editProfilePage);
-                              if (result == true) {
-                                _refreshProfile();
-                              }
-                            }
                           },
-                        );
-                      },
+                        )
+                      ],
                     ),
-                    const Divider(color: Color(0xFF02457A)),
-                    profileitem(
-                      image: 'assets/images/notifications.jpeg',
-                      title: 'Notifications',
-                      onTap: () {
-                        FocusScope.of(context).unfocus();
-                        context.push(Routes.notificationPage);
-                      },
-                    ),
-                    const Divider(color: Color(0xFF02457A)),
-                    profileitem(
-                      image: 'assets/images/achievements.jpeg',
-                      title: 'Achievements',
-                      onTap: () {
-                        FocusScope.of(context).unfocus();
-                        context.push(Routes.achievementPage);
-                      },
-                    ),
-                    const Divider(color: Color(0xFF02457A)),
-                    profileitem(
-                      image: 'assets/images/courses.jpeg',
-                      title: 'My courses',
-                      onTap: () {},
-                    ),
-                    const Divider(color: Color(0xFF02457A)),
-                    profileitem(
-                      image: 'assets/images/evaluation.jpeg',
-                      title: 'Evaluation',
-                      onTap: () {},
-                    ),
-                    const Divider(color: Color(0xFF02457A)),
-                    profileitem(
-                      image: 'assets/images/bookmark.jpeg',
-                      title: 'Bookmarks',
-                      onTap: () {
-                        
-                        FocusScope.of(context).unfocus();
-                        context.push(Routes.bookmarkPage);
-                      
-                      },
-                    ),
-                    const Divider(color: Color(0xFF02457A)),
-                    profileitem(
-                      image: 'assets/images/settings.jpeg',
-                      title: 'Settings',
-                      onTap: () {
-                        FocusScope.of(context).unfocus();
-                        context.push(Routes.settingsPage);
-                      },
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'Log out',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  // قائمة البروفايل
+                  BlocBuilder<KidProfileCubit, KidProfileState>(
+                    builder: (context, state) {
+                      return profileitem(
+                        image: 'assets/images/editprofile.jpeg',
+                        title: 'Edit profile',
+                        onTap: () async {
+                          if (state is KidProfileSuccess) {
+                            final result = await context.push(
+                              Routes.editProfilePage,
+                              extra: {
+                                'name': state.kid.name,
+                                'email': state.kid.email,
+                                'phone': state.kid.phoneNumber,
+                                'age': state.kid.age?.toString(),
+                                'governorate': state.kid.governorate,
+                                'gender': state.kid.gender,
+                                'image': state.kid.image,
+                              },
+                            );
+        
+                            if (result == true) {
+                              _refreshProfile();
+                            }
+                          } else {
+                            final result =
+                                await context.push(Routes.editProfilePage);
+                            if (result == true) {
+                              _refreshProfile();
+                            }
+                          }
+                        },
+                      );
+                    },
+                  ),
+                  const Divider(color: Color(0xFF02457A)),
+                  profileitem(
+                    image: 'assets/images/notifications.jpeg',
+                    title: 'Notifications',
+                    onTap: () {
+                      FocusScope.of(context).unfocus();
+                      context.push(Routes.notificationPage);
+                    },
+                  ),
+                  const Divider(color: Color(0xFF02457A)),
+                  profileitem(
+                    image: 'assets/images/achievements.jpeg',
+                    title: 'Achievements',
+                    onTap: () {
+                      FocusScope.of(context).unfocus();
+                      context.push(Routes.achievementPage);
+                    },
+                  ),
+                  const Divider(color: Color(0xFF02457A)),
+                  profileitem(
+                    image: 'assets/images/courses.jpeg',
+                    title: 'My courses',
+                    onTap: () {},
+                  ),
+                  const Divider(color: Color(0xFF02457A)),
+                  // profileitem(
+                  //   image: 'assets/images/evaluation.jpeg',
+                  //   title: 'Evaluation',
+                  //   onTap: () {},
+                  // ),
+                  // const Divider(color: Color(0xFF02457A)),
+                  profileitem(
+                    image: 'assets/images/bookmark.jpeg',
+                    title: 'Bookmarks',
+                    onTap: () {
+                      FocusScope.of(context).unfocus();
+                      context.push(Routes.bookmarkPage);
+                    },
+                  ),
+                  const Divider(color: Color(0xFF02457A)),
+                  profileitem(
+                    image: 'assets/images/settings.jpeg',
+                    title: 'Settings',
+                    onTap: () {
+                      FocusScope.of(context).unfocus();
+                      context.push(Routes.settingsPage);
+                    },
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

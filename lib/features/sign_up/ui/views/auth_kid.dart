@@ -113,24 +113,81 @@ String? validateName(String? value) {
               children: [
                 const UpperStickersPhoto(),
                 const ArrowBack(),
-                KidAuthBody(
-                  governmentController: _governmentController,
-                  phoneNumberController: _phoneNumberController,
-                  nameController: _nameController,
-                  ageController: _ageController,
-                  emailController: _emailController,
-                  passwordController: _passwordController,
-                  confirmPasswordController: _confirmPasswordController,
-                  obscurePassword: _obscurePassword,
-                  togglePasswordVisibility: togglePasswordVisibility,
-                  validateEmail: validateEmail,
-                  validatePassword: validatePassword,
-                  onGenderSelected: (String gender) {
-                    setState(() {
-                      _selectedGenderController.text = gender;
-                    });
+                BlocConsumer<MyCubit, MyState>(
+                  listener: (context, state) {
+                    if (state is MyFailure) {
+                      String message = "Something went wrong";
+                      if (state.error == "SIGN_UP_FAILED") {
+                        message = "This email is already used";
+                      }
+
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Row(
+                            children: const [
+                              Icon(Icons.warning, color: Colors.amber),
+                              SizedBox(width: 8),
+                              Text(
+                                'Sign Up Failed',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          content: Text(
+                            message,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: const Color(0xFF02457A),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    if (state is CreateNewKidSuccess) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Account created successfully")),
+                      );
+                    }
                   },
-                ),
+                  builder: (context, state) {
+                    return KidAuthBody(
+                      governmentController: _governmentController,
+                      phoneNumberController: _phoneNumberController,
+                      nameController: _nameController,
+                      ageController: _ageController,
+                      emailController: _emailController,
+                      passwordController: _passwordController,
+                      confirmPasswordController: _confirmPasswordController,
+                      obscurePassword: _obscurePassword,
+                      togglePasswordVisibility: togglePasswordVisibility,
+                      validateEmail: validateEmail,
+                      validatePassword: validatePassword,
+                      onGenderSelected: (String gender) {
+                        setState(() {
+                          _selectedGenderController.text = gender;
+                        });
+                      },
+                    );
+                  },
+                )
               ],
             ),
           ),

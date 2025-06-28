@@ -7,8 +7,10 @@ import 'package:loginpage/features/instructor_profile/ui/widgets/course_box.dart
 import 'package:loginpage/features/instructor_profile/ui/widgets/review_card.dart';
 import '../../../../core/injection/injection.dart';
 import '../../../kid_profile/logic/cubit/kid_profile_cubit.dart';
+import '../../../reviews/logic/cubit/reviews_cubit.dart';
 import '../../../sign_up/data/models/kid.dart';
 import '../../logic/cubit/course_category_cubit.dart';
+import '../../logic/cubit/discounted_courses_cubit.dart';
 import 'arts_category.dart';
 import 'education_category.dart';
 import 'games_category.dart';
@@ -37,7 +39,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  // final List<Widget> categoryPages = [
   final Map<String, Widget Function(String)> categoryPages = {
     "Education": (category) => EducationCategory(category: category),
     "Skills": (category) => SkillsCategory(category: category),
@@ -48,6 +49,8 @@ class _HomeState extends State<Home> {
 
   late KidProfileCubit kidProfileCubit;
   late CourseCategoryCubit courseCategoryCubit;
+  late ReviewsCubit reviewsCubit;
+  late DiscountedCoursesCubit discountedCoursesCubit;
 
   @override
   void initState() {
@@ -55,9 +58,14 @@ class _HomeState extends State<Home> {
     NavBarVisibilityController.showNavBar();
     kidProfileCubit = getIt<KidProfileCubit>();
     courseCategoryCubit = getIt<CourseCategoryCubit>();
+    reviewsCubit = getIt<ReviewsCubit>();
+    discountedCoursesCubit = getIt<DiscountedCoursesCubit>();
 
     kidProfileCubit.emitGetKidProfile();
+    
+    discountedCoursesCubit.emitGetDiscountedCourses();
     courseCategoryCubit.emitGetTrendingCourses();
+    reviewsCubit.emitGetRecentReviews();
   }
 
   @override
@@ -66,8 +74,11 @@ class _HomeState extends State<Home> {
       providers: [
         BlocProvider.value(value: kidProfileCubit),
         BlocProvider.value(value: courseCategoryCubit),
+        BlocProvider.value(value: reviewsCubit),
+        BlocProvider.value(value: discountedCoursesCubit),
       ],
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: Column(
           children: [
             BlocBuilder<KidProfileCubit, KidProfileState>(
@@ -88,7 +99,8 @@ class _HomeState extends State<Home> {
                 child: Column(
                   children: [
                     const SizedBox(height: 38),
-                    AdsPart(),
+
+                    const DiscountedCoursesCarousel(),
                     const SizedBox(height: 20),
 
                     // Trending Section
@@ -286,26 +298,107 @@ class _HomeState extends State<Home> {
                       padding: const EdgeInsets.only(left: 15.0),
                       child: SizedBox(
                         height: 150,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            buildHorizontalReviewCard(
-                              name: "Ahmed Mostafa",
-                              review: "Amazing instructor! Highly recommended.",
-                              rating: 5,
-                              courseName: "For Mathematics for kids",
-                              instructorName: "Abanoub Atef",
-                            ),
-                            const SizedBox(width: 10),
-                            buildHorizontalReviewCard(
-                              name: "Sara Ali",
-                              review:
-                                  "Practical examples and clear explanations!",
-                              rating: 4,
-                              courseName: "For Mathematics for kids",
-                              instructorName: "Abanoub Atef",
-                            ),
-                          ],
+                        child: BlocBuilder<ReviewsCubit, ReviewsState>(
+                          builder: (context, state) {
+                            if (state is GetReviewsLoading) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Color(0xFF02457A),
+                                ),
+                              );
+                            } else if (state is GetReviewsSuccess) {
+                              if (state.reviews.isEmpty) {
+                                return const Center(
+                                  child: Text(
+                                    "No reviews available",
+                                    style: TextStyle(
+                                      color: Color(0xFF02457A),
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: state.reviews.length,
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(width: 10),
+                                itemBuilder: (context, index) {
+                                  final review = state.reviews[index];
+                                  return buildHorizontalReviewCard(
+                                    name: review.displayKidName,
+                                    review: review.reviewText,
+                                    rating: review.rating,
+                                    courseName:
+                                        "For ${review.displayCourseName}",
+                                    instructorName:
+                                        review.displayInstructorName, 
+                                  );
+                                },
+                              );
+                            } else if (state is GetReviewsFailure) {
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.error_outline,
+                                      color: Colors.red,
+                                      size: 30,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "Failed to load reviews",
+                                      style: TextStyle(
+                                        color: Colors.red[700],
+                                        fontSize: 14,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        context
+                                            .read<ReviewsCubit>()
+                                            .emitGetRecentReviews();
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFF02457A),
+                                        foregroundColor: Colors.white,
+                                      ),
+                                      child: const Text("Retry"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+
+                            // Default state - fallback to hardcoded reviews
+                            return ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: [
+                                buildHorizontalReviewCard(
+                                  name: "Ahmed Mostafa",
+                                  review:
+                                      "Amazing instructor! Highly recommended.",
+                                  rating: 5,
+                                  courseName: "For Mathematics for kids",
+                                  instructorName: "Abanoub Atef",
+                                ),
+                                const SizedBox(width: 10),
+                                buildHorizontalReviewCard(
+                                  name: "Sara Ali",
+                                  review:
+                                      "Practical examples and clear explanations!",
+                                  rating: 4,
+                                  courseName: "For Mathematics for kids",
+                                  instructorName: "Abanoub Atef",
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                     ),

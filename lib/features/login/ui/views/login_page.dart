@@ -153,8 +153,44 @@ class LoginPageState extends State<LoginPage> {
                             context.read<RoleCubit>().selectRole('kid');
                             context.pushReplacement(Routes.homePage);
                           } else if (state is LoginFailure) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(state.error)),
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Row(
+                                  children: const [
+                                    Icon(Icons.warning, color: Colors.amber),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Login Failed',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                content: Text(
+                                  state.error,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      backgroundColor: const Color(0xFF02457A),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              ),
                             );
                           }
                         },
@@ -175,9 +211,9 @@ class LoginPageState extends State<LoginPage> {
                                 role: role,
                               );
 
-                              context.read<LoginCubit>().emitLoginUser(
-                                    user: user,
-                                  );
+                              context
+                                  .read<LoginCubit>()
+                                  .emitLoginUser(user: user);
                             }
                           },
                         ),
@@ -221,7 +257,8 @@ class LoginPageState extends State<LoginPage> {
 
                           FocusScope.of(context).unfocus();
                         },
-                      )
+                      ),
+                      SizedBox(height:70 ,)
                     ],
                   ),
                 ),

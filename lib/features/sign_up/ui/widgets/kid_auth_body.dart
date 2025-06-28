@@ -51,9 +51,8 @@ class KidAuthBody extends StatefulWidget {
 class KidAuthBodyState extends State<KidAuthBody> {
   String? _selectedGender;
   final _formKey = GlobalKey<FormState>();
-    bool isSubmitted = false;
- // final TextEditingController _emailController = TextEditingController();
-
+  bool isSubmitted = false;
+  // final TextEditingController _emailController = TextEditingController();
 
   final List<String> egyptianGovernorates = [
     'Alexandria',
@@ -93,6 +92,7 @@ class KidAuthBodyState extends State<KidAuthBody> {
     }
     return null;
   }
+
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Email is required';
@@ -101,16 +101,17 @@ class KidAuthBodyState extends State<KidAuthBody> {
     }
     return null;
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         const SizedBox(height: 200),
         Form(
-           key: _formKey,
-                    autovalidateMode: isSubmitted
-                        ? AutovalidateMode.onUserInteraction
-                        : AutovalidateMode.disabled,
+          key: _formKey,
+          autovalidateMode: isSubmitted
+              ? AutovalidateMode.onUserInteraction
+              : AutovalidateMode.disabled,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
@@ -237,7 +238,8 @@ class KidAuthBodyState extends State<KidAuthBody> {
                     setState(() {
                       _selectedGender = gender;
                     });
-                  }, initialGender: '',
+                  },
+                  initialGender: '',
                 ),
                 const SizedBox(height: 20),
                 BlocListener<MyCubit, MyState>(
@@ -245,22 +247,28 @@ class KidAuthBodyState extends State<KidAuthBody> {
                     if (state is CreateNewKidSuccess) {
                       context.push(Routes.loginPage);
                     } else if (state is MyFailure) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(state.error)),
-                      );
+                      if (state.error != "SIGN_UP_FAILED") {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(state.error)),
+                        );
+                      }
                     }
                   },
                   child: CustomButton(
                     text: 'Sign Up',
                     onPressed: () async {
-                              setState(() {
-                                isSubmitted =
-                                    true; // تفعيل الفاليديشن عند الضغط
-                              });
-                              // if (_formKey.currentState!.validate()) {
-                              //   final email = _emailController.text.trim();
-                                //final password =_passwordController.text.trim();
-
+                      setState(() {
+                        isSubmitted = true;
+                      });
+                      if (_formKey.currentState!.validate()) {
+                        if (_selectedGender == null ||
+                            _selectedGender!.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Please select gender')),
+                          );
+                          return;
+                        }
                         context.read<MyCubit>().emitCreateNewKid(
                               KidData(
                                 age: int.tryParse(widget.ageController.text),
@@ -272,7 +280,7 @@ class KidAuthBodyState extends State<KidAuthBody> {
                                 governorate: widget.governmentController.text,
                               ),
                             );
-                    //}
+                      }
                     },
                   ),
                 ),

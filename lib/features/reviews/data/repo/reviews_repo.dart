@@ -6,7 +6,7 @@ class ReviewsRepo {
 
   ReviewsRepo(this.webServices);
 
-  Future<ReviewResponseModel> createReview(ReviewRequestModel newReview) async {
+  Future<ReviewResponseModel> createReviews(ReviewRequestModel newReview) async {
     return await webServices.createReviews(newReview);
   }
 

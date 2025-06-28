@@ -13,13 +13,22 @@ class MyCubit extends Cubit<MyState> {
     try {
       if (isClosed) return;
       emit(MyLoading());
-      print("Request Data: ${newKid.toJson()}");
+
       await myRepo.createNewKid(newKid);
+
       if (isClosed) return;
       emit(CreateNewKidSuccess(newKid));
     } catch (e) {
       if (isClosed) return;
-      emit(MyFailure(e.toString()));
+
+      final rawMessage = e.toString();
+      String message = "Something went wrong";
+
+      if (rawMessage.contains("SIGN_UP_FAILED")) {
+        message = "SIGN_UP_FAILED";
+      }
+
+      emit(MyFailure(message));
     }
   }
 
@@ -33,7 +42,14 @@ class MyCubit extends Cubit<MyState> {
       emit(CreateNewInstructorSuccess(newInstructor));
     } catch (e) {
       if (isClosed) return;
-      emit(MyFailure(e.toString()));
+      final rawMessage = e.toString();
+      final message = rawMessage.contains("SIGN_UP_FAILED")
+          ? "SIGN_UP_FAILED"
+          : rawMessage
+              .replaceAll("Exception:", "")
+              .replaceAll("Error creating new instructor:", "")
+              .trim();
+      emit(MyFailure(message));
     }
   }
 }

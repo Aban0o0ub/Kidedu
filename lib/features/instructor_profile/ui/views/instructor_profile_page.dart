@@ -6,6 +6,7 @@ import 'package:loginpage/features/instructor_profile/ui/widgets/profile_body.da
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
 import '../../../../core/injection/injection.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../reviews/logic/cubit/reviews_cubit.dart';
 import '../../logic/cubit/my_courses_cubit.dart';
 import '../widgets/profile_header.dart';
 
@@ -19,6 +20,7 @@ class InstructorProfilePage extends StatefulWidget {
 class _InstructorProfilePage extends State<InstructorProfilePage> {
   late InstructorProfileCubit instructorProfileCubit;
   late MyCoursesCubit myCoursesCubit;
+  late ReviewsCubit reviewsCubit;
   @override
   void initState() {
     super.initState();
@@ -27,6 +29,9 @@ class _InstructorProfilePage extends State<InstructorProfilePage> {
 
     myCoursesCubit = getIt<MyCoursesCubit>();
     myCoursesCubit.emitGetMyCourses();
+
+    reviewsCubit = getIt<ReviewsCubit>();
+    reviewsCubit.emitGetReviewsByInstructor();
   }
 
   @override
@@ -35,6 +40,7 @@ class _InstructorProfilePage extends State<InstructorProfilePage> {
       providers: [
         BlocProvider.value(value: instructorProfileCubit),
         BlocProvider.value(value: myCoursesCubit),
+        BlocProvider.value(value: reviewsCubit),
       ],
       child: Scaffold(
         backgroundColor: Colors.white,

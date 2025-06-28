@@ -186,6 +186,8 @@ class CourseData {
   bool? purchased;
   List<SectionModel>? sections;
   String? governorate;
+  num? discountValue;
+  num? discountPercent;
 
   CourseData({
     this.id,
@@ -216,55 +218,59 @@ class CourseData {
     this.purchased,
     this.sections,
     this.governorate,
+    this.discountValue,
+    this.discountPercent,
   });
 
-factory CourseData.fromJson(Map<String, dynamic> json) {
-  try {
-    final String parsedId =
-        json['_id']?.toString() ?? json['id']?.toString() ?? '';
+  factory CourseData.fromJson(Map<String, dynamic> json) {
+    try {
+      final String parsedId =
+          json['_id']?.toString() ?? json['id']?.toString() ?? '';
 
-    final instructor = _parseInstructor(json['instructor']);
-    final governorate = instructor is Map<String, dynamic> 
-        ? instructor['Governorate']?.toString() 
-        : null;
+      final instructor = _parseInstructor(json['instructor']);
+      final governorate = instructor is Map<String, dynamic>
+          ? instructor['Governorate']?.toString()
+          : null;
 
-    return CourseData(
-      id: parsedId,
-      courseName: json['course_name']?.toString(),
-      courseId: json['course_id']?.toString(),
-      instructor: instructor,
-      kids: _parseKids(json['kid']),
-      level: json['level']?.toString(),
-      availability: json['availability']?.toString(),
-      offer: _parseNum(json['offer']),
-      category: json['category']?.toString(),
-      description: json['description']?.toString(),
-      startDate: _parseDateTime(json['start_date']),
-      endDate: _parseDateTime(json['end_date']),
-      courseImage: json['course_image']?.toString(),
-      createdAt: json['createdAt']?.toString(),
-      updatedAt: json['updatedAt']?.toString(),
-      v: _parseInt(json['__v']),
-      price: _parseNum(json['price']),
-      priceAfterDiscount: _parseNum(json['price_after_offer']) ??
-          _parseNum(json['price_after_discount']),
-      ratingQuantity: _parseInt(json['rating_quantity']),
-      lessons: _parseLessons(json['lessons']),
-      progress: _parseDouble(json['progress']),
-      firstSection: json['first_section']?.toString(),
-      numKids: _parseInt(json['numKids']),
-      suitableAges: _parseSuitableAges(json['suitableAges']),
-      earnings: _parseNum(json['earnings']),
-      purchased: json['purchased'] is bool ? json['purchased'] : null,
-      sections: _parseSections(json['sections']),
-      governorate: governorate,
-    );
-  } catch (e) {
-    print('Error parsing CourseData: $e');
-    print('JSON data: $json');
-    rethrow;
+      return CourseData(
+        id: parsedId,
+        courseName: json['course_name']?.toString(),
+        courseId: json['course_id']?.toString(),
+        instructor: instructor,
+        kids: _parseKids(json['kid']),
+        level: json['level']?.toString(),
+        availability: json['availability']?.toString(),
+        offer: _parseNum(json['offer']),
+        category: json['category']?.toString(),
+        description: json['description']?.toString(),
+        startDate: _parseDateTime(json['start_date']),
+        endDate: _parseDateTime(json['end_date']),
+        courseImage: json['course_image']?.toString(),
+        createdAt: json['createdAt']?.toString(),
+        updatedAt: json['updatedAt']?.toString(),
+        v: _parseInt(json['__v']),
+        price: _parseNum(json['price']),
+        priceAfterDiscount: _parseNum(json['price_after_offer']) ??
+            _parseNum(json['price_after_discount']),
+        ratingQuantity: _parseInt(json['rating_quantity']),
+        lessons: _parseLessons(json['lessons']),
+        progress: _parseDouble(json['progress']),
+        firstSection: json['first_section']?.toString(),
+        numKids: _parseInt(json['numKids']),
+        suitableAges: _parseSuitableAges(json['suitableAges']),
+        earnings: _parseNum(json['earnings']),
+        purchased: json['purchased'] is bool ? json['purchased'] : null,
+        sections: _parseSections(json['sections']),
+        governorate: governorate,
+        discountValue: _parseNum(json['discountValue']),
+        discountPercent: _parseNum(json['discountPercent']),
+      );
+    } catch (e) {
+      print('Error parsing CourseData: $e');
+      print('JSON data: $json');
+      rethrow;
+    }
   }
-}
 
   static Map<String, dynamic>? _parseInstructor(dynamic instructor) {
     if (instructor == null) return null;
@@ -389,26 +395,34 @@ factory CourseData.fromJson(Map<String, dynamic> json) {
       'earnings': earnings,
       'purchased': purchased,
       'governorate': governorate,
+      'discountValue': discountValue,
+      'discountPercent': discountPercent,
     };
   }
 }
 
 class EndCourseRequest {
   final String courseId;
+  final String? lessonId;
 
-  EndCourseRequest({required this.courseId});
+  EndCourseRequest({required this.courseId, this.lessonId});
 
   Map<String, dynamic> toJson() => {
         'courseId': courseId,
+        if (lessonId != null) 'lessonId': lessonId,
       };
 }
 
 class EndCourseResponse {
   final String message;
+  final int? progress;
 
-  EndCourseResponse({required this.message});
+  EndCourseResponse({required this.message, this.progress});
 
   factory EndCourseResponse.fromJson(Map<String, dynamic> json) {
-    return EndCourseResponse(message: json['message']);
+    return EndCourseResponse(
+      message: json['message'],
+      progress: json['progress'],
+    );
   }
 }

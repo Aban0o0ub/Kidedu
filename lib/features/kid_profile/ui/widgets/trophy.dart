@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class TrophyWidget extends StatelessWidget {
   final Map<String, dynamic> trophy;
   
-  const TrophyWidget({super.key, required this.trophy});
+  const TrophyWidget({super.key, required this.trophy, required bool isActive, required bool isUnlocked});
   
   @override
   Widget build(BuildContext context) {

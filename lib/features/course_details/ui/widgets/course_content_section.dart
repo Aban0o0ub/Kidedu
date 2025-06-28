@@ -22,7 +22,7 @@ class CourseContentSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<RoleCubit, String?>(
       builder: (context, userRole) {
-        if (userRole == 'instructor') {
+        if (userRole == 'instructor' || userRole == 'kid') {
           return Column(
             children: [
               Row(
@@ -36,32 +36,33 @@ class CourseContentSection extends StatelessWidget {
                       color: Color(0xFF02457A),
                     ),
                   ),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: onEndCourse,
-                        child: const Icon(
-                          Icons.check_circle_outline,
-                          color: Colors.green,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      if (!isCourseEnded) 
+                  if (userRole == 'instructor')
+                    Row(
+                      children: [
                         GestureDetector(
-                          onTap: () {
-                            context.push(Routes.addLessonPage, extra: {
-                              'courseId': courseId
-                            });
-                          },
+                          onTap: onEndCourse,
                           child: const Icon(
-                            Icons.add_outlined,
-                            color: Color(0xFF02457A),
+                            Icons.check_circle_outline,
+                            color: Colors.green,
                             size: 24,
                           ),
                         ),
-                    ],
-                  ),
+                        const SizedBox(width: 12),
+                        if (!isCourseEnded) 
+                          GestureDetector(
+                            onTap: () {
+                              context.push(Routes.addLessonPage, extra: {
+                                'courseId': courseId
+                              });
+                            },
+                            child: const Icon(
+                              Icons.add_outlined,
+                              color: Color(0xFF02457A),
+                              size: 24,
+                            ),
+                          ),
+                      ],
+                    ),
                 ],
               ),
               BlocBuilder<SectionCubit, SectionState>(
@@ -116,7 +117,7 @@ class CourseContentSection extends StatelessWidget {
             ],
           );
         }
-        return const SizedBox(); // Don't show content section for kids
+        return const SizedBox(); 
       },
     );
   }

@@ -8,6 +8,7 @@ import 'package:loginpage/features/instructor_profile/ui/widgets/review_card.dar
 import '../../../../core/injection/injection.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../course_details/logic/cubit/course_details_cubit.dart';
+import '../../../reviews/logic/cubit/reviews_cubit.dart';
 import '../../logic/cubit/my_courses_cubit.dart';
 
 class ProfileBody extends StatefulWidget {
@@ -167,26 +168,60 @@ class _ProfileBodyState extends State<ProfileBody> {
                       ),
                     ),
                     const SizedBox(height: 7),
-                    SizedBox(
-                      height: 142, // Height of the cards
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          buildHorizontalReviewCard(
-                            name: "Ahmed Mostafa",
-                            review: "Amazing instructor! Highly recommended.",
-                            rating: 5,
-                          ),
-                          const SizedBox(width: 10),
-                          buildHorizontalReviewCard(
-                            name: "Sara Ali",
-                            review:
-                                "Practical examples and clear explanations!",
-                            rating: 4,
-                          ),
-                        ],
-                      ),
-                    ),
+                   BlocBuilder<ReviewsCubit, ReviewsState>(
+  builder: (context, state) {
+    if (state is GetReviewsLoading) {
+      return const SizedBox(
+        height: 142,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    } else if (state is GetReviewsFailure) {
+      return SizedBox(
+        height: 142,
+        child: Center(child: Text("Error: ${state.error}")),
+      );
+    } else if (state is GetReviewsSuccess) {
+      final reviews = state.reviews;
+
+      if (reviews.isEmpty) {
+        return const SizedBox(
+          height: 142,
+          child: Center(
+            child: Text(
+              "No reviews yet",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+        );
+      }
+
+      return SizedBox(
+        height: 142,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: reviews.length,
+          itemBuilder: (context, index) {
+            final review = reviews[index];
+            return Padding(
+              padding: EdgeInsets.only(right: index < reviews.length - 1 ? 10 : 0),
+              child: buildHorizontalReviewCard(
+                name: review.kidId?.name ?? "Student",
+                review: review.reviewText ,
+                rating: review.rating ,
+                courseName: review.courseId?.courseName,
+              ),
+            );
+          },
+        ),
+      );
+    } else {
+      return const SizedBox(
+        height: 142,
+        child: Center(child: Text("No reviews available.")),
+      );
+    }
+  },
+),
                     const SizedBox(height: 30),
                     Align(
                       alignment: Alignment.centerLeft,

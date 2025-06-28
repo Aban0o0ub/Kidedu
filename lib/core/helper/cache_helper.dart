@@ -26,10 +26,10 @@ class CacheHelper {
       await _sharedPreferences.setDouble(key, value);
       return true;
     }
-     if (value is List<String>) {
-    await _sharedPreferences.setStringList(key, value);
-    return true;
-  }
+    if (value is List<String>) {
+      await _sharedPreferences.setStringList(key, value);
+      return true;
+    }
     return false;
   }
 
@@ -40,8 +40,11 @@ class CacheHelper {
 
   /// remover
   static Future<bool> removeData({required String key}) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.remove(key);
-}
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.remove(key);
+  }
 
+  static Future<void> clear() async {
+    await _sharedPreferences.clear();
+  }
 }

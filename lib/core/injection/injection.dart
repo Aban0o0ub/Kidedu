@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:loginpage/core/networking/web_services.dart';
+import 'package:loginpage/features/achievment/data/repo/achievment_repo.dart';
+import 'package:loginpage/features/achievment/logic/cubit/achievment_cubit.dart';
 import 'package:loginpage/features/add_course/data/repo/add_course_repo.dart';
 import 'package:loginpage/features/add_course/logic/cubit/add_course_cubit.dart';
 import 'package:loginpage/features/cart/data/repo/cart_repo.dart';
@@ -20,11 +22,14 @@ import 'package:loginpage/features/lesson/logic/cubit/quiz_cubit.dart';
 import 'package:loginpage/features/lesson/logic/cubit/section_cubit.dart';
 import 'package:loginpage/features/login/data/repo/my_repo.dart';
 import 'package:loginpage/features/login/logic/cubit/my_cubit.dart';
+import 'package:loginpage/features/reviews/data/repo/reviews_repo.dart';
+import 'package:loginpage/features/reviews/logic/cubit/reviews_cubit.dart';
 import 'package:loginpage/features/sign_up/data/repo/my_repo.dart';
 import 'package:loginpage/features/sign_up/logic/cubit/my_cubit.dart';
 import '../../features/cart/logic/cubit/cart_cubit.dart';
 import '../../features/home/data/Repo/course_category_repo.dart';
 import '../../features/home/logic/cubit/course_category_cubit.dart';
+import '../../features/home/logic/cubit/discounted_courses_cubit.dart';
 import '../../features/instructor_profile/logic/cubit/my_courses_cubit.dart';
 import '../../features/payment/data/repo/payment_repo.dart';
 import '../../features/payment/logic/cubit/payment_cubit.dart';
@@ -59,6 +64,10 @@ void initGetIt() {
   getIt.registerLazySingleton<QuizRepo>(() => QuizRepo(getIt<WebServices>()));
   getIt.registerLazySingleton<EarningsRepo>(
       () => EarningsRepo(getIt<WebServices>()));
+  getIt.registerLazySingleton<ReviewsRepo>(
+      () => ReviewsRepo(getIt<WebServices>()));
+      getIt.registerLazySingleton<AchievmentRepo>(
+      () => AchievmentRepo(getIt<WebServices>()));
 
   //Cubits
   getIt.registerFactory<MyCubit>(() => MyCubit(getIt<MyRepo>()));
@@ -82,13 +91,18 @@ void initGetIt() {
   getIt.registerFactory<QuizCubit>(() => QuizCubit(getIt<QuizRepo>()));
   getIt.registerFactory<EarningsCubit>(
       () => EarningsCubit(getIt<EarningsRepo>()));
+  getIt.registerFactory<ReviewsCubit>(() => ReviewsCubit(getIt<ReviewsRepo>()));
+  getIt.registerFactory<DiscountedCoursesCubit>(
+      () => DiscountedCoursesCubit(getIt<CourseCategoryRepo>()));
+  getIt.registerFactory<AchievmentCubit>(
+      () => AchievmentCubit(getIt<AchievmentRepo>()));
 }
 
 Dio createAndSetupDio() {
   Dio dio = Dio();
 
   dio.options = BaseOptions(
-    baseUrl: 'http://192.168.1.3:3000/api/',
+    baseUrl: 'http://192.168.1.6:3000/api/',
     connectTimeout: const Duration(seconds: 30),
     receiveTimeout: const Duration(seconds: 30),
   );

@@ -12,7 +12,7 @@ class ReviewsCubit extends Cubit<ReviewsState> {
     emit(CreateReviewLoading());
 
     try {
-      final response = await reviewsRepo.createReview(newReview);
+      final response = await reviewsRepo.createReviews(newReview);
       emit(CreateReviewSuccess(response.newReview));
     } catch (e) {
       emit(CreateReviewFailure(e.toString()));
@@ -24,7 +24,6 @@ class ReviewsCubit extends Cubit<ReviewsState> {
       emit(GetReviewsFailure('Course ID is not available'));
       return;
     }
-
     emit(GetReviewsLoading());
     try {
       final response = await reviewsRepo.getReviewsByCourse(courseId);

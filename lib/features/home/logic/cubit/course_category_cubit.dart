@@ -52,4 +52,15 @@ class CourseCategoryCubit extends Cubit<CourseCategoryState> {
       emit(GetAllCourseFailure(e.toString()));
     }
   }
+
+  // Future<void> emitGetDiscountedCourses() async {
+  //   emit(DiscountedCoursesLoading());
+  //   try {
+  //     final List<CourseData> discountedCourses =
+  //         await courseDetailsRepo.getTopDiscounts();
+  //     emit(GetDiscountedCourseSuccess(discountedCourses));
+  //   } catch (e) {
+  //     emit(GetDiscountedCourseFailure(e.toString()));
+  //   }
+  // }
 }

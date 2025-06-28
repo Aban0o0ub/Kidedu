@@ -24,4 +24,8 @@ class CourseDetailsRepo {
       EndCourseRequest endCourse) async {
     return await webServices.instructorEndCourse(endCourse);
   }
+
+  Future<EndCourseResponse> kidEndCourse(EndCourseRequest endCourse) async {
+    return await webServices.kidEndCourse(endCourse);
+  }
 }

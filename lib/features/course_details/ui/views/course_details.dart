@@ -7,6 +7,7 @@ import 'package:loginpage/features/instructor_profile/ui/widgets/info_container.
 import '../../../../core/routing/routes.dart';
 import '../../../lesson/logic/cubit/lesson_cubit.dart';
 import '../../../lesson/logic/cubit/section_cubit.dart';
+import '../../../reviews/logic/cubit/reviews_cubit.dart';
 import '../widgets/course_header_section.dart';
 import '../widgets/course_info_card.dart';
 import '../widgets/course_content_section.dart';
@@ -27,6 +28,7 @@ class _CourseDetailsState extends State<CourseDetails> {
   late CourseDetailsCubit courseDetailsCubit;
   late SectionCubit sectionCubit;
   late LessonCubit lessonCubit;
+  late ReviewsCubit reviewsCubit;
   String courseId = '';
 
   @override
@@ -42,9 +44,11 @@ class _CourseDetailsState extends State<CourseDetails> {
         courseDetailsCubit = getIt<CourseDetailsCubit>();
         sectionCubit = getIt<SectionCubit>();
         lessonCubit = getIt<LessonCubit>();
+        reviewsCubit = getIt<ReviewsCubit>();
 
         courseDetailsCubit.emitGetSingleCourse(id);
         sectionCubit.emitGetSection(id);
+        reviewsCubit.emitGetReviewsByCourse(courseId);
       } else {
         throw Exception('ID NOT FOUND');
       }
@@ -81,6 +85,7 @@ class _CourseDetailsState extends State<CourseDetails> {
         BlocProvider.value(value: courseDetailsCubit),
         BlocProvider.value(value: sectionCubit),
         BlocProvider.value(value: lessonCubit),
+        BlocProvider.value(value: reviewsCubit),
       ],
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -103,38 +108,39 @@ class _CourseDetailsState extends State<CourseDetails> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 15),
-                            
+
                             // Course Title and Instructor
                             _buildCourseTitleSection(course),
-                            
+
                             const SizedBox(height: 15),
-                            
+
                             // Course Info Card
                             CourseInfoCard(course: course),
-                            
+
                             const SizedBox(height: 15),
-                            
+
                             // Description
                             buildInfoContainer(
                               context: context,
                               header: "Description",
-                              text: course.description ?? "No description available",
+                              text: course.description ??
+                                  "No description available",
                             ),
-                            
+
                             const SizedBox(height: 15),
-                            
+
                             // Content Section (only for instructors)
                             CourseContentSection(
                               courseId: courseId,
                               isCourseEnded: isCourseEnded,
                               onEndCourse: _showEndCourseDialog,
                             ),
-                            
+
                             // Reviews Section
-                            const CourseReviewsSection(),
-                            
+                            CourseReviewsSection(courseId: courseId),
+
                             const SizedBox(height: 35),
-                            
+
                             // Action Buttons
                             CourseActionButtons(
                               onUpdateCourse: () {
@@ -142,7 +148,7 @@ class _CourseDetailsState extends State<CourseDetails> {
                               },
                               onDeleteCourse: _showDeleteCourseDialog,
                             ),
-                            
+
                             const SizedBox(height: 60),
                           ],
                         ),
@@ -151,12 +157,14 @@ class _CourseDetailsState extends State<CourseDetails> {
                       return Center(
                         child: Text(
                           "There was an error: ${state.error}",
-                          style: const TextStyle(fontSize: 20, color: Colors.red),
+                          style:
+                              const TextStyle(fontSize: 20, color: Colors.red),
                         ),
                       );
                     }
                     return const Center(
-                      child: CircularProgressIndicator(color: Color(0xFF02457A)),
+                      child:
+                          CircularProgressIndicator(color: Color(0xFF02457A)),
                     );
                   },
                 ),

@@ -54,3 +54,15 @@ final class GetAllCourseFailure extends CourseCategoryState {
   final String error;
   GetAllCourseFailure(this.error);
 }
+//////////////////////////////////////////////////////////////////////////////
+// final class DiscountedCoursesLoading extends CourseCategoryState {}
+
+// final class GetDiscountedCourseSuccess extends CourseCategoryState {
+//   final List<CourseData> discountedCourses;
+//   GetDiscountedCourseSuccess(this.discountedCourses);
+// }
+
+// final class GetDiscountedCourseFailure extends CourseCategoryState {
+//   final String error;
+//   GetDiscountedCourseFailure(this.error);
+// }

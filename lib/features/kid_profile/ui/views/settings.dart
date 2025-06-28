@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/helper/cache_helper.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/widgets/appbar.dart';
-import '../widgets/logout_delete.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -20,7 +20,10 @@ class _SettingsPageState extends State<SettingsPage> {
     //var themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
-      appBar:  CustomAppBar(title: 'Settings',onBackPressed: () => Navigator.pop(context),),
+      appBar: CustomAppBar(
+        title: 'Settings',
+        onBackPressed: () => Navigator.pop(context),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -54,7 +57,14 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildListTile(Icons.language, "Language",
                   trailingText: "English", showArrow: true),
               _buildDivider(),
-              _buildListTile(Icons.lock, "Change Password"),
+              _buildListTile(
+                Icons.lock,
+                "Change Password",
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                  context.push(Routes.changePassword);
+                },
+              ),
               _buildDivider(),
               _buildListTile(
                 Icons.privacy_tip,
@@ -127,31 +137,26 @@ class _SettingsPageState extends State<SettingsPage> {
               SizedBox(
                 height: 12,
               ),
-              Row(
-                //mainAxisAlignment:MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: SimpleSettingsTile(
-                      title: "Logout",
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Clicked Logout')),
-                        );
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: () {
+                        _showLogoutConfirmationDialog(context);
                       },
+                      child: const Text(
+                        "Logout",
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
                     ),
                   ),
-                  Expanded(
-                    child: SimpleSettingsTile(
-                      title: "Delete Account",
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Clicked Delete Account')),
-                        );
-                      },
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
@@ -191,7 +196,7 @@ Widget _buildListTile(
   String text, {
   String? trailingText,
   bool showArrow = true,
-  VoidCallback? onTap, 
+  VoidCallback? onTap,
 }) {
   return ListTile(
     leading: Icon(icon, color: Color(0xFF02457A)),
@@ -202,6 +207,68 @@ Widget _buildListTile(
     trailing: trailingText != null
         ? Text(trailingText, style: const TextStyle(color: Colors.grey))
         : (showArrow ? const Icon(Icons.arrow_forward_ios, size: 16) : null),
-    onTap: onTap, 
+    onTap: onTap,
   );
+}
+
+void _showLogoutConfirmationDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text("Logout"),
+        content: const Text("Are you sure to logout?"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // إغلاق الديالوج
+            },
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop(); // إغلاق ديالوج التأكيد
+              await _performLogout(context);
+            },
+            child: const Text("Logout"),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<void> _performLogout(BuildContext context) async {
+  try {
+    await CacheHelper.clear();
+
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Success"),
+            content: const Text("Logout successfully"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  context.go(Routes.roleSelectionPage);
+                },
+                child: const Text("Okay"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  } catch (e) {
+    // في حالة حدوث خطأ
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error during logout: $e')),
+      );
+    }
+  }
 }

@@ -37,25 +37,17 @@ Widget buildHorizontalReviewCard({
                 ),
               ),
               const SizedBox(height: 8),
-              if (courseName != null && instructorName != null)
-                Row(
-                  children: [
-                    Text(
-                      courseName,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF02457A),
-                      ),
+              if (courseName != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    courseName,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF02457A),
+                      fontWeight: FontWeight.w500,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '|' + '${instructorName}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF02457A),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               // Rating stars
               Row(

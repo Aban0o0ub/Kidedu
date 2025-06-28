@@ -25,4 +25,5 @@ class Routes {
   static const forgetPassword = '/forgetPassword';
   static const resetPassword = '/resetPassword';
   static const bookmarkPage = '/bookmarkPage';
+  static const changePassword = '/changePassword';
 }

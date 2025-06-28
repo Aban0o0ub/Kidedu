@@ -4,6 +4,7 @@ import 'package:loginpage/core/helper/cache_helper.dart';
 import 'package:loginpage/features/add_course/data/models/Course_Model.dart';
 import 'package:loginpage/features/login/data/models/user.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
+import '../../features/achievment/data/model/achievment_model.dart';
 import '../../features/cart/data/model/cart_model.dart';
 import '../../features/earnings/data/model/earnings_model.dart';
 import '../../features/lesson/data/models/lesson.dart';
@@ -26,12 +27,21 @@ class WebServices {
       final response = await dio.post(
         'user_kid',
         data: newKid.toJson(),
+        options: Options(validateStatus: (_) => true),
       );
-      KidResponse kid = KidResponse.fromJson(response.data);
 
-      return kid;
+      if ((response.statusCode != 200 && response.statusCode != 201) ||
+          (response.data['message']
+                  ?.toString()
+                  .toLowerCase()
+                  .contains('exist') ??
+              false)) {
+        throw Exception('SIGN_UP_FAILED');
+      }
+
+      return KidResponse.fromJson(response.data);
     } catch (e) {
-      throw Exception('Error creating new kid: ${e.toString()}');
+      throw Exception('SIGN_UP_FAILED');
     }
   }
 
@@ -45,13 +55,21 @@ class WebServices {
       final response = await dio.post(
         'user_instructor',
         data: newInstructor.toJson(),
+        options: Options(validateStatus: (_) => true),
       );
-      InstructorResponse instructor =
-          InstructorResponse.fromJson(response.data);
 
-      return instructor;
+      if ((response.statusCode != 200 && response.statusCode != 201) ||
+          (response.data['message']
+                  ?.toString()
+                  .toLowerCase()
+                  .contains('exist') ??
+              false)) {
+        throw Exception('SIGN_UP_FAILED');
+      }
+
+      return InstructorResponse.fromJson(response.data);
     } catch (e) {
-      throw Exception('Error creating new instructor: ${e.toString()}');
+      throw Exception('SIGN_UP_FAILED');
     }
   }
 
@@ -734,13 +752,42 @@ class WebServices {
     }
   }
 
+  // Future<LessonListResponse> getLessonBySectionId(String sectionId) async {
+  //   try {
+  //     String? token = CacheHelper.getData(key: "token");
+  //     if (token == null) {
+  //       throw Exception('Missing token');
+  //     }
+  //     final response = await dio.get(
+  //       'lesson/$sectionId',
+  //       options: Options(
+  //         headers: {
+  //           'token': 'Bearer $token',
+  //         },
+  //       ),
+  //     );
+  //     final responseData = response.data;
+  //     return LessonListResponse.fromJson(responseData);
+  //   } on DioException catch (dioError) {
+  //     if (dioError.response?.statusCode == 403) {
+  //       // Handle enrollment error specifically
+  //       final errorMessage = dioError.response?.data['message'] ??
+  //           'You are not enrolled in this course';
+  //       throw Exception('Access denied: $errorMessage');
+  //     }
+  //     // Handle other DioExceptions
+  //     throw Exception('Network error: ${dioError.message}');
+  //   } catch (e) {
+  //     throw Exception('Error getting lessons: ${e.toString()}');
+  //   }
+  // }
+
   Future<LessonListResponse> getLessonBySectionId(String sectionId) async {
     try {
       String? token = CacheHelper.getData(key: "token");
       if (token == null) {
         throw Exception('Missing token');
       }
-
       final response = await dio.get(
         'lesson/$sectionId',
         options: Options(
@@ -751,7 +798,17 @@ class WebServices {
       );
 
       final responseData = response.data;
+
+      // Log the status for debugging
+      print('Response status: ${response.statusCode}');
+      if (response.statusCode == 206) {
+        print('Received partial content - user not enrolled');
+      }
+
       return LessonListResponse.fromJson(responseData);
+    } on DioException catch (dioError) {
+      // Handle DioExceptions
+      throw Exception('Network error: ${dioError.message}');
     } catch (e) {
       throw Exception('Error getting lessons: ${e.toString()}');
     }
@@ -807,38 +864,38 @@ class WebServices {
   }
 
   Future<ReviewResponseModel> createReviews(
-      ReviewRequestModel newReview) async {
-    try {
-      String? token = CacheHelper.getData(key: "token");
-      if (token == null) {
-        throw Exception('Missing token');
-      }
-
-      final response = await dio.post(
-        'reviews',
-        data: newReview.toJson(),
-        options: Options(
-          headers: {
-            'token': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
-
-      final responseData = response.data;
-      return ReviewResponseModel.fromJson(responseData);
-    } on DioException catch (dioError) {
-      // Handle specific Dio errors
-      if (dioError.response != null) {
-        throw Exception(
-            'Server error: ${dioError.response?.statusCode} - ${dioError.response?.data}');
-      } else {
-        throw Exception('Network error: ${dioError.message}');
-      }
-    } catch (e) {
-      throw Exception('Error creating review: ${e.toString()}');
+    ReviewRequestModel newReview) async {
+  try {
+    String? token = CacheHelper.getData(key: "token");
+    if (token == null) {
+      throw Exception('Missing token');
     }
+    final response = await dio.post(
+      'reviews',
+      data: newReview.toJson(),
+      options: Options(
+        headers: {
+          'token': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
+    final responseData = response.data;
+    return ReviewResponseModel.fromJson(responseData);
+  } on DioException catch (dioError) {
+    if (dioError.response != null) {
+      if (dioError.response?.statusCode == 400) {
+        throw Exception('You have already reviewed this course');
+      }
+      throw Exception(
+          'Server error: ${dioError.response?.statusCode} - ${dioError.response?.data}');
+    } else {
+      throw Exception('Network error: ${dioError.message}');
+    }
+  } catch (e) {
+    throw Exception('Error creating review: ${e.toString()}');
   }
+}
 
   Future<ReviewListResponseModel> getRecentReviews() async {
     try {
@@ -1085,6 +1142,80 @@ class WebServices {
       return EndCourseResponse.fromJson(responseData);
     } catch (e) {
       throw Exception('Error completing course: ${e.toString()}');
+    }
+  }
+
+  Future<EndCourseResponse> kidEndCourse(EndCourseRequest endCourse) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+      final response = await dio.post(
+        'user_kid/complete-course',
+        data: endCourse.toJson(),
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+        ),
+      );
+      final responseData = response.data;
+      return EndCourseResponse.fromJson(responseData);
+    } catch (e) {
+      throw Exception('Error completing course: ${e.toString()}');
+    }
+  }
+
+  Future<List<CourseData>> getTopDiscountedCourses() async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      final response = await dio.get(
+        'course/top-discounts',
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+          validateStatus: (status) => status! < 500,
+        ),
+      );
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data != null && data['topDiscountedCourses'] != null) {
+          return List<CourseData>.from(
+            data['topDiscountedCourses']
+                .map((course) => CourseData.fromJson(course)),
+          );
+        } else {
+          return [];
+        }
+      } else if (response.statusCode == 404) {
+        return [];
+      } else {
+        throw Exception("Unexpected error: ${response.statusMessage}");
+      }
+    } catch (e) {
+      throw Exception("Error fetching courses: ${e.toString()}");
+    }
+  }
+
+  Future<MyPointsResponse> getMyPoints() async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) throw Exception('Missing token');
+
+      final response = await dio.get(
+        'points/my-points',
+        options: Options(headers: {'token': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 200) {
+        return MyPointsResponse.fromJson(response.data);
+      } else {
+        throw Exception("Server Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception('Error fetching points: ${e.toString()}');
     }
   }
 }

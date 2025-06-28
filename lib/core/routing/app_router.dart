@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:loginpage/features/kid_profile/ui/widgets/change_password.dart';
 import 'package:loginpage/features/lesson/ui/views/view_lesson.dart';
 import '../../features/add_course/ui/views/add_course_page.dart';
 import '../../features/cart/ui/views/cart.dart';
@@ -7,7 +8,7 @@ import '../../features/earnings/ui/views/earning_page.dart';
 import '../../features/home/ui/views/home_page.dart';
 import '../../features/home/ui/views/my_courses.dart';
 import '../../features/instructor_profile/ui/views/instructor_profile_page.dart';
-import '../../features/kid_profile/ui/views/achievments.dart';
+import '../../features/achievment/ui/achievments.dart';
 import '../../features/kid_profile/ui/views/boohmark.dart';
 import '../../features/kid_profile/ui/views/edit_profile.dart';
 import '../../features/kid_profile/ui/views/kid_profile_page.dart';
@@ -124,10 +125,11 @@ final GoRouter router = GoRouter(
         final Map<String, dynamic>? params =
             state.extra as Map<String, dynamic>?;
         final String sectionId = params?['sectionId'] ?? "";
+        final String courseId = params?['courseId'] ?? ""; // أضف ده
         final String? lessonId = params?['lessonId'];
-
         return ViewLesson(
           sectionId: sectionId,
+          courseId: courseId, // أضف ده
           initialLessonId: lessonId,
         );
       },
@@ -158,6 +160,10 @@ final GoRouter router = GoRouter(
           await BookmarkManager.removeFromBookmark(course['id']);
         },
       ),
-    )
+    ),
+    GoRoute(
+      path: Routes.changePassword,
+      builder: (context, state) => const ChangePasswordScreen(),
+    ),
   ],
 );
