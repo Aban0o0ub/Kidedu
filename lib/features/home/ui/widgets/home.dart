@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loginpage/features/home/ui/widgets/ads_part.dart';
 import 'package:loginpage/features/home/ui/widgets/categories_item.dart';
 import 'package:loginpage/features/home/ui/widgets/home_appbar.dart';
 import 'package:loginpage/features/instructor_profile/ui/widgets/course_box.dart';
 import 'package:loginpage/features/instructor_profile/ui/widgets/review_card.dart';
 import '../../../../core/injection/injection.dart';
+import '../../../../core/routing/routes.dart';
+import '../../../course_details/logic/cubit/course_details_cubit.dart';
 import '../../../kid_profile/logic/cubit/kid_profile_cubit.dart';
 import '../../../reviews/logic/cubit/reviews_cubit.dart';
 import '../../../sign_up/data/models/kid.dart';
@@ -51,6 +54,7 @@ class _HomeState extends State<Home> {
   late CourseCategoryCubit courseCategoryCubit;
   late ReviewsCubit reviewsCubit;
   late DiscountedCoursesCubit discountedCoursesCubit;
+  late CourseDetailsCubit courseDetailsCubit;
 
   @override
   void initState() {
@@ -60,9 +64,9 @@ class _HomeState extends State<Home> {
     courseCategoryCubit = getIt<CourseCategoryCubit>();
     reviewsCubit = getIt<ReviewsCubit>();
     discountedCoursesCubit = getIt<DiscountedCoursesCubit>();
+    courseDetailsCubit = getIt<CourseDetailsCubit>();
 
     kidProfileCubit.emitGetKidProfile();
-    
     discountedCoursesCubit.emitGetDiscountedCourses();
     courseCategoryCubit.emitGetTrendingCourses();
     reviewsCubit.emitGetRecentReviews();
@@ -76,6 +80,7 @@ class _HomeState extends State<Home> {
         BlocProvider.value(value: courseCategoryCubit),
         BlocProvider.value(value: reviewsCubit),
         BlocProvider.value(value: discountedCoursesCubit),
+        BlocProvider.value(value: courseDetailsCubit),
       ],
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -154,15 +159,30 @@ class _HomeState extends State<Home> {
                               itemCount: state.courses.length,
                               itemBuilder: (context, index) {
                                 final course = state.courses[index];
-                                return buildCourseBox(
-                                  courseName:
-                                      course.courseName ?? "Unknown Course",
-                                  imagePath: (course.courseImage == null ||
-                                          course.courseImage!.isEmpty ||
-                                          !course.courseImage!
-                                              .startsWith("assets/"))
-                                      ? "assets/images/CourseDefaultPhoto.jpeg"
-                                      : course.courseImage!,
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (course.id != null &&
+                                        course.id!.isNotEmpty) {
+                                      context.push(
+                                        Routes.courseDetails,
+                                        extra: {
+                                          '_id': course.id,
+                                          'courseDetailsCubit':
+                                              courseDetailsCubit,
+                                        },
+                                      );
+                                    }
+                                  },
+                                  child: buildCourseBox(
+                                    courseName:
+                                        course.courseName ?? "Unknown Course",
+                                    imagePath: (course.courseImage == null ||
+                                            course.courseImage!.isEmpty ||
+                                            !course.courseImage!
+                                                .startsWith("assets/"))
+                                        ? "assets/images/CourseDefaultPhoto.jpeg"
+                                        : course.courseImage!,
+                                  ),
                                 );
                               },
                             ),
@@ -333,7 +353,7 @@ class _HomeState extends State<Home> {
                                     courseName:
                                         "For ${review.displayCourseName}",
                                     instructorName:
-                                        review.displayInstructorName, 
+                                        review.displayInstructorName,
                                   );
                                 },
                               );

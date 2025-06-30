@@ -1,10 +1,12 @@
 import 'package:go_router/go_router.dart';
 import 'package:loginpage/features/kid_profile/ui/widgets/change_password.dart';
 import 'package:loginpage/features/lesson/ui/views/view_lesson.dart';
+import '../../features/add_course/data/models/Course_Model.dart';
 import '../../features/add_course/ui/views/add_course_page.dart';
 import '../../features/cart/ui/views/cart.dart';
 import '../../features/course_details/ui/views/course_details.dart';
 import '../../features/earnings/ui/views/earning_page.dart';
+import '../../features/earnings/ui/views/our_earnings.dart';
 import '../../features/home/ui/views/home_page.dart';
 import '../../features/home/ui/views/my_courses.dart';
 import '../../features/instructor_profile/ui/views/instructor_profile_page.dart';
@@ -61,7 +63,10 @@ final GoRouter router = GoRouter(
     ),
     GoRoute(
       path: Routes.addCoursePage,
-      builder: (context, state) => const AddCoursePage(),
+      builder: (context, state) {
+        final courseToEdit = state.extra as CourseData?;
+        return AddCoursePage(courseToEdit: courseToEdit);
+      },
     ),
     GoRoute(
       path: Routes.loginPage,
@@ -164,6 +169,10 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: Routes.changePassword,
       builder: (context, state) => const ChangePasswordScreen(),
+    ),
+     GoRoute(
+      path: Routes.adminEarnings,
+      builder: (context, state) => const AdminEarningsScreen(),
     ),
   ],
 );

@@ -36,6 +36,8 @@ class CourseCard extends StatefulWidget {
 }
 
 class _CourseCardState extends State<CourseCard> {
+  // إضافة loading state منفصل لكل card
+  bool _isLocalLoading = false;
   
   bool _isValidNetworkImage(String? imagePath) {
     if (imagePath == null || imagePath.isEmpty) {
@@ -229,38 +231,60 @@ class _CourseCardState extends State<CourseCard> {
                       ),
                     ),
                   )
-                : BlocBuilder<CartCubit, CartState>(
+                : BlocConsumer<CartCubit, CartState>(
+                    listener: (context, state) {
+                      // إيقاف الـ local loading عند انتهاء العملية
+                      if (state is AddCartSuccess || state is AddCartFailure) {
+                        if (mounted) {
+                          setState(() {
+                            _isLocalLoading = false;
+                          });
+                        }
+                      }
+                      
+                      // عرض رسالة خطأ إذا كان الكورس متضاف مسبقاً
+                      if (state is AddCartFailure && 
+                          state.error.contains('already')) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Course already in cart or purchased'),
+                            backgroundColor: Colors.orange,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    },
                     buildWhen: (previous, current) =>
                         current is CartStatusChanged ||
-                        current is CartInitial ||
-                        current is CartLoading,
+                        current is CartInitial,
                     builder: (context, state) {
                       final cartCubit = context.read<CartCubit>();
                       final courseId = widget.id ?? '';
-                      final isAddedToCart =
-                          cartCubit.isCourseAddedToCart(courseId);
+                      final isAddedToCart = cartCubit.isCourseAddedToCart(courseId);
 
                       return SizedBox(
                         width: 100,
                         height: 36,
                         child: OutlinedButton(
-                          onPressed: state is CartLoading
+                          onPressed: _isLocalLoading
                               ? null
-                              : () {
+                              : () async {
                                   if (isAddedToCart) {
-                                    TabControllerHelper
-                                        .selectedIndexNotifier.value = 4;
-
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
+                                    // الانتقال للسلة
+                                    TabControllerHelper.selectedIndexNotifier.value = 4;
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
                                       if (Navigator.canPop(context)) {
                                         Navigator.pop(context);
                                       }
                                     });
                                   } else {
-                                    context
-                                        .read<CartCubit>()
-                                        .emitAddNewCart(courseId);
+                                    // بدء الـ loading للكارد ده فقط
+                                    setState(() {
+                                      _isLocalLoading = true;
+                                    });
+                                    
+                                    // إضافة الكورس للسلة
+                                    context.read<CartCubit>().emitAddNewCart(courseId);
                                   }
                                 },
                           style: OutlinedButton.styleFrom(
@@ -269,7 +293,7 @@ class _CourseCardState extends State<CourseCard> {
                                 isAddedToCart ? Colors.white : Colors.blue,
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                           ),
-                          child: state is CartLoading
+                          child: _isLocalLoading
                               ? const SizedBox(
                                   width: 16,
                                   height: 16,

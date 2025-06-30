@@ -20,6 +20,15 @@ class CourseCategoryCubit extends Cubit<CourseCategoryState> {
     }
   }
 
+Future<List<CourseData>> getKidCoursesData() async {
+  try {
+    final List<CourseData> myCourses = await courseDetailsRepo.getKidCourses();
+    return myCourses;
+  } catch (e) {
+    throw e;
+  }
+}
+
   Future<void> emitGetKidCourses() async {
     emit(GetKidCoursesLoading());
     try {

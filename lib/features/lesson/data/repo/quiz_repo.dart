@@ -1,4 +1,3 @@
-import '../../../../core/helper/cache_helper.dart';
 import '../../../../core/networking/web_services.dart';
 import '../models/quiz.dart';
 
@@ -12,12 +11,10 @@ class QuizRepo {
   }
 
   Future<SubmitQuizResponse> submitQuiz(SubmitQuizRequest submitQuiz) async {
-    String? token = await CacheHelper.getData(key: "token");
-
-    if (token == null) {
-      throw Exception('Token is missing');
-    }
-
     return await webServices.submitQuiz(submitQuiz);
+  } 
+
+Future<GetQuizzesResponse> getQuizzes(String lessonId) async {
+    return await webServices.getQuizzes(lessonId);
   } 
 }

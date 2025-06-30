@@ -16,24 +16,25 @@ class CourseRequest {
   String? firstSection;
   int? ratingQuantity;
   List<String>? lessons;
+  List<int>? suitableAges;
 
-  CourseRequest({
-    this.courseName,
-    this.instructor,
-    this.level,
-    this.availability,
-    this.offer,
-    this.category,
-    this.description,
-    this.price,
-    this.priceAfterDiscount,
-    this.startDate,
-    this.endDate,
-    this.courseImage,
-    this.firstSection,
-    this.ratingQuantity,
-    this.lessons,
-  });
+  CourseRequest(
+      {this.courseName,
+      this.instructor,
+      this.level,
+      this.availability,
+      this.offer,
+      this.category,
+      this.description,
+      this.price,
+      this.priceAfterDiscount,
+      this.startDate,
+      this.endDate,
+      this.courseImage,
+      this.firstSection,
+      this.ratingQuantity,
+      this.lessons,
+      this.suitableAges});
 
   factory CourseRequest.fromJson(Map<String, dynamic> json) {
     return CourseRequest(
@@ -56,6 +57,9 @@ class CourseRequest {
       ratingQuantity: json['rating_quantity'],
       lessons:
           json['lessons'] != null ? List<String>.from(json['lessons']) : [],
+      suitableAges: json['suitableAges'] != null
+          ? List<int>.from(json['suitableAges'])
+          : null,
     );
   }
 
@@ -76,6 +80,7 @@ class CourseRequest {
       "first_section": firstSection,
       "rating_quantity": ratingQuantity,
       "lessons": lessons,
+      "suitableAges": suitableAges ?? [],
     };
   }
 }
@@ -161,7 +166,8 @@ class CourseData {
   String? id;
   String? courseName;
   String? courseId;
-  Map<String, dynamic>? instructor;
+  //Map<String, dynamic>? instructor;
+  dynamic instructor;
   List<dynamic>? kids;
   String? level;
   String? availability;
@@ -227,7 +233,7 @@ class CourseData {
       final String parsedId =
           json['_id']?.toString() ?? json['id']?.toString() ?? '';
 
-      final instructor = _parseInstructor(json['instructor']);
+      final instructor = json['instructor'];
       final governorate = instructor is Map<String, dynamic>
           ? instructor['Governorate']?.toString()
           : null;
@@ -272,17 +278,17 @@ class CourseData {
     }
   }
 
-  static Map<String, dynamic>? _parseInstructor(dynamic instructor) {
-    if (instructor == null) return null;
+  // static Map<String, dynamic>? _parseInstructor(dynamic instructor) {
+  //   if (instructor == null) return null;
 
-    if (instructor is Map<String, dynamic>) {
-      return instructor;
-    } else if (instructor is String) {
-      return {'_id': instructor};
-    } else {
-      return {'_id': instructor.toString()};
-    }
-  }
+  //   if (instructor is Map<String, dynamic>) {
+  //     return instructor;
+  //   } else if (instructor is String) {
+  //     return {'_id': instructor};
+  //   } else {
+  //     return {'_id': instructor.toString()};
+  //   }
+  // }
 
   static List<dynamic> _parseKids(dynamic kids) {
     if (kids == null) return [];

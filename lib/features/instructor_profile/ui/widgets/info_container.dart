@@ -11,6 +11,7 @@ Widget buildInfoContainer({
   String? email,
   String? governorate,
   String? title,
+   bool showEditButton = true,
 }) {
   List<Widget> widgetList = [];
 

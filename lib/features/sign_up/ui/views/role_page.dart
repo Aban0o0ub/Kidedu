@@ -136,6 +136,27 @@ class RoleSelectionPage extends StatelessWidget {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 20),
+                      GestureDetector(
+                        onTap: () {
+                          context
+                              .read<RoleCubit>()
+                              .selectRole("admin"); 
+                          context.push(Routes.loginPage).then((_) {
+                            FocusScope.of(context).unfocus();
+                          });
+                        },
+                        child: Text(
+                          'Continue as admin',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Color(0xFF02457A),
+                            decoration: TextDecoration.underline,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
                     ],
                   ),
                 ),

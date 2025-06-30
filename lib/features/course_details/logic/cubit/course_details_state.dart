@@ -30,3 +30,18 @@ class EndCourseFailure extends CourseDetailsState {
 
   EndCourseFailure(this.error);
 }
+
+////////////////////////////////////
+final class DeleteCourseLoading extends CourseDetailsState {}
+
+class DeleteCourseSuccess extends CourseDetailsState {
+  final String message;
+
+  DeleteCourseSuccess(this.message);
+}
+
+class DeleteCourseFailure extends CourseDetailsState {
+  final String error;
+
+  DeleteCourseFailure(this.error);
+}

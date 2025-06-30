@@ -32,10 +32,13 @@ class LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   LoginCubit loginCubit = getIt<LoginCubit>();
 
+  // ✅ الإيميل والباسورد الصحيح للأدمن
+  static const String ADMIN_EMAIL = 'Kidedu2026@gmail.com';
+  static const String ADMIN_PASSWORD = 'Kidedu1234@'; // ✅ الباسورد الصحيح
+
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).unfocus();
     });
@@ -53,7 +56,15 @@ class LoginPageState extends State<LoginPage> {
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Email is required';
-    } else if (!AppRegex.isValidEmail(value)) {
+    }
+
+    // ✅ للأدمن مش محتاج email validation معقد
+    if (_isAdminEmail(value.trim())) {
+      return null;
+    }
+
+    // للمستخدمين العاديين
+    if (!AppRegex.isValidEmail(value)) {
       return 'Please enter a valid email';
     }
     return null;
@@ -62,7 +73,15 @@ class LoginPageState extends State<LoginPage> {
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Password is required';
-    } else if (!AppRegex.hasLowercase(value)) {
+    }
+
+    // ✅ للأدمن - تخفيف شروط الباسورد
+    if (_isAdminEmail(_emailController.text.trim())) {
+      return null; // الأدمن مش محتاج شروط معقدة
+    }
+
+    // ✅ للمستخدمين العاديين - الشروط الكاملة
+    if (!AppRegex.hasLowercase(value)) {
       return 'Password must contain at least one lowercase letter';
     } else if (!AppRegex.hasUppercase(value)) {
       return 'Password must contain at least one uppercase letter';
@@ -83,12 +102,14 @@ class LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  Future<String> checkUserType(String email) async {
-    if (email.contains('instructor')) {
-      return 'instructor';
-    } else {
-      return 'kid';
-    }
+  // ✅ التحقق من إيميل الأدمن
+  bool _isAdminEmail(String email) {
+    return email.trim() == ADMIN_EMAIL;
+  }
+
+  // ✅ التحقق من بيانات الأدمن كاملة
+  bool _isAdminCredentials(String email, String password) {
+    return email.trim() == ADMIN_EMAIL && password.trim() == ADMIN_PASSWORD;
   }
 
   @override
@@ -146,18 +167,33 @@ class LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 24),
                       BlocListener<LoginCubit, LoginState>(
                         listener: (context, state) {
-                          if (state is LoginInstructorSuccess) {
-                            context.read<RoleCubit>().selectRole('instructor');
-                            context.push(Routes.instructorProfilePage);
-                          } else if (state is LoginKidSuccess) {
-                            context.read<RoleCubit>().selectRole('kid');
-                            context.pushReplacement(Routes.homePage);
+                          if (state is LoginInstructorSuccess ||
+                              state is LoginKidSuccess ||
+                              state is LoginAdminSuccess) {
+                            // ✅ التعامل مع الأدمن أولاً
+                            if (state is LoginAdminSuccess) {
+                              context.read<RoleCubit>().selectRole('admin');
+                              context.pushReplacement(Routes.adminEarnings);
+                              return;
+                            }
+
+                            // ✅ للمستخدمين العاديين
+                            if (state is LoginInstructorSuccess) {
+                              context
+                                  .read<RoleCubit>()
+                                  .selectRole('instructor');
+                              context.pushReplacement(
+                                  Routes.instructorProfilePage);
+                            } else if (state is LoginKidSuccess) {
+                              context.read<RoleCubit>().selectRole('kid');
+                              context.pushReplacement(Routes.homePage);
+                            }
                           } else if (state is LoginFailure) {
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: Row(
-                                  children: const [
+                                title: const Row(
+                                  children: [
                                     Icon(Icons.warning, color: Colors.amber),
                                     SizedBox(width: 8),
                                     Text(
@@ -199,16 +235,60 @@ class LoginPageState extends State<LoginPage> {
                             setState(() {
                               isSubmitted = true;
                             });
+
                             if (_formKey.currentState!.validate()) {
                               final email = _emailController.text.trim();
                               final password = _passwordController.text.trim();
 
-                              final role = context.read<RoleCubit>().state;
+                              if (_isAdminCredentials(email, password)) {
+                                final user = User(
+                                  email: email,
+                                  password: password,
+                                  role: 'admin',
+                                );
+                                context
+                                    .read<LoginCubit>()
+                                    .emitLoginUser(user: user);
+                                return;
+                              }
+
+                              final currentRole =
+                                  context.read<RoleCubit>().state;
+                              if (currentRole == 'admin') {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Row(
+                                      children: [
+                                        Icon(Icons.warning,
+                                            color: Colors.amber),
+                                        SizedBox(width: 8),
+                                        Text('Invalid Admin Credentials'),
+                                      ],
+                                    ),
+                                    content: const Text(
+                                        'Please enter the correct admin email and password.'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                return;
+                              }
+
+                              final roleForBackend =
+                                  (currentRole == 'instructor')
+                                      ? 'instructor'
+                                      : 'kid';
 
                               final user = User(
                                 email: email,
                                 password: password,
-                                role: role,
+                                role: roleForBackend,
                               );
 
                               context
@@ -242,12 +322,12 @@ class LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 28),
                       AuthPrompt(
-                        questionText: "Don’t have an account?",
+                        questionText: "Don't have an account?",
                         actionText: "Sign up",
                         onActionPressed: () {
                           final role = context.read<RoleCubit>().state;
 
-                          if (role == 'kid') {
+                          if (role == 'kid' || role == 'admin') {
                             context.read<RoleCubit>().selectRole('kid');
                             context.push(Routes.authKidPage);
                           } else if (role == 'instructor') {
@@ -258,7 +338,7 @@ class LoginPageState extends State<LoginPage> {
                           FocusScope.of(context).unfocus();
                         },
                       ),
-                      SizedBox(height:70 ,)
+                      const SizedBox(height: 70),
                     ],
                   ),
                 ),
@@ -269,130 +349,4 @@ class LoginPageState extends State<LoginPage> {
       ),
     );
   }
-} 
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:go_router/go_router.dart';
-// import '../../../../core/injection/injection.dart';
-// import '../../../../core/routing/routes.dart';
-// import '../../../sign_up/ui/widgets/auth_prompt.dart';
-// import '../../../sign_up/ui/widgets/or_divider.dart';
-// import '../../../sign_up/ui/widgets/upper_stickers_photo.dart';
-// import '../../data/models/user.dart';
-// import '../../logic/cubit/my_cubit.dart';
-// import '../widgets/login_form.dart';
-// import '../widgets/social_login_buttons.dart';
-
-// class LoginPage extends StatefulWidget {
-//   const LoginPage({super.key});
-//   @override
-//   LoginPageState createState() => LoginPageState();
-// }
-// class LoginPageState extends State<LoginPage> {
-//   bool _rememberMe = false;
-//   bool isSubmitted = false;
-//   final _formKey = GlobalKey<FormState>();
-//   final TextEditingController _emailController = TextEditingController();
-//   final TextEditingController _passwordController = TextEditingController();
-//   LoginCubit loginCubit = getIt<LoginCubit>();
-//   @override
-//   void initState() {
-//     super.initState();
-//     WidgetsBinding.instance.addPostFrameCallback((_) {
-//       FocusScope.of(context).unfocus();
-//     });
-//   }
-//   void showErrorMessage(String message) {
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(
-//         content: Text(message),
-//         backgroundColor: Colors.red,
-//       ),
-//     );
-//   }
-//   @override
-//   void dispose() {
-//     _emailController.dispose();
-//     _passwordController.dispose();
-//     super.dispose();
-//   }
-//   Future<String> checkUserType(String email) async {
-//     if (email.contains('instructor')) {
-//       return 'instructor';
-//     } else {
-//       return 'kid';
-//     }
-//   }
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.white,
-//       body: GestureDetector(
-//         onTap: () {
-//           FocusScope.of(context).unfocus();
-//         },
-//         child: SingleChildScrollView(
-//           child: Column(
-//             children: [
-//               const UpperStickersPhoto(),
-//               Padding(
-//                 padding: const EdgeInsets.symmetric(horizontal: 16),
-//                 child: LoginForm(
-//                   formKey: _formKey,
-//                   emailController: _emailController,
-//                   passwordController: _passwordController,
-//                   rememberMe: _rememberMe,
-//                   onRememberMeChanged: (value) {
-//                     setState(() {
-//                       _rememberMe = value ?? false;
-//                     });
-//                   },
-//                   onSubmit: () async {
-//                     setState(() {
-//                       isSubmitted = true;
-//                     });
-//                     if (_formKey.currentState!.validate()) {
-//                       final email = _emailController.text.trim();
-//                       final password = _passwordController.text.trim();
-//                       final role = context.read<RoleCubit>().state;
-//                       final user = User(
-//                         email: email,
-//                         password: password,
-//                         role: role,
-//                       );
-//                       context.read<LoginCubit>().emitLoginUser(
-//                         user: user,
-//                       );
-//                     }
-//                   },
-//                 ),
-//               ),
-//               const SizedBox(height: 28),
-//               const OrDivider(),
-//               const SizedBox(height: 28),
-//               SocialLoginButtons(),
-//               const SizedBox(height: 28),
-//               AuthPrompt(
-//                 questionText: "Don’t have an account?",
-//                 actionText: "Sign up",
-//                 onActionPressed: () {
-//                   final role = context.read<RoleCubit>().state;
-//                   if (role == 'kid') {
-//                     context.read<RoleCubit>().selectRole('kid');
-//                     context.push(Routes.authKidPage);
-//                   } else if (role == 'instructor') {
-//                     context.read<RoleCubit>().selectRole('instructor');
-//                     context.push(Routes.authInstructorPage);
-//                   }
-//                   FocusScope.of(context).unfocus();
-//                 },
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
+}

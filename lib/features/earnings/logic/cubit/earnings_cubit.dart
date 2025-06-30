@@ -21,4 +21,15 @@ class EarningsCubit extends Cubit<EarningsState> {
       emit(InstructorEarningsFailure('error getting instructor earnings'));
     }
   }
+
+   Future<void> emitGetOurEarnings() async {
+    emit(KidEduEarningsLoading());
+    try {
+      final ourEarnings = await earningsRepo.getOurEarnings();
+      emit(KidEduEarningsSuccess(ourEarnings));
+    } catch (e) {
+      print('Cubit error: $e');
+      emit(KidEduEarningsFailure(e.toString()));
+    }
+  }
 }

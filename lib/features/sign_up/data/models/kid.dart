@@ -197,6 +197,7 @@ class InstructorData {
   String? image;
   String? title;
   String? experience;
+  num? earnings;
 
   InstructorData({
     this.id,
@@ -212,6 +213,7 @@ class InstructorData {
     this.image,
     this.title,
     this.experience,
+    this.earnings
   });
 
   InstructorData.fromJson(Map<String, dynamic> json) {
@@ -228,6 +230,7 @@ class InstructorData {
     image = json['Image'];
     title = json['Title'];
     experience = json['Experience'];
+    earnings = json['earnings'];
   }
 
   Map<String, dynamic> toJson() {

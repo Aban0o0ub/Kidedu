@@ -9,4 +9,8 @@ class EarningsRepo {
   Future<EarningsResponseModel> getInstructorEarnings() async {
     return await webServices.getInstructorEarnings();
   }
+
+   Future<AdminStatsResponseModel> getOurEarnings() async {
+    return await webServices.getOurEarnings();
+  }
 }

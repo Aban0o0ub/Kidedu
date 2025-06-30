@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../../../../core/networking/web_services.dart';
 import '../../../add_course/data/models/Course_Model.dart';
 
@@ -27,5 +29,9 @@ class CourseDetailsRepo {
 
   Future<EndCourseResponse> kidEndCourse(EndCourseRequest endCourse) async {
     return await webServices.kidEndCourse(endCourse);
+  }
+
+  Future<Response> deleteCourse(String courseId) async {
+    return await webServices.deleteCourse(courseId);
   }
 }

@@ -37,6 +37,7 @@ class _SkillsCategoryState extends State<SkillsCategory> {
     Future.microtask(() {
       courseCategoryCubit.emitGetCourseByCategory(widget.category);
     });
+    
   }
 
   @override
@@ -64,7 +65,7 @@ class _SkillsCategoryState extends State<SkillsCategory> {
                 showCustomToast(context, "Course added to cart!",
                     isSuccess: true);
               } else if (state is AddCartFailure) {
-                showCustomToast(context, "Failed to add course!",
+                showCustomToast(context,"Course already in cart or purchased!",
                     isSuccess: false);
               }
             },

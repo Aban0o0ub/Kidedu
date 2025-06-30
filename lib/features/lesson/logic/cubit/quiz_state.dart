@@ -32,3 +32,17 @@ class SubmitQuizFailure extends QuizState {
 
   SubmitQuizFailure(this.error);
 }
+////////////////////////////////////////////////////////////////////////
+final class GetQuizzesLoading extends QuizState {}
+
+class GetQuizzesSuccess extends QuizState {
+ final List<QuizListItem> quizzes;
+
+  GetQuizzesSuccess(this.quizzes);
+}
+
+class GetQuizzesFailure extends QuizState {
+  final String error;
+
+  GetQuizzesFailure(this.error);
+}

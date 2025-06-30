@@ -12,6 +12,12 @@ class LoginKidSuccess extends LoginState {
   LoginKidSuccess(this.loginResponse);
 }
 
+class LoginAdminSuccess extends LoginState {
+  final LoginResponse loginResponse;
+  
+  LoginAdminSuccess(this.loginResponse);
+}
+
 class LoginInstructorSuccess extends LoginState {
   final LoginResponse loginResponse;
   LoginInstructorSuccess(this.loginResponse);

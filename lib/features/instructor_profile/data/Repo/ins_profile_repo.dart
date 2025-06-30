@@ -22,4 +22,7 @@ class InstructorProfileRepo {
       throw Exception("Error fetching courses: ${e.toString()}");
     }
   }
+  Future<InstructorData> getOnlyInstructor(String id) async {
+    return await webServices.getOnlyInstructor(id);
+  }
 }

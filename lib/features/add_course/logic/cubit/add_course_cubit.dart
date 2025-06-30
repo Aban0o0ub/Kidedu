@@ -45,4 +45,26 @@ class AddCourseCubit extends Cubit<AddCourseState> {
       );
     }
   }
+  
+  void emitUpdateCourse(
+    BuildContext context,
+    String courseId,
+    Map<String, dynamic> updatedCourseData,
+  ) async {
+    try {
+      if (isClosed) return;
+      emit(AddCourseLoading());
+
+      CourseResponse courseResponse =
+          await addCourseRepo.updateCourse(courseId, updatedCourseData);
+
+      if (isClosed) return;
+      emit(AddCourseSuccess(courseResponse));
+
+      // ❌ شيل التنقل من هنا برضو
+    } catch (e) {
+      if (isClosed) return;
+      emit(AddCourseFailure(e.toString()));
+    }
+  }
 }

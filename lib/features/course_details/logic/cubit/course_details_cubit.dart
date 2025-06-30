@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/features/course_details/data/repo/course_details_repo.dart';
@@ -40,6 +41,18 @@ class CourseDetailsCubit extends Cubit<CourseDetailsState> {
       emit(EndCourseSuccess(response));
     } catch (e) {
       emit(EndCourseFailure(e.toString()));
+    }
+  }
+
+  
+  Future<Response> emitDeleteCourse(String courseId) async {
+    emit(DeleteCourseLoading());
+    try {
+      final response = await courseDetailsRepo.deleteCourse(courseId);
+      return response;
+    } catch (e) {
+      emit(DeleteCourseFailure(e.toString()));
+      throw Exception(e.toString());
     }
   }
 }

@@ -86,6 +86,7 @@ class WebServices {
         if (loginData.token != null) {
           await CacheHelper.setData(key: "token", value: loginData.token);
 
+          // ✅ التعامل مع جميع الأدوار
           if (response.data['role'] == 'kid') {
             String kidJson = jsonEncode(response.data['kid']);
             await CacheHelper.setData(key: "user_data", value: kidJson);
@@ -94,6 +95,14 @@ class WebServices {
             String instructorJson = jsonEncode(response.data['instructor']);
             await CacheHelper.setData(key: "user_data", value: instructorJson);
             await CacheHelper.setData(key: "role", value: 'instructor');
+          } else if (response.data['role'] == 'admin') {
+            // ✅ إضافة التعامل مع الأدمن
+            await CacheHelper.setData(key: "role", value: 'admin');
+            // الأدمن مفيش user_data specific ليه، بس ممكن نحط basic info
+            if (response.data['admin'] != null) {
+              String adminJson = jsonEncode(response.data['admin']);
+              await CacheHelper.setData(key: "user_data", value: adminJson);
+            }
           }
         }
 
@@ -221,6 +230,36 @@ class WebServices {
       }
     } catch (e) {
       throw Exception("Error updating kid profile: ${e.toString()}");
+    }
+  }
+
+  Future<InstructorData> getOnlyInstructor(String id) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+
+      final response = await dio.get(
+        'user_instructor/$id',
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
+        ),
+      );
+
+      if (response.data == null) {
+        throw Exception('No data returned from API');
+      }
+
+      return InstructorData.fromJson(response.data);
+    } catch (e) {
+      print('Error in getOnlyInstructor: ${e.toString()}');
+      throw Exception('Error fetching instructor data: ${e.toString()}');
     }
   }
 
@@ -839,6 +878,35 @@ class WebServices {
     }
   }
 
+  Future<GetQuizzesResponse> getQuizzes(String lessonId) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+
+      final response = await dio.get(
+        'quiz/lesson/$lessonId',
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return GetQuizzesResponse.fromJson(response.data);
+      } else {
+        throw Exception("Unexpected error: ${response.statusMessage}");
+      }
+    } catch (e) {
+      throw Exception('Error getting quizzes: ${e.toString()}');
+    }
+  }
+
   Future<SubmitQuizResponse> submitQuiz(SubmitQuizRequest request) async {
     try {
       String? token = CacheHelper.getData(key: "token");
@@ -864,38 +932,38 @@ class WebServices {
   }
 
   Future<ReviewResponseModel> createReviews(
-    ReviewRequestModel newReview) async {
-  try {
-    String? token = CacheHelper.getData(key: "token");
-    if (token == null) {
-      throw Exception('Missing token');
-    }
-    final response = await dio.post(
-      'reviews',
-      data: newReview.toJson(),
-      options: Options(
-        headers: {
-          'token': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      ),
-    );
-    final responseData = response.data;
-    return ReviewResponseModel.fromJson(responseData);
-  } on DioException catch (dioError) {
-    if (dioError.response != null) {
-      if (dioError.response?.statusCode == 400) {
-        throw Exception('You have already reviewed this course');
+      ReviewRequestModel newReview) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
       }
-      throw Exception(
-          'Server error: ${dioError.response?.statusCode} - ${dioError.response?.data}');
-    } else {
-      throw Exception('Network error: ${dioError.message}');
+      final response = await dio.post(
+        'reviews',
+        data: newReview.toJson(),
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+      final responseData = response.data;
+      return ReviewResponseModel.fromJson(responseData);
+    } on DioException catch (dioError) {
+      if (dioError.response != null) {
+        if (dioError.response?.statusCode == 400) {
+          throw Exception('You have already reviewed this course');
+        }
+        throw Exception(
+            'Server error: ${dioError.response?.statusCode} - ${dioError.response?.data}');
+      } else {
+        throw Exception('Network error: ${dioError.message}');
+      }
+    } catch (e) {
+      throw Exception('Error creating review: ${e.toString()}');
     }
-  } catch (e) {
-    throw Exception('Error creating review: ${e.toString()}');
   }
-}
 
   Future<ReviewListResponseModel> getRecentReviews() async {
     try {
@@ -1217,5 +1285,87 @@ class WebServices {
     } catch (e) {
       throw Exception('Error fetching points: ${e.toString()}');
     }
+  }
+
+  Future<AdminStatsResponseModel> getOurEarnings() async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) throw Exception('Missing token');
+
+      final response = await dio.get(
+        'KidEdu/admin/stats',
+        options: Options(headers: {'token': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 500) {
+        throw Exception('Server error: Please try again later');
+      }
+
+      if (response.data == null) {
+        throw Exception('No data returned from API');
+      }
+
+      return AdminStatsResponseModel.fromJson(response.data);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 500) {
+        throw Exception('Server error: Earnings calculation failed');
+      }
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Error fetching earnings data: ${e.toString()}');
+    }
+  }
+
+  Future<Response> deleteCourse(String courseId) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) throw Exception('Missing token');
+
+      final response = await dio.delete(
+        'course/$courseId',
+        options: Options(
+          headers: {'token': 'Bearer $token'},
+        ),
+      );
+
+      return response;
+    } catch (e) {
+      throw Exception('Delete course failed: ${e.toString()}');
+    }
+  }
+
+  Future<Response> changePassword({
+    required String oldPassword,
+    required String newPassword,
+    required String token,
+  }) async {
+    return await dio.post(
+      '/authentication/change-password',
+      data: {
+        'currentPassword': oldPassword,
+        'newPassword': newPassword,
+      },
+      options: Options(headers: {
+        'token': 'Bearer $token',
+      }),
+    );
+  }
+
+Future<CourseResponse> updateCourse({
+    required String courseId,
+    required Map<String, dynamic> data,
+  }) async {
+    String? token = await CacheHelper.getData(key: "token");
+    final response = await dio.patch(
+      '/course/$courseId',
+      data: data,
+      options: Options(
+        headers: {
+          'token': 'Bearer $token',
+        },
+      ),
+    );
+
+    return CourseResponse.fromJson(response.data);
   }
 }

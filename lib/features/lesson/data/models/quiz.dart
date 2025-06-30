@@ -304,3 +304,120 @@ class OptionFormData {
     );
   }
 }
+//////////////////////////////////////////////////////////////////////////////////////
+class GetQuizzesResponse {
+  final bool success;
+  final List<QuizListItem> quizzes;
+
+  GetQuizzesResponse({
+    required this.success,
+    required this.quizzes,
+  });
+
+  factory GetQuizzesResponse.fromJson(Map<String, dynamic> json) {
+    return GetQuizzesResponse(
+      success: json['success'] ?? false,
+      quizzes: (json['quizzes'] as List? ?? [])
+          .map((q) => QuizListItem.fromJson(q))
+          .toList(),
+    );
+  }
+}
+
+// نموذج عنصر الكويز في القائمة
+class QuizListItem {
+  final String id;
+  final String title;
+  final String lessonId;
+  final String instructorId;
+  final List<QuizQuestion> questions;
+  final int passingScore;
+  final int timeLimit;
+  final List<dynamic> attempts;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final int version;
+
+  QuizListItem({
+    required this.id,
+    required this.title,
+    required this.lessonId,
+    required this.instructorId,
+    required this.questions,
+    required this.passingScore,
+    required this.timeLimit,
+    required this.attempts,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.version,
+  });
+
+  factory QuizListItem.fromJson(Map<String, dynamic> json) {
+    return QuizListItem(
+      id: json['_id'] ?? '',
+      title: json['title'] ?? '',
+      lessonId: json['lessonId'] ?? '',
+      instructorId: json['instructorId'] ?? '',
+      questions: (json['questions'] as List? ?? [])
+          .map((q) => QuizQuestion.fromJson(q))
+          .toList(),
+      passingScore: json['passingScore'] ?? 0,
+      timeLimit: json['timeLimit'] ?? 0,
+      attempts: json['attempts'] ?? [],
+      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
+      version: json['__v'] ?? 0,
+    );
+  }
+}
+
+class QuizQuestion {
+  final String id;
+  final String questionText;
+  final String questionType;
+  final List<QuizOption> options;
+  final int points;
+
+  QuizQuestion({
+    required this.id,
+    required this.questionText,
+    required this.questionType,
+    required this.options,
+    required this.points,
+  });
+
+  factory QuizQuestion.fromJson(Map<String, dynamic> json) {
+    return QuizQuestion(
+      id: json['_id'] ?? '',
+      questionText: json['questionText'] ?? '',
+      questionType: json['questionType'] ?? '',
+      options: (json['options'] as List? ?? [])
+          .map((o) => QuizOption.fromJson(o))
+          .toList(),
+      points: json['points'] ?? 0,
+    );
+  }
+}
+
+class QuizOption {
+  final String id;
+  final int optionId;
+  final String text;
+  final bool isCorrect;
+
+  QuizOption({
+    required this.id,
+    required this.optionId,
+    required this.text,
+    required this.isCorrect,
+  });
+
+  factory QuizOption.fromJson(Map<String, dynamic> json) {
+    return QuizOption(
+      id: json['_id'] ?? '',
+      optionId: json['id'] ?? 0,
+      text: json['text'] ?? '',
+      isCorrect: json['isCorrect'] ?? false,
+    );
+  }
+}

@@ -1,7 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/routing/routes.dart';
 import '../../../add_course/data/models/Course_Model.dart';
+import '../../../course_details/logic/cubit/course_details_cubit.dart';
 import '../../logic/cubit/discounted_courses_cubit.dart';
 
 class DiscountedCoursesCarousel extends StatefulWidget {
@@ -18,7 +21,6 @@ class _DiscountedCoursesCarouselState extends State<DiscountedCoursesCarousel> {
   @override
   void initState() {
     super.initState();
-   //context.read<CourseCategoryCubit>().emitGetDiscountedCourses();
   }
 
   @override
@@ -162,129 +164,144 @@ class _DiscountedCoursesCarouselState extends State<DiscountedCoursesCarousel> {
   }
 
   Widget _buildCourseCard(CourseData course) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Course Image
-            course.courseImage != null && course.courseImage!.isNotEmpty
-                ? Image.network(
-                    course.courseImage!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        'assets/images/blackfriday.jpg',
-                        fit: BoxFit.cover,
-                      );
-                    },
-                  )
-                : Image.asset(
-                    'assets/images/blackfriday.jpg',
-                    fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () {
+        if (course.id != null && course.id!.isNotEmpty) {
+          final courseDetailsCubit = context.read<CourseDetailsCubit>();
+          
+          context.push(
+            Routes.courseDetails,
+            extra: {
+              '_id': course.id,
+              'courseDetailsCubit': courseDetailsCubit,
+            },
+          );
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 5),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Course Image
+              course.courseImage != null && course.courseImage!.isNotEmpty
+                  ? Image.network(
+                      course.courseImage!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          'assets/images/blackfriday.jpg',
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    )
+                  : Image.asset(
+                      'assets/images/blackfriday.jpg',
+                      fit: BoxFit.cover,
+                    ),
+              // Gradient overlay
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.7),
+                    ],
                   ),
-            // Gradient overlay
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.7),
-                  ],
                 ),
               ),
-            ),
-            // Course info
-            Positioned(
-              bottom: 20,
-              left: 20,
-              right: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Discount badge
-                  if (course.discountPercent != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        '${course.discountPercent?.toInt()}% OFF',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+              // Course info
+              Positioned(
+                bottom: 20,
+                left: 20,
+                right: 20,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Discount badge
+                    if (course.discountPercent != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                      ),
-                    ),
-                  const SizedBox(height: 8),
-                  // Course name
-                  Text(
-                    course.courseName ?? 'Course Name',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  // Category
-                  if (course.category != null)
-                    Text(
-                      course.category!,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                  const SizedBox(height: 8),
-                  // Price info
-                  Row(
-                    children: [
-                      if (course.price != null)
-                        Text(
-                          '${course.price} EGP',
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                      const SizedBox(width: 8),
-                      if (course.priceAfterDiscount != null)
-                        Text(
-                          '${course.priceAfterDiscount} EGP',
+                        child: Text(
+                          '${course.discountPercent?.toInt()}% OFF',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                    ],
-                  ),
-                ],
+                      ),
+                    const SizedBox(height: 8),
+                    // Course name
+                    Text(
+                      course.courseName ?? 'Course Name',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    // Category
+                    if (course.category != null)
+                      Text(
+                        course.category!,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
+                      ),
+                    const SizedBox(height: 8),
+                    // Price info
+                    Row(
+                      children: [
+                        if (course.price != null)
+                          Text(
+                            '${course.price} EGP',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                        const SizedBox(width: 8),
+                        if (course.priceAfterDiscount != null)
+                          Text(
+                            '${course.priceAfterDiscount} EGP',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -29,4 +29,15 @@ class QuizCubit extends Cubit<QuizState> {
       emit(SubmitQuizFailure(e.toString()));
     }
   }
+
+  Future<void> emitGetQuizzes(String lessonId) async {
+    emit(GetQuizzesLoading());
+
+    try {
+      final quizzes = await quizRepo.getQuizzes(lessonId);
+      emit(GetQuizzesSuccess(quizzes.quizzes));
+    } catch (e) {
+      emit(GetQuizzesFailure(e.toString()));
+    }
+  }
 }

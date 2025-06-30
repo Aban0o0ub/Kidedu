@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loginpage/features/add_course/data/models/Course_Model.dart';
 import 'package:loginpage/features/home/ui/widgets/course_card.dart';
 import '../../../../core/injection/injection.dart';
+import '../../../../core/routing/routes.dart';
+import '../../../course_details/logic/cubit/course_details_cubit.dart';
 import '../../../home/logic/cubit/course_category_cubit.dart';
 
 class SearchPage extends StatefulWidget {
+  const SearchPage({super.key});
+
   @override
-  _SearchPageState createState() => _SearchPageState();
+  SearchPageState createState() => SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class SearchPageState extends State<SearchPage> {
   final TextEditingController searchController = TextEditingController();
   final FocusNode searchFocusNode = FocusNode();
 
   List<CourseData> allCourses = [];
   List<CourseData> displayedCourses = [];
+
   late CourseCategoryCubit courseCategoryCubit;
+  late CourseDetailsCubit courseDetailsCubit;
+
   String? selectedAvailability;
-  RangeValues selectedAgeRange =
-      RangeValues(0, 15); // based on suitableAges from API
+  RangeValues selectedAgeRange = RangeValues(0, 15);
   String? selectedCategory;
   String? selectedGovernorate;
 
@@ -27,6 +34,7 @@ class _SearchPageState extends State<SearchPage> {
   void initState() {
     super.initState();
     courseCategoryCubit = getIt<CourseCategoryCubit>();
+    courseDetailsCubit = getIt<CourseDetailsCubit>();
     courseCategoryCubit.emitGetAllCourses();
   }
 
@@ -238,9 +246,13 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: courseCategoryCubit,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: courseCategoryCubit),
+        BlocProvider.value(value: courseDetailsCubit),
+      ],
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -306,7 +318,7 @@ class _SearchPageState extends State<SearchPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Error: ${state.error}'),
+                      Text('Error: //${state.error}'),
                       SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
@@ -344,17 +356,32 @@ class _SearchPageState extends State<SearchPage> {
                             itemCount: coursesToShow.length,
                             itemBuilder: (context, index) {
                               final course = coursesToShow[index];
-                              return CourseCard(
-                                courseImage:
-                                    _isValidNetworkImage(course.courseImage)
-                                        ? course.courseImage!
-                                        : null,
-                                courseName: course.courseName ?? '',
-                                instructor: course.instructor?['Name'] ?? '',
-                                description: course.description ?? '',
-                                price: course.price?.toDouble() ?? 0.0,
-                                availability: course.availability ?? '',
-                                id: course.id ?? '',
+                              return GestureDetector(
+                                onTap: () {
+                                  if (course.id != null &&
+                                      course.id!.isNotEmpty) {
+                                    context.push(
+                                      Routes.courseDetails,
+                                      extra: {
+                                        '_id': course.id,
+                                        'courseDetailsCubit':
+                                            courseDetailsCubit,
+                                      },
+                                    );
+                                  }
+                                },
+                                child: CourseCard(
+                                  courseImage:
+                                      _isValidNetworkImage(course.courseImage)
+                                          ? course.courseImage!
+                                          : null,
+                                  courseName: course.courseName ?? '',
+                                  instructor: course.instructor?['Name'] ?? '',
+                                  description: course.description ?? '',
+                                  price: course.price?.toDouble() ?? 0.0,
+                                  availability: course.availability ?? '',
+                                  id: course.id ?? '',
+                                ),
                               );
                             },
                           );

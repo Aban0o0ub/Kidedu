@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/features/kid_profile/data/Repo/kid_profile_repo.dart';
@@ -32,4 +33,26 @@ class KidProfileCubit extends Cubit<KidProfileState> {
   }
 }
 
+
+  Future<void> emitChangePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    emit(ChangePasswordLoading());
+    try {
+      await kidProfileRepo.changePassword(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      );
+      emit(ChangePasswordSuccess());
+    } catch (e) {
+      String errorMessage = 'Something went wrong';
+      if (e is DioException) {
+        errorMessage = e.response?.data['message'] ?? errorMessage;
+      } else {
+        errorMessage = e.toString();
+      }
+      emit(ChangePasswordFailure(errorMessage));
+    }
+  }
 }

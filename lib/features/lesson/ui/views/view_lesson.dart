@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/core/widgets/arrow_back.dart';
+import 'package:loginpage/features/lesson/logic/cubit/quiz_cubit.dart';
 import '../../../../core/injection/injection.dart';
 import '../../../add_course/data/models/Course_Model.dart';
 import '../../../course_details/logic/cubit/course_details_cubit.dart';
@@ -32,6 +33,7 @@ class _ViewLessonState extends State<ViewLesson> {
   late LessonCubit lessonCubit;
   late CourseDetailsCubit courseDetailsCubit;
   late ReviewsCubit reviewsCubit;
+  late QuizCubit quizCubit;
   int selectedIndex = 0;
   int selectedLessonIndex = 0;
 
@@ -41,6 +43,7 @@ class _ViewLessonState extends State<ViewLesson> {
     courseDetailsCubit = getIt<CourseDetailsCubit>();
     reviewsCubit = getIt<ReviewsCubit>();
     lessonCubit = getIt<LessonCubit>();
+    quizCubit = getIt<QuizCubit>();
     lessonCubit.emitGetLesson(widget.sectionId);
   }
 
@@ -51,7 +54,6 @@ class _ViewLessonState extends State<ViewLesson> {
         lessonId: currentLesson.id,
       );
 
-      // Use the local instance instead of context.read
       courseDetailsCubit.emitKidEndCourse(request);
     }
 
@@ -73,6 +75,7 @@ class _ViewLessonState extends State<ViewLesson> {
         BlocProvider.value(value: lessonCubit),
         BlocProvider.value(value: courseDetailsCubit),
         BlocProvider.value(value: reviewsCubit),
+        BlocProvider.value(value: quizCubit),
       ],
       child: MultiBlocListener(
         listeners: [
@@ -148,34 +151,46 @@ class _ViewLessonState extends State<ViewLesson> {
 
                           final currentLesson = lessons[selectedLessonIndex];
 
-                          return Column(
-                            children: [
-                              if (lessons.length > 1)
-                                LessonNavigation(
-                                  lessons: lessons,
-                                  selectedLessonIndex: selectedLessonIndex,
-                                  currentLesson: currentLesson,
-                                  courseId: widget.courseId,
-                                  onNavigate: _handleLessonNavigation,
+                          // التعديل في الجزء ده من build method - استخدام SingleChildScrollView
+                          return SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                if (lessons.length > 1)
+                                  LessonNavigation(
+                                    lessons: lessons,
+                                    selectedLessonIndex: selectedLessonIndex,
+                                    currentLesson: currentLesson,
+                                    courseId: widget.courseId,
+                                    onNavigate: _handleLessonNavigation,
+                                  ),
+                                VideoLesson(
+                                  key: ValueKey(
+                                      '${currentLesson.id}_${currentLesson.youtubeVideoUrl}'),
+                                  videoLink:
+                                      currentLesson.youtubeVideoUrl ?? "",
+                                  lessonName: currentLesson.name,
+                                  description: currentLesson.description,
                                 ),
-                              VideoLesson(
-                                key: ValueKey(
-                                    '${currentLesson.id}_${currentLesson.youtubeVideoUrl}'),
-                                videoLink: currentLesson.youtubeVideoUrl ?? "",
-                                lessonName: currentLesson.name,
-                                description: currentLesson.description,
-                              ),
-                              LessonTabs(
-                                selectedIndex: selectedIndex,
-                                onTabSelected: _handleTabSelection,
-                              ),
-                              Expanded(
-                                child: LessonContent(
+                                LessonTabs(
                                   selectedIndex: selectedIndex,
-                                  currentLesson: currentLesson,
+                                  onTabSelected: _handleTabSelection,
                                 ),
-                              ),
-                            ],
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    minHeight:
+                                        MediaQuery.of(context).size.height *
+                                            0.4,
+                                    maxHeight:
+                                        MediaQuery.of(context).size.height *
+                                            0.8,
+                                  ),
+                                  child: LessonContent(
+                                    selectedIndex: selectedIndex,
+                                    currentLesson: currentLesson,
+                                  ),
+                                ),
+                              ],
+                            ),
                           );
                         }
 

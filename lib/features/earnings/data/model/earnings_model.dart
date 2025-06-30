@@ -56,3 +56,40 @@ class EarningCourse {
     );
   }
 }
+
+class AdminStatsResponseModel {
+  final String status;
+  final AdminStatsData data;
+
+  AdminStatsResponseModel({
+    required this.status,
+    required this.data,
+  });
+
+  factory AdminStatsResponseModel.fromJson(Map<String, dynamic> json) {
+    return AdminStatsResponseModel(
+      status: json['status'],
+      data: AdminStatsData.fromJson(json['data']),
+    );
+  }
+}
+
+class AdminStatsData {
+  final num totalProfit;
+  final int totalPayments;
+  final DateTime lastUpdated;
+
+  AdminStatsData({
+    required this.totalProfit,
+    required this.totalPayments,
+    required this.lastUpdated,
+  });
+
+  factory AdminStatsData.fromJson(Map<String, dynamic> json) {
+    return AdminStatsData(
+      totalProfit: json['totalProfit'],
+      totalPayments: json['totalPayments'],
+      lastUpdated: DateTime.parse(json['lastUpdated']),
+    );
+  }
+}

@@ -13,12 +13,19 @@ class User {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
+ Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {
       'Email': email,
       'Password': password,
-      'role': role, 
     };
+    
+    // ✅ بس لو الـ role مش null، حطه في الـ JSON
+    // ده اللي هيحل مشكلة "Invalid role"
+    if (role != null && role!.isNotEmpty) {
+      data['role'] = role;
+    }
+    
+    return data;
   }
 }
 

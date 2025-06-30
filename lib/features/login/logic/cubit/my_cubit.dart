@@ -12,37 +12,41 @@ class LoginCubit extends Cubit<LoginState> {
 
   LoginCubit(this.myRepo) : super(LoginInitial());
 
-  Future<void> emitLoginUser({required User user}) async {
-    emit(LoginLoading());
-
-    try {
-      LoginResponse response = await myRepo.loginUser(user);
-
-      if (response.role == 'kid') {
-        emit(LoginKidSuccess(response));
-      } else if (response.role == 'instructor') {
-        emit(LoginInstructorSuccess(response));
-      } else {
-        emit(LoginFailure('role is incorrect ${response.role}'));
-      }
-    } catch (e) {
-      final errorString = e.toString();
-      String errorMessage;
-
-      if (errorString.contains('kid not found')) {
-        errorMessage =
-            "This kid user isn't found. Please make sure of your email and password.";
-      } else if (errorString.contains('instructor not found')) {
-        errorMessage =
-            "This instructor user isn't found. Please make sure of your email and password.";
-      } else {
-        errorMessage =
-            "This user isn't found. Please make sure of your email and password.";
-      }
-
-      emit(LoginFailure(errorMessage));
+ Future<void> emitLoginUser({required User user}) async {
+  emit(LoginLoading());
+  try {
+    LoginResponse response = await myRepo.loginUser(user);
+    
+    // ✅ تعامل مع جميع الأدوار بما في ذلك الأدمن
+    if (response.role == 'kid') {
+      emit(LoginKidSuccess(response));
+    } else if (response.role == 'instructor') {
+      emit(LoginInstructorSuccess(response));
+    } else if (response.role == 'admin') {
+      // ✅ إضافة التعامل مع الأدمن
+      emit(LoginAdminSuccess(response));
+    } else {
+      emit(LoginFailure('role is incorrect ${response.role}'));
     }
+  } catch (e) {
+    final errorString = e.toString();
+    String errorMessage;
+    
+    if (errorString.contains('kid not found')) {
+      errorMessage = "This kid user isn't found. Please make sure of your email and password.";
+    } else if (errorString.contains('instructor not found')) {
+      errorMessage = "This instructor user isn't found. Please make sure of your email and password.";
+    } else if (errorString.contains('Invalid credentials')) {
+      errorMessage = "Invalid email or password. Please try again.";
+    } else if (errorString.contains('Invalid role')) {
+      errorMessage = "Invalid role selected. Please try again.";
+    } else {
+      errorMessage = "Login failed. Please make sure of your email and password.";
+    }
+    
+    emit(LoginFailure(errorMessage));
   }
+}
 
   Future<void> emitForgetPassword({
     required String email,

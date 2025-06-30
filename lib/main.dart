@@ -13,6 +13,7 @@ import 'core/routing/app_router.dart';
 import 'core/routing/routes.dart';
 import 'features/add_course/logic/cubit/add_course_cubit.dart';
 import 'features/cart/logic/cubit/cart_cubit.dart';
+import 'features/kid_profile/logic/cubit/kid_profile_cubit.dart';
 import 'features/kid_profile/ui/widgets/book_mark_manager.dart';
 import 'features/login/data/repo/my_repo.dart';
 import 'features/login/logic/cubit/my_cubit.dart';
@@ -56,6 +57,9 @@ void main() async {
             create: (context) => LoginCubit(
               RepositoryProvider.of<LoginRepo>(context),
             ),
+          ),
+          BlocProvider<KidProfileCubit>(
+            create: (_) => getIt<KidProfileCubit>(),
           ),
         ],
         child: const KidEdu(),

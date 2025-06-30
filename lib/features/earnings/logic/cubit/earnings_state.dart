@@ -18,3 +18,17 @@ class InstructorEarningsFailure extends EarningsState {
 
   InstructorEarningsFailure(this.error);
 }
+///////////////////////////////////////////////////////////////////
+final class KidEduEarningsLoading extends EarningsState {}
+
+class KidEduEarningsSuccess extends EarningsState {
+  final AdminStatsResponseModel ourEarnings;
+
+  KidEduEarningsSuccess(this.ourEarnings);
+}
+
+class KidEduEarningsFailure extends EarningsState {
+  final String error;
+
+  KidEduEarningsFailure(this.error);
+}
