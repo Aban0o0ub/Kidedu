@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:loginpage/core/widgets/arrow_back.dart';
+import 'package:loginpage/core/widgets/appbar.dart';
 import 'package:loginpage/features/lesson/logic/cubit/quiz_cubit.dart';
 import '../../../../core/injection/injection.dart';
 import '../../../add_course/data/models/Course_Model.dart';
 import '../../../course_details/logic/cubit/course_details_cubit.dart';
+import '../../../kid_profile/ui/widgets/notification_helper.dart';
 import '../../../reviews/logic/cubit/reviews_cubit.dart';
 import '../../data/models/lesson.dart';
 import '../../logic/cubit/lesson_cubit.dart';
 import '../widgets/lessons_tabs.dart';
 import '../widgets/video_screen.dart';
-import '../widgets/lesson_header.dart';
 import '../widgets/lesson_navigation.dart';
 import '../widgets/lesson_content.dart';
 import '../widgets/error_view.dart';
@@ -82,6 +82,7 @@ class _ViewLessonState extends State<ViewLesson> {
           BlocListener<CourseDetailsCubit, CourseDetailsState>(
             listener: (context, state) {
               if (state is EndCourseSuccess) {
+                NotificationHelper.showCourseCompletedNotification();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.endcourse.message),
@@ -101,12 +102,14 @@ class _ViewLessonState extends State<ViewLesson> {
         ],
         child: Scaffold(
           backgroundColor: Colors.white,
+          appBar: CustomAppBar(title: "View Lessnon"),
           body: Stack(
             children: [
-              const ArrowBack(),
               Column(
                 children: [
-                  LessonHeader(selectedLessonIndex: selectedLessonIndex),
+                  SizedBox(
+                    height: 12,
+                  ),
                   Expanded(
                     child: BlocBuilder<LessonCubit, LessonState>(
                       builder: (context, state) {
@@ -114,15 +117,13 @@ class _ViewLessonState extends State<ViewLesson> {
                           return const Center(
                               child: CircularProgressIndicator());
                         }
-
                         if (state is GetLessonFailure) {
                           return ErrorView(
                             error: state.error,
-                            onRetry: () => lessonCubit.emitGetLesson(widget
-                                .sectionId), // Also use local instance here
+                            onRetry: () =>
+                                lessonCubit.emitGetLesson(widget.sectionId),
                           );
                         }
-
                         if (state is GetLessonSuccess) {
                           final lessons = state.response.lessons;
 
@@ -138,7 +139,6 @@ class _ViewLessonState extends State<ViewLesson> {
                               });
                             }
                           }
-
                           if (lessons.isEmpty) {
                             return const Center(
                               child: Text(
@@ -148,10 +148,7 @@ class _ViewLessonState extends State<ViewLesson> {
                               ),
                             );
                           }
-
                           final currentLesson = lessons[selectedLessonIndex];
-
-                          // التعديل في الجزء ده من build method - استخدام SingleChildScrollView
                           return SingleChildScrollView(
                             child: Column(
                               children: [
@@ -193,7 +190,6 @@ class _ViewLessonState extends State<ViewLesson> {
                             ),
                           );
                         }
-
                         return const SizedBox.shrink();
                       },
                     ),

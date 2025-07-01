@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
     _showWelcomeNotificationOnLogin();
     _screens = [
       KidProfilePage(kid: KidData()),
-       SearchPage(),
+      SearchPage(),
       Home(
         courseTitles: HomePage.courseTitles,
         backgroundImages: HomePage.backgroundImages,
@@ -85,11 +85,14 @@ class _HomePageState extends State<HomePage> {
     TabControllerHelper.selectedIndexNotifier.addListener(_onTabChanged);
   }
 
- Future<void> _showWelcomeNotificationOnLogin() async {
+  Future<void> _showWelcomeNotificationOnLogin() async {
     await Future.delayed(const Duration(seconds: 1));
-    
     await NotificationHelper.showWelcomeNotification();
+
+    await Future.delayed(const Duration(seconds: 2));
+    await NotificationHelper.showKeepLearningNotification();
   }
+
 
 
   @override

@@ -30,7 +30,7 @@ class _CourseActionButtonsState extends State<CourseActionButtons> {
   bool isLoading = true;
   bool isPurchased = false;
   late CourseCategoryCubit courseCategoryCubit;
-   late final CourseData courseData;
+   CourseData? courseData;
   get onDeleteCourse => null;
 
   @override

@@ -7,6 +7,7 @@ import 'package:loginpage/features/sign_up/ui/widgets/custom_dropdown.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_text_field.dart';
 import 'package:loginpage/features/sign_up/ui/widgets/custom_button.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import '../../../kid_profile/ui/widgets/notification_helper.dart';
 import '../../data/models/Course_Model.dart';
 import '../../logic/cubit/add_course_cubit.dart';
 import '../widgets/header_image.dart';
@@ -74,6 +75,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
       child: BlocConsumer<AddCourseCubit, AddCourseState>(
         listener: (context, state) {
           if (state is AddCourseSuccess) {
+            NotificationHelper.showCourseAddedNotification();
             showDialog(
               context: context,
               builder: (context) => AlertDialog(

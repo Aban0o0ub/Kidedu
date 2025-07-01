@@ -30,7 +30,6 @@ class _AdminEarningsScreenState extends State<AdminEarningsScreen> {
         backgroundColor: Colors.white,
         appBar: CustomAppBar(
           title: "Our Earnings",
-          onBackPressed: () => Navigator.pop(context),
         ),
         body: BlocBuilder<EarningsCubit, EarningsState>(
           builder: (context, state) {

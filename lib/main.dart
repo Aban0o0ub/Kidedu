@@ -11,10 +11,12 @@ import 'package:provider/provider.dart';
 import 'core/injection/injection.dart';
 import 'core/routing/app_router.dart';
 import 'core/routing/routes.dart';
+import 'core/widgets/app_themes.dart';
 import 'features/add_course/logic/cubit/add_course_cubit.dart';
 import 'features/cart/logic/cubit/cart_cubit.dart';
 import 'features/kid_profile/logic/cubit/kid_profile_cubit.dart';
 import 'features/kid_profile/ui/widgets/book_mark_manager.dart';
+import 'features/kid_profile/ui/widgets/theme_provider.dart';
 import 'features/login/data/repo/my_repo.dart';
 import 'features/login/logic/cubit/my_cubit.dart';
 
@@ -46,6 +48,7 @@ void main() async {
       ],
       child: MultiProvider(
         providers: [
+          ChangeNotifierProvider(create: (_) => ThemeProvider()),
           BlocProvider(create: (_) => RoleCubit()),
           BlocProvider<AddCourseCubit>(
             create: (context) => getIt<AddCourseCubit>(),
@@ -127,25 +130,24 @@ class _KidEduState extends State<KidEdu> {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(360, 690),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return MaterialApp.router(
-          theme: ThemeData(
-            fontFamily: 'Alegreya',
-          ),
-          debugShowCheckedModeBanner: false,
-          routerConfig: router,
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return ScreenUtilInit(
+          designSize: const Size(360, 690),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (context, child) {
+            return MaterialApp.router(
+              theme: AppThemes.lightTheme,
+              darkTheme: AppThemes.darkTheme,
+              themeMode: themeProvider.isDarkMode 
+                  ? ThemeMode.dark 
+                  : ThemeMode.light,
+              debugShowCheckedModeBanner: false,
+              routerConfig: router,
+            );
+          },
         );
-        // return MaterialApp(
-        //   theme: ThemeData(
-        //     fontFamily: 'Alegreya',
-        //   ),
-        //   debugShowCheckedModeBanner: false,
-        //   home: const ResetPasswordPage(),
-        // );
       },
     );
   }

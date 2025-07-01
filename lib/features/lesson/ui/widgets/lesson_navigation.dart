@@ -56,73 +56,97 @@ class LessonNavigation extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildNavigationButton({
-    required BuildContext context,
-    required bool isNext,
-    required bool canNavigate,
-    required VoidCallback onTap,
-  }) {
-    return BlocBuilder<CourseDetailsCubit, CourseDetailsState>(
-      builder: (context, courseState) {
-        bool isLoading = courseState is EndCourseLoading;
-        return GestureDetector(
-          onTap: canNavigate && !isLoading ? onTap : null,
-          child: Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: canNavigate && !isLoading
-                  ? const Color(0xff02457A)
-                  : Colors.grey[300],
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: isLoading
-                ? const Padding(
-                    padding: EdgeInsets.all(12.0),
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : Icon(
-                    isNext ? Icons.arrow_forward_ios : Icons.arrow_back_ios_new,
-                    color: canNavigate ? Colors.white : Colors.grey[500],
-                    size: 20,
-                  ),
+Widget _buildNavigationButton({
+  required BuildContext context,
+  required bool isNext,
+  required bool canNavigate,
+  required VoidCallback onTap,
+}) {
+  return BlocBuilder<CourseDetailsCubit, CourseDetailsState>(
+    builder: (context, courseState) {
+      bool isLoading = courseState is EndCourseLoading;
+      Color buttonColor;
+      if (canNavigate && !isLoading) {
+        buttonColor = isNext 
+            ? const Color(0xff02457A)  
+            : Colors.grey.withOpacity(0.8);
+            
+      } else {
+        buttonColor = Colors.grey[300]!; 
+      }
+      
+      return GestureDetector(
+        onTap: canNavigate && !isLoading ? onTap : null,
+        child: Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: buttonColor,
+            borderRadius: BorderRadius.circular(25),
           ),
-        );
-      },
-    );
-  }
+          child: isLoading
+              ? const Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Icon(
+                  isNext ? Icons.arrow_forward_ios : Icons.arrow_back_ios_new,
+                  color: canNavigate ? Colors.white : Colors.grey[500],
+                  size: 20,
+                ),
+        ),
+      );
+    },
+  );
+}
 
   Widget _buildLessonNameContainer() {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 15),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xff02457A).withOpacity(0.1),
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(
-            color: const Color(0xff02457A),
-            width: 1,
-          ),
+  return Expanded(
+    child: Container(
+      margin: const EdgeInsets.symmetric(horizontal: 15),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.grey.withOpacity(0.8), Color(0xff02457A).withOpacity(0.8),],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
         ),
-        child: Text(
-          currentLesson.name,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Color(0xff02457A),
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-        ),
+        borderRadius: BorderRadius.circular(25),
       ),
-    );
-  }
+      child: Row(
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text('📚', style: TextStyle(fontSize: 16)),
+            ),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              currentLesson.name,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   void _showCourseCompletionDialog(BuildContext context) {
     showDialog(

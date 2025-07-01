@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/helper/cache_helper.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/widgets/appbar.dart';
+import '../widgets/theme_provider.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -12,12 +14,12 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool isDarkMode = false;
+  // احذف isDarkMode من هنا - مش محتاجه
   bool isNotificationsEnabled = true;
 
   @override
   Widget build(BuildContext context) {
-    //var themeProvider = Provider.of<ThemeProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -33,11 +35,10 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildSwitchTile(
                 icon: Icons.dark_mode,
                 text: "Dark mode",
-                value: isDarkMode,
+                value: themeProvider.isDarkMode, // ✅ صحيح
                 onChanged: (value) {
-                  setState(() {
-                    isDarkMode = value;
-                  });
+                  // ✅ الحل الصحيح
+                  themeProvider.setThemeValue(value);
                 },
               ),
               _buildDivider(),
@@ -134,9 +135,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ),
-              SizedBox(
-                height: 12,
-              ),
+              const SizedBox(height: 12),
               Center(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -166,13 +165,14 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
-Widget _buildSwitchTile(
-    {required IconData icon,
-    required String text,
-    required bool value,
-    required Function(bool) onChanged}) {
+Widget _buildSwitchTile({
+  required IconData icon,
+  required String text,
+  required bool value,
+  required Function(bool) onChanged,
+}) {
   return SwitchListTile(
-    secondary: Icon(icon, color: Color(0xFF02457A)),
+    secondary: Icon(icon, color: const Color(0xFF02457A)),
     title: Text(text,
         style: const TextStyle(
             fontWeight: FontWeight.w500,
@@ -180,6 +180,7 @@ Widget _buildSwitchTile(
             color: Color(0xFF02457A))),
     value: value,
     onChanged: onChanged,
+    activeColor: Colors.blue, // لون الـ switch لما يكون مفعل
   );
 }
 
@@ -199,7 +200,7 @@ Widget _buildListTile(
   VoidCallback? onTap,
 }) {
   return ListTile(
-    leading: Icon(icon, color: Color(0xFF02457A)),
+    leading: Icon(icon, color: const Color(0xFF02457A)),
     title: Text(
       text,
       style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 24),
@@ -221,13 +222,13 @@ void _showLogoutConfirmationDialog(BuildContext context) {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // إغلاق الديالوج
+              Navigator.of(context).pop();
             },
             child: const Text("Cancel"),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.of(context).pop(); // إغلاق ديالوج التأكيد
+              Navigator.of(context).pop();
               await _performLogout(context);
             },
             child: const Text("Logout"),
@@ -264,7 +265,6 @@ Future<void> _performLogout(BuildContext context) async {
       );
     }
   } catch (e) {
-    // في حالة حدوث خطأ
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error during logout: $e')),
