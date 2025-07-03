@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -25,6 +26,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   await BookmarkManager.loadBookmarks();
   await CacheHelper.cacheInitialization();
   initGetIt();
@@ -41,31 +43,39 @@ void main() async {
   );
 
   runApp(
-    MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider(
-            create: (_) => LoginRepo(WebServices(createAndSetupDio()))),
+     EasyLocalization(
+       supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('ar', 'SA'),
       ],
-      child: MultiProvider(
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en', 'US'),
+      child: MultiRepositoryProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => ThemeProvider()),
-          BlocProvider(create: (_) => RoleCubit()),
-          BlocProvider<AddCourseCubit>(
-            create: (context) => getIt<AddCourseCubit>(),
-          ),
-          BlocProvider<CartCubit>(
-            create: (_) => getIt<CartCubit>()..emitGetCart(),
-          ),
-          BlocProvider(
-            create: (context) => LoginCubit(
-              RepositoryProvider.of<LoginRepo>(context),
-            ),
-          ),
-          BlocProvider<KidProfileCubit>(
-            create: (_) => getIt<KidProfileCubit>(),
-          ),
+          RepositoryProvider(
+              create: (_) => LoginRepo(WebServices(createAndSetupDio()))),
         ],
-        child: const KidEdu(),
+        child: MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
+            BlocProvider(create: (_) => RoleCubit()),
+            BlocProvider<AddCourseCubit>(
+              create: (context) => getIt<AddCourseCubit>(),
+            ),
+            BlocProvider<CartCubit>(
+              create: (_) => getIt<CartCubit>()..emitGetCart(),
+            ),
+            BlocProvider(
+              create: (context) => LoginCubit(
+                RepositoryProvider.of<LoginRepo>(context),
+              ),
+            ),
+            BlocProvider<KidProfileCubit>(
+              create: (_) => getIt<KidProfileCubit>(),
+            ),
+          ],
+          child: const KidEdu(),
+        ),
       ),
     ),
   );
@@ -128,27 +138,31 @@ class _KidEduState extends State<KidEdu> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return ScreenUtilInit(
-          designSize: const Size(360, 690),
-          minTextAdapt: true,
-          splitScreenMode: true,
-          builder: (context, child) {
-            return MaterialApp.router(
-              theme: AppThemes.lightTheme,
-              darkTheme: AppThemes.darkTheme,
-              themeMode: themeProvider.isDarkMode 
-                  ? ThemeMode.dark 
-                  : ThemeMode.light,
-              debugShowCheckedModeBanner: false,
-              routerConfig: router,
-            );
-          },
-        );
-      },
-    );
-  }
+ @override
+Widget build(BuildContext context) {
+  return Consumer<ThemeProvider>(
+    builder: (context, themeProvider, child) {
+      return ScreenUtilInit(
+        designSize: const Size(360, 690),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (context, child) {
+          return MaterialApp.router(
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            
+            theme: AppThemes.lightTheme,
+            darkTheme: AppThemes.darkTheme,
+            themeMode: themeProvider.isDarkMode 
+                ? ThemeMode.dark 
+                : ThemeMode.light,
+            debugShowCheckedModeBanner: false,
+            routerConfig: router,
+          );
+        },
+      );
+    },
+  );
+}
 }

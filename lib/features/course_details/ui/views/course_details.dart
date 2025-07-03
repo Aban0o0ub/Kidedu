@@ -86,7 +86,7 @@ class _CourseDetailsState extends State<CourseDetails> {
     try {
       // Clean phone number (remove any spaces or special characters)
       String cleanedNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
-      
+
       // If number doesn't start with +, add +20 for Egypt
       if (!cleanedNumber.startsWith('+')) {
         if (cleanedNumber.startsWith('0')) {
@@ -95,10 +95,11 @@ class _CourseDetailsState extends State<CourseDetails> {
           cleanedNumber = '+20$cleanedNumber';
         }
       }
-      
+
       // WhatsApp URL with pre-filled message
-      final whatsappUrl = 'https://wa.me/$cleanedNumber?text=Hello! I\'m interested in your course.';
-      
+      final whatsappUrl =
+          'https://wa.me/$cleanedNumber?text=Hello! I\'m interested in your course.';
+
       if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
         await launchUrl(
           Uri.parse(whatsappUrl),
@@ -106,7 +107,8 @@ class _CourseDetailsState extends State<CourseDetails> {
         );
       } else {
         // Fallback: try to open WhatsApp app directly
-        final whatsappAppUrl = 'whatsapp://send?phone=$cleanedNumber&text=Hello! I\'m interested in your course.';
+        final whatsappAppUrl =
+            'whatsapp://send?phone=$cleanedNumber&text=Hello! I\'m interested in your course.';
         if (await canLaunchUrl(Uri.parse(whatsappAppUrl))) {
           await launchUrl(Uri.parse(whatsappAppUrl));
         } else {
@@ -156,7 +158,8 @@ class _CourseDetailsState extends State<CourseDetails> {
                         if (state is GetCourseSuccess) {
                           var course = state.course;
                           return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -197,7 +200,7 @@ class _CourseDetailsState extends State<CourseDetails> {
                                 // Action Buttons
                                 CourseActionButtons(
                                   courseId: courseId,
-                                   courseData: course,
+                                  courseData: course,
                                   onUpdateCourse: () {
                                     // Add your update course logic here
                                   },
@@ -212,14 +215,14 @@ class _CourseDetailsState extends State<CourseDetails> {
                           return Center(
                             child: Text(
                               "There was an error: ${state.error}",
-                              style:
-                                  const TextStyle(fontSize: 20, color: Colors.red),
+                              style: const TextStyle(
+                                  fontSize: 20, color: Colors.red),
                             ),
                           );
                         }
                         return const Center(
-                          child:
-                              CircularProgressIndicator(color: Color(0xFF02457A)),
+                          child: CircularProgressIndicator(
+                              color: Color(0xFF02457A)),
                         );
                       },
                     ),
@@ -237,13 +240,15 @@ class _CourseDetailsState extends State<CourseDetails> {
                     child: GestureDetector(
                       onTap: () {
                         if (course.instructor is Map<String, dynamic>) {
-                          String? phoneNumber = course.instructor['PhoneNumber'];
+                          String? phoneNumber =
+                              course.instructor['PhoneNumber'];
                           if (phoneNumber != null && phoneNumber.isNotEmpty) {
                             _openWhatsApp(phoneNumber);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Instructor phone number not available'),
+                                content: Text(
+                                    'Instructor phone number not available'),
                                 backgroundColor: Colors.orange,
                               ),
                             );
@@ -303,19 +308,30 @@ class _CourseDetailsState extends State<CourseDetails> {
         Center(
           child: GestureDetector(
             onTap: () {
-              if (course.instructor is Map<String, dynamic>) {
-                String? instructorId = course.instructor['_id'];
-                if (instructorId != null) {
-                  FocusScope.of(context).unfocus();
-                  context.push(
-                    Routes.instructorProfilePage,
-                    extra: {'_id': instructorId},
-                  );
-                }
+              String? instructorId = course.instructorId;
+              if (instructorId != null) {
+                FocusScope.of(context).unfocus();
+                context.push(
+                  Routes.instructorProfilePage,
+                  extra: {
+                    '_id': instructorId,
+                    'courses': course.courses ?? course.instructorCourses,
+                    'reviews': course.reviews ?? course.instructorReviews,
+                    'instructorData':
+                        course.instructorData ?? course.instructor,
+                  },
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Instructor information not available'),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
               }
             },
             child: Text(
-              course.instructor?['Name'] ?? "Instructor Name",
+              course.instructorName ?? "Instructor Name",
               style: const TextStyle(
                 decoration: TextDecoration.underline,
                 decorationColor: Color(0xff1877F2),

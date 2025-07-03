@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -133,12 +134,12 @@ class LoginPageState extends State<LoginPage> {
                       : AutovalidateMode.disabled,
                   child: Column(
                     children: [
-                      const CustomTitle(text: 'Log In'),
+                      CustomTitle(text: 'Log In'.tr()),
                       CustomTextField(
                         width: 360,
-                        label: "Email",
+                        label: "Email".tr(),
                         icon: Icons.email,
-                        hintText: "Your Email",
+                        hintText: "Your Email".tr(),
                         controller: _emailController,
                         validator: validateEmail,
                         contentPadding:
@@ -147,9 +148,9 @@ class LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 24),
                       CustomTextField(
                         width: 360,
-                        label: "Password",
+                        label: "Password".tr(),
                         icon: Icons.lock,
-                        hintText: "Password",
+                        hintText: "Password".tr(),
                         isPasswordField: true,
                         controller: _passwordController,
                         validator: validatePassword,
@@ -322,8 +323,8 @@ class LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 28),
                       AuthPrompt(
-                        questionText: "Don't have an account?",
-                        actionText: "Sign up",
+                        questionText: "Don't have an account?".tr(),
+                        actionText: "Sign up".tr(),
                         onActionPressed: () {
                           final role = context.read<RoleCubit>().state;
 

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -20,23 +21,22 @@ class RoleSelectionPage extends StatelessWidget {
           Column(
             children: [
               const SizedBox(height: 240),
-              const Text(
-                'Role',
+               Text(
+                'Role'.tr(),
                 style: TextStyle(
                   fontSize: 60,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF02457A),
                 ),
               ),
-              const SizedBox(height: 18),
-              const Text(
-                'Who are you?',
+              const SizedBox(height: 8),
+               Text(
+                'Who are you?'.tr(),
                 style: TextStyle(
                   fontSize: 24,
                   color: Color(0xFF02457A),
                 ),
               ),
-              const SizedBox(height: 20),
               Expanded(
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -69,9 +69,9 @@ class RoleSelectionPage extends StatelessWidget {
                                   bottomRight: Radius.circular(25),
                                 ),
                               ),
-                              child: const Center(
+                              child:  Center(
                                 child: Text(
-                                  'Kid',
+                                  'Kid'.tr(),
                                   style: TextStyle(
                                     fontSize: 35,
                                     fontWeight: FontWeight.bold,
@@ -114,9 +114,9 @@ class RoleSelectionPage extends StatelessWidget {
                                   bottomLeft: Radius.circular(25),
                                 ),
                               ),
-                              child: const Center(
+                              child:  Center(
                                 child: Text(
-                                  'Instructor',
+                                  'Instructor'.tr(),
                                   style: TextStyle(
                                     fontSize: 35,
                                     fontWeight: FontWeight.bold,
@@ -147,7 +147,7 @@ class RoleSelectionPage extends StatelessWidget {
                           });
                         },
                         child: Text(
-                          'Continue as admin',
+                          'Continue as admin'.tr(),
                           style: TextStyle(
                             fontSize: 18,
                             color: Color(0xFF02457A),

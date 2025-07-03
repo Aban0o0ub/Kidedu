@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -40,7 +41,7 @@ class _PolicyPageState extends State<PolicyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'Privacy Policy',onBackPressed: () => Navigator.pop(context),), // استخدام الـ AppBar المخصص
+      appBar: CustomAppBar(title: 'Privacy Policy'.tr(),onBackPressed: () => Navigator.pop(context),), // استخدام الـ AppBar المخصص
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Markdown(

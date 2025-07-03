@@ -34,16 +34,15 @@ class ReviewResponseModel {
     );
   }
 }
-
 class ReviewData {
   final String id;
   final String reviewText;
   final int rating;
   final dynamic courseId;
-  final dynamic instructorId; 
+  final dynamic instructorId;
   final dynamic kidId;
   final DateTime createdAt;
-
+  
   ReviewData({
     required this.id,
     required this.reviewText,
@@ -53,48 +52,66 @@ class ReviewData {
     required this.kidId,
     required this.createdAt,
   });
-
+  
   factory ReviewData.fromJson(Map<String, dynamic> json) {
     final courseData = json['courseId'];
     final kidData = json['kidId'];
-    final instructorData = json['instructorId']; 
-
+    final instructorData = json['instructorId'];
     return ReviewData(
       id: json['_id'],
       reviewText: json['reviewText'],
       rating: json['rating'],
       courseId: courseData is Map<String, dynamic>
           ? ReviewCourse.fromJson(courseData)
-          : courseData?.toString(), 
+          : courseData?.toString(),
       instructorId: instructorData is Map<String, dynamic>
-          ? ReviewInstructor.fromJson(instructorData) 
-          : instructorData?.toString(), 
+          ? ReviewInstructor.fromJson(instructorData)
+          : instructorData?.toString(),
       kidId: kidData is Map<String, dynamic>
           ? ReviewKid.fromJson(kidData)
-          : kidData?.toString(), 
+          : kidData?.toString(),
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
 
+  // إضافة toJson method
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'reviewText': reviewText,
+      'rating': rating,
+      'courseId': courseId is ReviewCourse
+          ? (courseId as ReviewCourse).toJson()
+          : courseId?.toString(),
+      'instructorId': instructorId is ReviewInstructor
+          ? (instructorId as ReviewInstructor).toJson()
+          : instructorId?.toString(),
+      'kidId': kidId is ReviewKid
+          ? (kidId as ReviewKid).toJson()
+          : kidId?.toString(),
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
+  
   ReviewCourse? get courseObject => courseId is ReviewCourse ? courseId : null;
   String? get courseIdString => courseId is String ? courseId : null;
   String get displayCourseName =>
       courseObject?.courseName ?? courseIdString ?? 'Unknown Course';
-
+      
   ReviewKid? get kidObject => kidId is ReviewKid ? kidId : null;
   String? get kidIdString => kidId is String ? kidId : null;
   String get displayKidName =>
       kidObject?.name ?? kidIdString ?? 'Unknown Student';
-
+      
   ReviewInstructor? get instructorObject => instructorId is ReviewInstructor ? instructorId : null;
   String? get instructorIdString => instructorId is String ? instructorId : null;
   String get displayInstructorName =>
       instructorObject?.name ?? instructorIdString ?? 'Unknown Instructor';
-
+      
   String get formattedDate {
     return '${createdAt.day}/${createdAt.month}/${createdAt.year}';
   }
-
+  
   List<bool> get ratingStars {
     return List.generate(5, (index) => index < rating);
   }

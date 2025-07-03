@@ -52,4 +52,14 @@ class ReviewsCubit extends Cubit<ReviewsState> {
       emit(GetReviewsFailure(e.toString()));
     }
   }
+
+  Future<void> emitGetReviewsByInstructorId(String instructorId) async {
+    emit(GetReviewsLoading());
+    try {
+      final response = await reviewsRepo.getReviewsByInstructorId(instructorId);
+      emit(GetReviewsSuccess(response.reviews));
+    } catch (e) {
+      emit(GetReviewsFailure(e.toString()));
+    }
+  }
 }

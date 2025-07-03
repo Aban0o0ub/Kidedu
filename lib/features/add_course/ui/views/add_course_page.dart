@@ -68,6 +68,16 @@ class _AddCoursePageState extends State<AddCoursePage> {
     }
   }
 
+  String _getButtonText() {
+    if (availabilitycontroller.text.toLowerCase() == 'online') {
+      return "Save and Continue";
+    } else if (availabilitycontroller.text.toLowerCase() == 'offline') {
+      return "Save";
+    } else {
+      return "Save and Continue"; // Default text
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -177,6 +187,11 @@ class _AddCoursePageState extends State<AddCoursePage> {
                                   hintText: 'Select',
                                   controller: availabilitycontroller,
                                   items: availabilityitems,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      availabilitycontroller.text = value ?? '';
+                                    });
+                                  },
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -381,7 +396,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                               },
                               text: widget.courseToEdit != null
                                   ? "Save Changes"
-                                  : "Save and Continue",
+                                  : _getButtonText(),
                               width: 320,
                             ),
                           ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -54,7 +55,7 @@ class _SkillsCategoryState extends State<SkillsCategory> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: CustomAppBar(
-          title: "Skills",
+          title: "Skills".tr(),
           onBackPressed: () => Navigator.pop(context),
         ),
         body: BlocProvider.value(

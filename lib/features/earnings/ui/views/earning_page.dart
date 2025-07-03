@@ -42,45 +42,160 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 ),
               );
             } else if (state is InstructorEarningsFailure) {
+              // فحص إذا كان الخطأ متعلق بعدم وجود earnings
+              bool isNoEarnings = state.error.contains('NO_EARNINGS_YET') ||
+                  state.error.contains('Cast to Number failed') ||
+                  state.error.contains('NaN') ||
+                  state.error.toLowerCase().contains('no earnings');
+
+              if (isNoEarnings) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.account_balance_wallet_outlined,
+                        size: 80,
+                        color: Color(0xFF02457A).withOpacity(0.7),
+                      ),
+                      SizedBox(height: 24),
+                      Text(
+                        "No Earnings Yet",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF02457A),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        "You haven't earned anything yet.\nStart by creating and selling courses!",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "Your earnings will appear here once students\npurchase your courses.",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                          height: 1.3,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              context
+                                  .read<EarningsCubit>()
+                                  .emitGetInstructorEarnings();
+                            },
+                            icon: Icon(Icons.refresh,
+                                color: Colors.white, size: 20),
+                            label: Text("Refresh",
+                                style: TextStyle(color: Colors.white)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFF02457A),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          OutlinedButton.icon(
+                            onPressed: () {
+                              // Navigate to add course page
+                              // context.push(Routes.addCoursePage);
+                            },
+                            icon: Icon(Icons.add_circle_outline,
+                                color: Color(0xFF02457A), size: 20),
+                            label: Text(
+                              "Create Course",
+                              style: TextStyle(color: Color(0xFF02457A)),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: Color(0xFF02457A)),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              // في حالة أخطاء أخرى
+              bool isNetworkError =
+                  state.error.toLowerCase().contains('network') ||
+                      state.error.toLowerCase().contains('connection') ||
+                      state.error.toLowerCase().contains('timeout');
+
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.error_outline,
+                      isNetworkError ? Icons.wifi_off : Icons.error_outline,
                       size: 60,
                       color: Colors.red,
                     ),
                     SizedBox(height: 16),
                     Text(
-                      "Failed to load earnings data",
+                      isNetworkError
+                          ? "Connection Problem"
+                          : "Failed to Load Earnings",
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                         color: Colors.red,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 8),
                     Text(
-                      "There seems to be an issue with earnings calculation",
+                      isNetworkError
+                          ? "Please check your internet connection and try again"
+                          : "There was an issue loading your earnings data",
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
+                        height: 1.3,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 16),
-                    ElevatedButton(
+                    ElevatedButton.icon(
                       onPressed: () {
                         context
                             .read<EarningsCubit>()
                             .emitGetInstructorEarnings();
                       },
+                      icon: Icon(Icons.refresh, color: Colors.white, size: 20),
+                      label: Text("Try Again",
+                          style: TextStyle(color: Colors.white)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF02457A),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                      child:
-                          Text("Retry", style: TextStyle(color: Colors.white)),
                     ),
                   ],
                 ),

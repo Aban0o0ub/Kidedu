@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../helper/cache_helper.dart';
+
 class ThemeProvider extends ChangeNotifier {
   bool _isDarkMode = false;
   static const String _themeKey = 'isDarkMode';
@@ -43,4 +45,12 @@ class ThemeProvider extends ChangeNotifier {
     await prefs.setBool(_themeKey, _isDarkMode);
   }
 
+  // في ThemeProvider أو منفصل
+  void saveLanguage(String languageCode) async {
+    await CacheHelper.setData(key: 'language', value: languageCode);
+  }
+
+  Future<String> getSavedLanguage() async {
+    return await CacheHelper.getData(key: 'language') ?? 'en';
+  }
 }

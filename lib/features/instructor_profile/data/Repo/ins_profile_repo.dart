@@ -1,6 +1,7 @@
 import 'package:loginpage/core/networking/web_services.dart';
 import 'package:loginpage/features/sign_up/data/models/kid.dart';
 import '../../../add_course/data/models/Course_Model.dart';
+import '../../../reviews/data/models/review_model.dart';
 
 class InstructorProfileRepo {
   final WebServices webServices;
@@ -24,5 +25,13 @@ class InstructorProfileRepo {
   }
   Future<InstructorData> getOnlyInstructor(String id) async {
     return await webServices.getOnlyInstructor(id);
+  }
+
+  Future<List<CourseData>> getCoursesByInstructorId(String instructorId) async {
+    return await webServices.getCoursesByInstructorId(instructorId);
+  }
+
+  Future<ReviewListResponseModel> getReviewsByInstructorId(String instructorId) async {
+    return await webServices.getReviewsByInstructorId(instructorId);
   }
 }

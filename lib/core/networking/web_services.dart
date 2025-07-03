@@ -1078,34 +1078,41 @@ class WebServices {
     }
   }
 
-  Future<EarningsResponseModel> getInstructorEarnings() async {
-    try {
-      String? token = CacheHelper.getData(key: "token");
-      if (token == null) throw Exception('Missing token');
-
-      final response = await dio.get(
-        'user_instructor/earnings',
-        options: Options(headers: {'token': 'Bearer $token'}),
-      );
-
-      if (response.statusCode == 500) {
-        throw Exception('Server error: Please try again later');
-      }
-
-      if (response.data == null) {
-        throw Exception('No data returned from API');
-      }
-
-      return EarningsResponseModel.fromJson(response.data);
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 500) {
-        throw Exception('Server error: Earnings calculation failed');
-      }
-      throw Exception('Network error: ${e.message}');
-    } catch (e) {
-      throw Exception('Error fetching earnings data: ${e.toString()}');
+ Future<EarningsResponseModel> getInstructorEarnings() async {
+  try {
+    String? token = CacheHelper.getData(key: "token");
+    if (token == null) throw Exception('Missing token');
+    
+    final response = await dio.get(
+      'user_instructor/earnings',
+      options: Options(headers: {'token': 'Bearer $token'}),
+    );
+    
+    if (response.data == null) {
+      throw Exception('No data returned from API');
     }
+    
+    return EarningsResponseModel.fromJson(response.data);
+  } on DioException catch (e) {
+    if (e.response?.statusCode == 500) {
+      final responseBody = e.response?.data?.toString() ?? '';
+      if (responseBody.contains('Cast to Number failed for value "NaN"') ||
+          responseBody.contains('earnings calculation') ||
+          responseBody.contains('NaN')) {
+        throw Exception('NO_EARNINGS_YET');
+      }
+      throw Exception('Server error: Please try again later');
+    } else if (e.response?.statusCode == 404) {
+      throw Exception('NO_EARNINGS_YET');
+    }
+    throw Exception('Network error: ${e.message}');
+  } catch (e) {
+    if (e.toString().contains('NO_EARNINGS_YET')) {
+      rethrow;
+    }
+    throw Exception('Error fetching earnings data: ${e.toString()}');
   }
+}
 
   Future<List<CourseData>> getAllCourses() async {
     try {
@@ -1367,5 +1374,56 @@ Future<CourseResponse> updateCourse({
     );
 
     return CourseResponse.fromJson(response.data);
+  }
+
+  Future<List<CourseData>> getCoursesByInstructorId(String instructorId) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      final response = await dio.get(
+        'course/getCoursesForInstructor/$instructorId',
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((course) => CourseData.fromJson(course))
+            .toList();
+      } else if (response.statusCode == 404) {
+        return [];
+      } else {
+        throw Exception("Unexpected error: {response.statusMessage}");
+      }
+    } catch (e) {
+      throw Exception("Error fetching courses: {e.toString()}");
+    }
+  }
+
+  Future<ReviewListResponseModel> getReviewsByInstructorId(String instructorId) async {
+    try {
+      String? token = CacheHelper.getData(key: "token");
+      if (token == null) {
+        throw Exception('Missing token');
+      }
+      final response = await dio.get(
+        'reviews/instructor/$instructorId',
+        options: Options(
+          headers: {
+            'token': 'Bearer $token',
+          },
+        ),
+      );
+      if (response.data == null) {
+        throw Exception('No data returned from API');
+      }
+      return ReviewListResponseModel.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Error fetching instructor reviews: {e.toString()}');
+    }
   }
 }

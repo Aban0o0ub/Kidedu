@@ -21,4 +21,8 @@ class ReviewsRepo {
   Future<ReviewListResponseModel> getReviewsByInstructor() async {
     return await webServices.getReviewsByInstructor();
   }
+
+  Future<ReviewListResponseModel> getReviewsByInstructorId(String instructorId) async {
+    return await webServices.getReviewsByInstructorId(instructorId);
+  }
 }

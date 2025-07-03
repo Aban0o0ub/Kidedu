@@ -47,7 +47,6 @@ class _QuizContentState extends State<QuizContent> {
     );
   }
 
- 
   Widget _buildContentContainer() {
     return Container(
       width: double.infinity,
@@ -78,28 +77,23 @@ class _QuizContentState extends State<QuizContent> {
           if (state is GetQuizzesLoading) {
             return _buildLoading();
           }
-
           if (state is GetQuizzesFailure) {
-            return _buildErrorMessage(state.error);
+            // بدلاً من إظهار رسالة خطأ، نظهر رسالة عدم وجود كويز
+            return _buildNoQuizForCourseMessage();
           }
-
           if (state is GetQuizzesSuccess) {
             if (state.quizzes.isEmpty) {
-              return _buildNoQuizMessage();
+              return _buildNoQuizForCourseMessage();
             }
-
             if (selectedQuiz == null) {
               selectedQuiz = state.quizzes.first;
             }
-
             return _buildQuizContent(state.quizzes);
           }
-
           if (state is SubmitQuizLoading) {
             return _buildLoading(message: "Submitting your answers...");
           }
-
-          return _buildNoQuizMessage();
+          return _buildNoQuizForCourseMessage();
         },
       ),
     );
@@ -397,7 +391,9 @@ class _QuizContentState extends State<QuizContent> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isSelected ? Color(0xff02457A).withOpacity(0.1) : Colors.white,
+                    color: isSelected
+                        ? Color(0xff02457A).withOpacity(0.1)
+                        : Colors.white,
                     border: Border.all(
                       color: Color(0xff02457A),
                       width: isSelected ? 2 : 1,
@@ -411,7 +407,9 @@ class _QuizContentState extends State<QuizContent> {
                         height: 20,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isSelected ? Color(0xff02457A) : Colors.transparent,
+                          color: isSelected
+                              ? Color(0xff02457A)
+                              : Colors.transparent,
                           border: Border.all(
                             color: Color(0xff02457A),
                             width: 2,
@@ -431,8 +429,11 @@ class _QuizContentState extends State<QuizContent> {
                           option.text,
                           style: TextStyle(
                             fontSize: 16,
-                            color: isSelected ? Color(0xff02457A) : Colors.black87,
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                            color:
+                                isSelected ? Color(0xff02457A) : Colors.black87,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
                           ),
                         ),
                       ),
@@ -506,7 +507,8 @@ class _QuizContentState extends State<QuizContent> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        currentQuestionIndex < selectedQuiz!.questions.length - 1
+                        currentQuestionIndex <
+                                selectedQuiz!.questions.length - 1
                             ? 'Next'
                             : 'Submit',
                         style: TextStyle(
@@ -516,7 +518,8 @@ class _QuizContentState extends State<QuizContent> {
                       ),
                       SizedBox(width: 8),
                       Icon(
-                        currentQuestionIndex < selectedQuiz!.questions.length - 1
+                        currentQuestionIndex <
+                                selectedQuiz!.questions.length - 1
                             ? Icons.arrow_forward
                             : Icons.send,
                         size: 16,
@@ -708,69 +711,68 @@ class _QuizContentState extends State<QuizContent> {
       ),
     );
   }
-
-  Widget _buildErrorMessage(String error) {
+Widget _buildNoQuizForCourseMessage() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
-              color: Colors.red,
+              color: Color(0xff02457A).withOpacity(0.1),
               shape: BoxShape.circle,
+              border: Border.all(
+                color: Color(0xff02457A).withOpacity(0.3),
+                width: 2,
+              ),
             ),
             child: Center(
-              child: Text('⚠️', style: TextStyle(fontSize: 30)),
+              child: Text(
+                '📚',
+                style: TextStyle(fontSize: 35),
+              ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           Text(
-            "Something went wrong",
+            "No Quiz Available!",
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.red,
+              color: Color(0xff02457A),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            error,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-              height: 1.4,
+          const SizedBox(height: 12),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              "This lesson doesn't have any quizzes yet.\nKeep learning and check back soon! 🌟",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade600,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
           Container(
-            height: 45,
-            child: ElevatedButton(
-              onPressed: () {
-                context.read<QuizCubit>().emitGetQuizzes(widget.lesson.id);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xff02457A),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Color(0xff02457A).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Color(0xff02457A).withOpacity(0.2),
+                width: 1,
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.refresh, color: Colors.white, size: 16),
-                  SizedBox(width: 8),
-                  Text(
-                    'Try Again',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+            ),
+            child: Text(
+              "✨ Keep exploring other lessons! ✨",
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xff02457A),
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -778,4 +780,4 @@ class _QuizContentState extends State<QuizContent> {
       ),
     );
   }
-}
+  }

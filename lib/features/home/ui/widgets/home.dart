@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -109,12 +110,12 @@ class _HomeState extends State<Home> {
                     const SizedBox(height: 20),
 
                     // Trending Section
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
                         padding: EdgeInsets.only(left: 25.0),
                         child: Text(
-                          "Trending",
+                          "Trending".tr(),
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -245,12 +246,12 @@ class _HomeState extends State<Home> {
                     const SizedBox(height: 20),
 
                     // Categories Section
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
                         padding: EdgeInsets.only(left: 25.0),
                         child: Text(
-                          "Categories",
+                          "Categories".tr(),
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -299,12 +300,12 @@ class _HomeState extends State<Home> {
                     const SizedBox(height: 20),
 
                     // Recent Reviews Section
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
                         padding: EdgeInsets.only(left: 25.0),
                         child: Text(
-                          "Recent Reviews",
+                          "Recent Reviews".tr(),
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -358,39 +359,99 @@ class _HomeState extends State<Home> {
                                 },
                               );
                             } else if (state is GetReviewsFailure) {
-                              return Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.error_outline,
-                                      color: Colors.red,
-                                      size: 30,
+                              // التحقق من نوع الخطأ - 404 يعني مفيش reviews
+                              bool isNoReviews = state.error.contains('404') ||
+                                  state.error
+                                      .toLowerCase()
+                                      .contains('not found');
+
+                              if (isNoReviews) {
+                                // عرض رسالة "لا توجد مراجعات" بدل error
+                                return const SizedBox(
+                                  height: 142,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.rate_review_outlined,
+                                          color: Color(0xFF02457A),
+                                          size: 32,
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          "No reviews yet",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Color(0xFF02457A),
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          "Be the first to review this course!",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      "Failed to load reviews",
-                                      style: TextStyle(
-                                        color: Colors.red[700],
-                                        fontSize: 14,
+                                  ),
+                                );
+                              }
+
+                              bool isNetworkError = state.error
+                                      .toLowerCase()
+                                      .contains('network') ||
+                                  state.error
+                                      .toLowerCase()
+                                      .contains('connection') ||
+                                  state.error.toLowerCase().contains('timeout');
+
+                              return SizedBox(
+                                height: 142,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        isNetworkError
+                                            ? Icons.wifi_off
+                                            : Icons.error_outline,
+                                        color: Colors.red,
+                                        size: 32,
                                       ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    const SizedBox(height: 8),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        context
-                                            .read<ReviewsCubit>()
-                                            .emitGetRecentReviews();
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xFF02457A),
-                                        foregroundColor: Colors.white,
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        isNetworkError
+                                            ? "Check your internet connection"
+                                            : "Failed to load reviews",
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.red,
+                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
-                                      child: const Text("Retry"),
-                                    ),
-                                  ],
+                                      const SizedBox(height: 4),
+                                      GestureDetector(
+                                        onTap: () {
+                                          context
+                                              .read<ReviewsCubit>()
+                                              .emitGetRecentReviews();
+                                        },
+                                        child: const Text(
+                                          "Tap to retry",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Color(0xFF02457A),
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               );
                             }

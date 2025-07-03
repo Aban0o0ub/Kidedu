@@ -1,4 +1,5 @@
 import '../../../lesson/data/models/section.dart';
+import '../../../reviews/data/models/review_model.dart';
 
 class CourseRequest {
   String? courseName;
@@ -166,7 +167,6 @@ class CourseData {
   String? id;
   String? courseName;
   String? courseId;
-  //Map<String, dynamic>? instructor;
   dynamic instructor;
   List<dynamic>? kids;
   String? level;
@@ -194,6 +194,12 @@ class CourseData {
   String? governorate;
   num? discountValue;
   num? discountPercent;
+  List<CourseData>? instructorCourses;
+  List<ReviewData>? instructorReviews;
+  // إضافة الحقول المفقودة
+  dynamic instructorData; // لحفظ بيانات المدرس كاملة
+  List<CourseData>? courses; // للكورسات المرجعة من الـ API
+  List<ReviewData>? reviews; // للمراجعات المرجعة من الـ API
 
   CourseData({
     this.id,
@@ -226,6 +232,11 @@ class CourseData {
     this.governorate,
     this.discountValue,
     this.discountPercent,
+    this.instructorCourses,
+    this.instructorReviews,
+    this.instructorData,
+    this.courses,
+    this.reviews,
   });
 
   factory CourseData.fromJson(Map<String, dynamic> json) {
@@ -270,6 +281,13 @@ class CourseData {
         governorate: governorate,
         discountValue: _parseNum(json['discountValue']),
         discountPercent: _parseNum(json['discountPercent']),
+        // الحقول الموجودة مسبقاً
+        instructorCourses: _parseInstructorCourses(json['courses']),
+        instructorReviews: _parseInstructorReviews(json['reviews']),
+        // الحقول الجديدة
+        instructorData: json['instructor'], // حفظ بيانات المدرس
+        courses: _parseInstructorCourses(json['courses']), // نفس الـ parsing
+        reviews: _parseInstructorReviews(json['reviews']), // نفس الـ parsing
       );
     } catch (e) {
       print('Error parsing CourseData: $e');
@@ -277,18 +295,6 @@ class CourseData {
       rethrow;
     }
   }
-
-  // static Map<String, dynamic>? _parseInstructor(dynamic instructor) {
-  //   if (instructor == null) return null;
-
-  //   if (instructor is Map<String, dynamic>) {
-  //     return instructor;
-  //   } else if (instructor is String) {
-  //     return {'_id': instructor};
-  //   } else {
-  //     return {'_id': instructor.toString()};
-  //   }
-  // }
 
   static List<dynamic> _parseKids(dynamic kids) {
     if (kids == null) return [];
@@ -372,6 +378,26 @@ class CourseData {
     }
   }
 
+  static List<CourseData> _parseInstructorCourses(dynamic courses) {
+    if (courses == null || courses is! List) return [];
+    try {
+      return courses.map((course) => CourseData.fromJson(course)).toList();
+    } catch (e) {
+      print('Error parsing instructor courses: $e');
+      return [];
+    }
+  }
+
+  static List<ReviewData> _parseInstructorReviews(dynamic reviews) {
+    if (reviews == null || reviews is! List) return [];
+    try {
+      return reviews.map((review) => ReviewData.fromJson(review)).toList();
+    } catch (e) {
+      print('Error parsing instructor reviews: $e');
+      return [];
+    }
+  }
+
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
@@ -403,8 +429,94 @@ class CourseData {
       'governorate': governorate,
       'discountValue': discountValue,
       'discountPercent': discountPercent,
+      'courses': courses?.map((course) => course.toJson()).toList(),
+      'reviews': reviews?.map((review) => review.toJson()).toList(),
     };
   }
+
+  // Helper methods للوصول للبيانات
+  String? get instructorName {
+  // جرب من الـ instructor الأساسي الأول
+  if (instructor is Map<String, dynamic>) {
+    final name = instructor['Name']?.toString();
+    if (name != null && name.isNotEmpty) return name;
+  }
+  
+  // ثم جرب من instructorData
+  if (instructorData is Map<String, dynamic>) {
+    return instructorData['Name']?.toString();
+  }
+  
+  return null;
+}
+
+  String? get instructorEmail {
+    if (instructorData is Map<String, dynamic>) {
+      return instructorData['Email']?.toString();
+    }
+    if (instructor is Map<String, dynamic>) {
+      return instructor['Email']?.toString();
+    }
+    return null;
+  }
+
+  String? get instructorGovernorate {
+    if (instructorData is Map<String, dynamic>) {
+      return instructorData['Governorate']?.toString();
+    }
+    if (instructor is Map<String, dynamic>) {
+      return instructor['Governorate']?.toString();
+    }
+    return null;
+  }
+
+  String? get instructorBio {
+    if (instructorData is Map<String, dynamic>) {
+      return instructorData['Bio']?.toString();
+    }
+    if (instructor is Map<String, dynamic>) {
+      return instructor['Bio']?.toString();
+    }
+    return null;
+  }
+
+  num? get instructorEarnings {
+    if (instructorData is Map<String, dynamic>) {
+      return _parseNum(instructorData['earnings']);
+    }
+    if (instructor is Map<String, dynamic>) {
+      return _parseNum(instructor['earnings']);
+    }
+    return null;
+  }
+
+
+String? get instructorId {
+  // جرب من الـ instructor الأساسي الأول
+  if (instructor is Map<String, dynamic>) {
+    return instructor['_id']?.toString();
+  }
+  
+  // لو كان string، يبقى ده هو الـ ID
+  if (instructor is String) {
+    return instructor;
+  }
+  
+  return null;
+}
+
+String? get instructorPhone {
+  if (instructor is Map<String, dynamic>) {
+    final phone = instructor['PhoneNumber']?.toString();
+    if (phone != null && phone.isNotEmpty) return phone;
+  }
+  
+  if (instructorData is Map<String, dynamic>) {
+    return instructorData['PhoneNumber']?.toString();
+  }
+  
+  return null;
+}
 }
 
 class EndCourseRequest {

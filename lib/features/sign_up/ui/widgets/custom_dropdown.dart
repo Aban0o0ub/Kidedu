@@ -12,6 +12,7 @@ class CustomDropdownField extends StatelessWidget {
     this.height = 56,
     this.isRequired = true,
     this.validator,
+    this.onChanged,
     String? errorText,
   });
 
@@ -24,6 +25,7 @@ class CustomDropdownField extends StatelessWidget {
   final double height;
   final bool isRequired;
   final String? Function(String?)? validator;
+   final void Function(String?)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +54,7 @@ class CustomDropdownField extends StatelessWidget {
                         ),
                       ))
                   .toList(),
+                  
               onChanged: (String? newValue) {
                 controller.text = newValue ?? '';
               },

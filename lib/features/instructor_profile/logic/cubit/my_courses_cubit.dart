@@ -19,4 +19,14 @@ class MyCoursesCubit extends Cubit<MyCoursesState> {
   }
 }
 
+Future<void> emitGetCoursesByInstructorId(String instructorId) async {
+  emit(MyCoursesLoading());
+  try {
+    final List<CourseData> courses = await instructorProfileRepo.getCoursesByInstructorId(instructorId);
+    emit(GetMyCoursesSuccess(courses));
+  } catch (e) {
+    emit(GetMyCoursesFailure(e.toString()));
+  }
+}
+
 }

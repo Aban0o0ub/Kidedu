@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loginpage/core/routing/routes.dart';
 import '../../logic/cubit/course_details_cubit.dart';
 
 void showDeleteCourseDialog({
@@ -8,7 +9,7 @@ void showDeleteCourseDialog({
   required CourseDetailsCubit courseDetailsCubit,
 }) {
   bool isLoading = false;
-  
+
   showDialog(
     context: context,
     barrierDismissible: false,
@@ -27,16 +28,12 @@ void showDeleteCourseDialog({
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white,
-                    Color(0xFFF8F9FA),
-                  ],
+                  colors: [Colors.white, Color(0xFFF8F9FA)],
                 ),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // أيقونة التحذير الأحمر
                   Container(
                     width: 80,
                     height: 80,
@@ -51,8 +48,6 @@ void showDeleteCourseDialog({
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // العنوان
                   const Text(
                     'Delete Course',
                     style: TextStyle(
@@ -62,8 +57,6 @@ void showDeleteCourseDialog({
                     ),
                   ),
                   const SizedBox(height: 12),
-
-                  // النص
                   const Text(
                     'Are you sure you want to delete this course? This action cannot be undone.',
                     textAlign: TextAlign.center,
@@ -74,14 +67,13 @@ void showDeleteCourseDialog({
                     ),
                   ),
                   const SizedBox(height: 30),
-
-                  // الأزرار
                   Row(
                     children: [
-                      // زر الإلغاء
                       Expanded(
                         child: TextButton(
-                          onPressed: isLoading ? null : () => Navigator.of(dialogContext).pop(),
+                          onPressed: isLoading
+                              ? null
+                              : () => Navigator.of(dialogContext).pop(),
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
@@ -93,7 +85,7 @@ void showDeleteCourseDialog({
                             ),
                           ),
                           child: const Text(
-                           'Cancel',
+                            'Cancel',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -102,77 +94,163 @@ void showDeleteCourseDialog({
                           ),
                         ),
                       ),
-                      SizedBox(width: 12),
-
-                      // زر الحذف
+                      const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: isLoading ? null : () async {
-                            setDialogState(() {
-                              isLoading = true;
-                            });
-                            
-                            try {
-                              // Add your delete course logic here
-                              // courseDetailsCubit.emitDeleteCourse(courseId);
-                              
-                              await Future.delayed(Duration(seconds: 2));
-                              
-                              Navigator.of(dialogContext).pop();
-                              
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Icon(Icons.check_circle, color: Colors.white),
-                                      SizedBox(width: 8),
-                                      Text('Course deleted successfully.'),
-                                    ],
-                                  ),
-                                  backgroundColor: Colors.red,
-                                  duration: Duration(seconds: 3),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              );
-                              
-                              // Navigate back after deletion
-                              context.pop();
-                              
-                            } catch (e) {
-                              print('Error: $e');
-                              Navigator.of(dialogContext).pop();
-                              
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("An error occurred while deleting the course."),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          },
+                          onPressed: isLoading
+                              ? null
+                              : () async {
+                                  setDialogState(() {
+                                    isLoading = true;
+                                  });
+
+                                  try {
+                                    final response = await courseDetailsCubit
+                                        .emitDeleteCourse(courseId);
+                                    final statusCode = response.statusCode;
+                                    final message = response.data['message'] ??
+                                        'Something went wrong';
+
+                                    Icon icon;
+                                    String title;
+
+                                    if (statusCode == 200 ||
+                                        statusCode == 204) {
+                                      icon = const Icon(Icons.check_circle,
+                                          color: Colors.green);
+                                      title = 'Success';
+                                    } else if (statusCode == 400 ||
+                                        statusCode == 403 ||
+                                        statusCode == 404) {
+                                      icon = const Icon(Icons.warning,
+                                          color: Colors.amber);
+                                      title = 'Delete Failed';
+                                    } else {
+                                      throw Exception(
+                                          'Unexpected status code: $statusCode');
+                                    }
+
+                                    showDialog(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: Row(
+                                          children: [
+                                            icon,
+                                            const SizedBox(width: 8),
+                                            Text(title,
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ],
+                                        ),
+                                        content: Text(message,
+                                            style:
+                                                const TextStyle(fontSize: 16)),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(ctx).pop();
+                                              Navigator.of(dialogContext).pop();
+                                              if (statusCode == 200 ||
+                                                  statusCode == 204) {
+                                                context.go(
+                                                  Routes.instructorProfilePage,
+                                                  extra: {
+                                                    'deletedCourseId': courseId
+                                                  },
+                                                );
+                                              }
+                                            },
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: Colors.white,
+                                              backgroundColor:
+                                                  const Color(0xFF02457A),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 12),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } catch (e) {
+                                    Navigator.of(dialogContext).pop();
+                                    showDialog(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: Row(
+                                          children: const [
+                                            Icon(Icons.error,
+                                                color: Colors.red),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'Error',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                        content: const Text(
+                                          'Something went wrong while deleting the course.',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(ctx).pop(),
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: Colors.white,
+                                              backgroundColor:
+                                                  const Color(0xFF02457A),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 12),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
-                            padding: EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             elevation: 2,
                           ),
                           child: isLoading
-                              ? SizedBox(
+                              ? const SizedBox(
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
-                                    ),
+                                        Colors.white),
                                   ),
                                 )
-                              : Text(
+                              : const Text(
                                   'Delete',
                                   style: TextStyle(
                                     fontSize: 16,

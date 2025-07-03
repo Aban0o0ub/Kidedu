@@ -234,7 +234,9 @@ class _CourseCardState extends State<CourseCard> {
                 : BlocConsumer<CartCubit, CartState>(
                     listener: (context, state) {
                       // إيقاف الـ local loading عند انتهاء العملية
-                      if (state is AddCartSuccess || state is AddCartFailure) {
+                      if (state is AddCartSuccess || 
+                          state is AddCartFailure || 
+                          state is RemoveCartSuccess) {
                         if (mounted) {
                           setState(() {
                             _isLocalLoading = false;
@@ -253,10 +255,18 @@ class _CourseCardState extends State<CourseCard> {
                           ),
                         );
                       }
+                      
+                      // الحل: إضافة listener للـ RemoveCartSuccess لتحديث الحالة
+                      if (state is RemoveCartSuccess) {
+                        // هنا الـ widget هيتحديث تلقائياً عن طريق الـ builder
+                        // لأن الـ buildWhen بيسمع للـ RemoveCartSuccess
+                      }
                     },
                     buildWhen: (previous, current) =>
                         current is CartStatusChanged ||
-                        current is CartInitial,
+                        current is CartInitial ||
+                        current is RemoveCartSuccess ||
+                        current is AddCartSuccess,
                     builder: (context, state) {
                       final cartCubit = context.read<CartCubit>();
                       final courseId = widget.id ?? '';

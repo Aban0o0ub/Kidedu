@@ -1,9 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/helper/cache_helper.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/widgets/appbar.dart';
+import '../../../../core/widgets/language_settings.dart';
 import '../widgets/theme_provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -23,7 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Settings',
+        title: 'Settings'.tr(),
         onBackPressed: () => Navigator.pop(context),
       ),
       body: SingleChildScrollView(
@@ -34,7 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               _buildSwitchTile(
                 icon: Icons.dark_mode,
-                text: "Dark mode",
+                text: "dark_mode".tr(),
                 value: themeProvider.isDarkMode, // ✅ صحيح
                 onChanged: (value) {
                   // ✅ الحل الصحيح
@@ -44,7 +46,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildDivider(),
               _buildSwitchTile(
                 icon: Icons.notifications,
-                text: "Notifications",
+                text: "notifications".tr(),
                 value: isNotificationsEnabled,
                 onChanged: (val) {
                   setState(() {
@@ -53,14 +55,24 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
               ),
               _buildDivider(),
-              _buildListTile(Icons.payment, "Payment"),
+              _buildListTile(
+                Icons.payment,
+                "payment".tr(),
+              ),
               _buildDivider(),
-              _buildListTile(Icons.language, "Language",
-                  trailingText: "English", showArrow: true),
+              _buildListTile(
+                Icons.language,
+                "language".tr(),
+                trailingText: context.locale.languageCode == 'ar'
+                    ? 'arabic'.tr()
+                    : 'english'.tr(),
+                showArrow: true,
+                onTap: () => LanguageBottomSheet.show(context),
+              ),
               _buildDivider(),
               _buildListTile(
                 Icons.lock,
-                "Change Password",
+                "Change Password".tr(),
                 onTap: () {
                   FocusScope.of(context).unfocus();
                   context.push(Routes.changePassword);
@@ -69,7 +81,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildDivider(),
               _buildListTile(
                 Icons.privacy_tip,
-                "Privacy Policy",
+                "Privacy Policy".tr(),
                 showArrow: false,
                 onTap: () {
                   context.push(Routes.policyPage);
@@ -78,7 +90,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildDivider(),
               _buildListTile(
                 Icons.description,
-                "Terms And Conditions",
+                "Terms And Conditions".tr(),
                 showArrow: false,
                 onTap: () {
                   context.push(Routes.conditionsPage);
@@ -86,10 +98,10 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               const SizedBox(height: 20),
               _buildDivider(),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
-                  "Contact Us",
+                  "Contact Us".tr(),
                   style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 24,
@@ -112,7 +124,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   InkWell(
                     onTap: () {},
                     child: Image.asset(
-                      'assets/images/facebookicon.png',
+                      'assets/images/whatsapp.jpeg',
                       width: 40,
                       height: 40,
                     ),
@@ -120,7 +132,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   InkWell(
                     onTap: () {},
                     child: Image.asset(
-                      'assets/images/facebookicon.png',
+                      'assets/images/linkedin.jpeg',
                       width: 40,
                       height: 40,
                     ),
@@ -128,30 +140,35 @@ class _SettingsPageState extends State<SettingsPage> {
                   InkWell(
                     onTap: () {},
                     child: Image.asset(
-                      'assets/images/facebookicon.png',
+                      'assets/images/github.jpeg',
                       width: 40,
                       height: 40,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height:16),
               Center(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SizedBox(
-                    width: double.infinity,
+                    width: 200,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30), 
+                        ),
                       ),
                       onPressed: () {
                         _showLogoutConfirmationDialog(context);
                       },
-                      child: const Text(
-                        "Logout",
-                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      child: Text(
+                        "Logout".tr(),
+                        style: const TextStyle(
+                            fontSize: 16,color: Colors.white),
                       ),
                     ),
                   ),
@@ -203,7 +220,8 @@ Widget _buildListTile(
     leading: Icon(icon, color: const Color(0xFF02457A)),
     title: Text(
       text,
-      style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 24),
+      style: const TextStyle(
+          fontWeight: FontWeight.w500, fontSize: 24, color: Color(0xFF02457A)),
     ),
     trailing: trailingText != null
         ? Text(trailingText, style: const TextStyle(color: Colors.grey))

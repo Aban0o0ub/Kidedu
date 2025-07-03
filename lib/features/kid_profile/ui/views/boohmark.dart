@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:loginpage/core/widgets/appbar.dart';
 import '../../../home/ui/widgets/course_card.dart';
@@ -27,7 +28,7 @@ class _BookmarkedCoursesPageState extends State<BookmarkedCoursesPage> {
         }
       },
       child: Scaffold(
-        appBar: CustomAppBar(title: "Bookmark",onBackPressed: () => Navigator.pop(context),),
+        appBar: CustomAppBar(title: "Bookmark".tr(),onBackPressed: () => Navigator.pop(context),),
         body: widget.bookmarkedCourses.isEmpty
             ? const Center(
                 child: Column(
