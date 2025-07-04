@@ -105,6 +105,8 @@ class CaptionContent extends StatelessWidget {
     );
   }
 
+
+
   Widget _buildPlayfulDivider() {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 16),

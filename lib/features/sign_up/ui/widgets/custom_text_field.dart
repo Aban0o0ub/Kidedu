@@ -58,11 +58,25 @@ class CustomTextFieldState extends State<CustomTextField> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.label,
-            style: const TextStyle(
-              color: Color(0xFF02457A),
-              fontSize: 24,
+          RichText(
+            text: TextSpan(
+              text: widget.label,
+              style: const TextStyle(
+                color: Color(0xFF02457A),
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+              ),
+              children: [
+                if (widget.isRequired)
+                  const TextSpan(
+                    text: ' *',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+              ],
             ),
           ),
           TextFormField(
@@ -78,7 +92,7 @@ class CustomTextFieldState extends State<CustomTextField> {
             onTap: widget.onTap, 
             decoration: InputDecoration(
               contentPadding: widget.hasIcon
-                  ? widget.contentPadding
+                  ? const EdgeInsets.symmetric(vertical: 16, horizontal: 12)
                   : const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
               prefixIcon: widget.hasIcon && widget.icon != null
                   ? Icon(

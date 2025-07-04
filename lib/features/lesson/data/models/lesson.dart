@@ -9,6 +9,7 @@ class LessonModel {
   final String? quiz;
   final String? description;
   final String? youtubeVideoUrl;
+  final List<String>? images;  // Added support for multiple images
   final DateTime createdAt;
   final bool isFinalLesson;
 
@@ -19,12 +20,26 @@ class LessonModel {
     required this.instructorId,
     this.description,
     this.youtubeVideoUrl,
+    this.images,  // Added images parameter
     required this.createdAt,
     this.quiz,
     required this.isFinalLesson,
   });
 
   factory LessonModel.fromJson(Map<String, dynamic> json) {
+    // Handle images array
+    List<String>? imagesList;
+    if (json['images'] != null) {
+      if (json['images'] is List) {
+        imagesList = (json['images'] as List)
+            .where((img) => img != null && img.toString().isNotEmpty)
+            .map((img) => img.toString())
+            .toList();
+      } else if (json['images'] is String && json['images'].toString().isNotEmpty) {
+        imagesList = [json['images'].toString()];
+      }
+    }
+
     return LessonModel(
       id: json['_id']?.toString() ?? json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
@@ -32,6 +47,7 @@ class LessonModel {
       instructorId: json['instructorId']?.toString() ?? '',
       description: json['description']?.toString(),
       youtubeVideoUrl: json['youtubeVideoUrl']?.toString(),
+      images: imagesList,  // Added images handling
       quiz: json['quiz']?.toString(),
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now()
@@ -72,7 +88,7 @@ class LessonCreateRequest {
   final String name;
   final String description;
   final String youtubeVideoUrl;
-  final List<File> files;
+  final List<File> files;  // Already supports multiple files
 
   LessonCreateRequest({
     required this.sectionId,

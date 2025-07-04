@@ -116,6 +116,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false, // Keep navigation bar fixed when keyboard appears
       body: Stack(
         children: [
           IndexedStack(

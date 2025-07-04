@@ -49,10 +49,27 @@ class _KidProfilePageState extends State<KidProfilePage> {
                         Stack(
                           alignment: Alignment.bottomRight,
                           children: [
-                            const CircleAvatar(
-                              radius: 60,
-                              backgroundImage:
-                                  AssetImage('assets/images/kidprofile.jpeg'),
+                            BlocBuilder<KidProfileCubit, KidProfileState>(
+                              builder: (context, state) {
+                                if (state is KidProfileSuccess) {
+                                  final kid = state.kid;
+                                  return CircleAvatar(
+                                    radius: 60,
+                                    backgroundImage: (kid.image != null && kid.image!.isNotEmpty)
+                                        ? (kid.image!.startsWith('http') || kid.image!.startsWith('/uploads/'))
+                                            ? NetworkImage(kid.image!.startsWith('http') 
+                                                ? kid.image! 
+                                                : 'http://192.168.1.3:3000${kid.image}')
+                                            : AssetImage('assets/images/kidprofile.jpeg')
+                                        : const AssetImage('assets/images/kidprofile.jpeg') as ImageProvider,
+                                  );
+                                } else {
+                                  return const CircleAvatar(
+                                    radius: 60,
+                                    backgroundImage: AssetImage('assets/images/kidprofile.jpeg'),
+                                  );
+                                }
+                              },
                             ),
                             CircleAvatar(
                               radius: 16,

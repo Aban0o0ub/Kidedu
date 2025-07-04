@@ -167,6 +167,7 @@ class _ViewLessonState extends State<ViewLesson> {
                                       currentLesson.youtubeVideoUrl ?? "",
                                   lessonName: currentLesson.name,
                                   description: currentLesson.description,
+                                  lesson: currentLesson, // Pass the lesson for images
                                 ),
                                 LessonTabs(
                                   selectedIndex: selectedIndex,

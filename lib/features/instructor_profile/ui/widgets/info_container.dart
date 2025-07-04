@@ -81,21 +81,23 @@ Widget buildInfoContainer({
                 color: Color(0xFF02457A),
               ),
             ),
-            IconButton(
-              onPressed: () {
-                _showEditDialog(
-                  context: context,
-                  header: header,
-                  text: text,
-                  name: name,
-                  phone: phone,
-                  email: email,
-                  governorate: governorate,
-                  title: title,
-                );
-              },
-              icon: const Icon(Icons.edit, color: Color(0xFF02457A)),
-            ),
+            // أخفي إيقون التعديل لو showEditButton هو false
+            if (showEditButton)
+              IconButton(
+                onPressed: () {
+                  _showEditDialog(
+                    context: context,
+                    header: header,
+                    text: text,
+                    name: name,
+                    phone: phone,
+                    email: email,
+                    governorate: governorate,
+                    title: title,
+                  );
+                },
+                icon: const Icon(Icons.edit, color: Color(0xFF02457A)),
+              ),
           ],
         ),
         const SizedBox(height: 8),

@@ -34,11 +34,25 @@ class CustomDropdownField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFF02457A),
-              fontSize: 24,
+          RichText(
+            text: TextSpan(
+              text: label,
+              style: const TextStyle(
+                color: Color(0xFF02457A),
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+              ),
+              children: [
+                if (isRequired)
+                  const TextSpan(
+                    text: ' *',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+              ],
             ),
           ),
           SizedBox(
@@ -63,7 +77,7 @@ class CustomDropdownField extends StatelessWidget {
                   icon,
                   color: const Color(0xFF9D9D9D),
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 15),
+                contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
                 hintText: hintText,
                 hintStyle: const TextStyle(
                   color: Color(0xFF9D9D9D),

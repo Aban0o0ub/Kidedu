@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:loginpage/core/helper/cache_helper.dart';
 import 'package:loginpage/features/add_course/data/models/Course_Model.dart';
@@ -170,7 +171,7 @@ class WebServices {
           formFields['PhoneNumber'] = kidData.phoneNumber;
         }
 
-        formFields['Image'] = await MultipartFile.fromFile(kidData.image!);
+        formFields['image'] = await MultipartFile.fromFile(kidData.image!);
 
         FormData formData = FormData.fromMap(formFields);
 
@@ -324,7 +325,7 @@ class WebServices {
               instructorData.experience; // تأكد إن ده موجود
         }
 
-        formFields['Image'] =
+        formFields['image'] =
             await MultipartFile.fromFile(instructorData.image!);
 
         FormData formData = FormData.fromMap(formFields);
@@ -339,7 +340,14 @@ class WebServices {
         );
 
         if (response.statusCode == 200) {
-          return InstructorResponse.fromJson(response.data);
+          print('DEBUG: Raw response data: ${response.data}');
+          
+          // الـ model بيدعم الـ response structure بالفعل
+          final instructorResponse = InstructorResponse.fromJson(response.data);
+          
+          print('DEBUG: Parsed instructor response: ${instructorResponse.data?.instructor?.name}');
+          
+          return instructorResponse;
         } else {
           throw Exception("Update failed: ${response.statusMessage}");
         }
@@ -374,7 +382,13 @@ class WebServices {
         );
 
         if (response.statusCode == 200) {
-          return InstructorResponse.fromJson(response.data);
+          print('DEBUG: Raw response data (no image): ${response.data}');
+          
+          final instructorResponse = InstructorResponse.fromJson(response.data);
+          
+          print('DEBUG: Parsed instructor response (no image): ${instructorResponse.data?.instructor?.name}');
+          
+          return instructorResponse;
         } else {
           throw Exception("Update failed: ${response.statusMessage}");
         }
@@ -390,15 +404,71 @@ class WebServices {
       if (token == null) {
         throw Exception('Missing token');
       }
-      final response = await dio.post(
-        'course',
-        data: newCourse.toJson(),
-        options: Options(
-          headers: {
-            'token': 'Bearer $token',
-          },
-        ),
-      );
+
+      // Check if we have local images to upload
+      bool hasLocalImages = newCourse.courseImages != null && 
+          newCourse.courseImages!.isNotEmpty &&
+          newCourse.courseImages!.any((image) => !image.startsWith('http'));
+
+      Response response;
+
+      if (hasLocalImages) {
+        // Use FormData for file upload
+        Map<String, dynamic> formFields = newCourse.toJson();
+        
+        // Remove the courseImages from formFields 
+        formFields.remove('course_image');
+        
+        // Create FormData first
+        FormData formData = FormData.fromMap(formFields);
+        
+                // Add each image file separately for req.files array
+        for (String imagePath in newCourse.courseImages!) {
+          if (!imagePath.startsWith('http')) {
+            // Check if file exists
+            final File file = File(imagePath);
+            if (!file.existsSync()) continue;
+            
+            String fileName = imagePath.split('/').last;
+            
+            // Basic file validation
+            if (file.lengthSync() > 5 * 1024 * 1024) continue;  // 5MB limit
+            
+            // Use clean filename
+            String finalFileName = 'course_image_${DateTime.now().millisecondsSinceEpoch}.jpg';
+            
+            formData.files.add(MapEntry(
+              'images',  // Match backend field name exactly
+              await MultipartFile.fromFile(
+                imagePath,
+                filename: finalFileName,
+              ),
+            ));
+          }
+        }
+
+        response = await dio.post(
+          'course',
+          data: formData,
+          options: Options(
+            headers: {
+              'token': 'Bearer $token',
+            },
+          ),
+        );
+      } else {
+        // Use regular JSON for courses without new images (editing with existing images)
+        response = await dio.post(
+          'course',
+          data: newCourse.toJson(),
+          options: Options(
+            headers: {
+              'token': 'Bearer $token',
+            },
+          ),
+        );
+      }
+
       final responseData = response.data;
       if (responseData is Map<String, dynamic> &&
           responseData.containsKey('data')) {
@@ -771,6 +841,25 @@ class WebServices {
       };
 
       final formData = FormData.fromMap(formDataMap);
+
+      // Add multiple image files
+      for (File file in newLesson.files) {
+        if (file.existsSync()) {
+          // Basic file validation
+          if (file.lengthSync() > 5 * 1024 * 1024) continue;  // 5MB limit
+          
+          // Use clean filename
+          String finalFileName = 'lesson_image_${DateTime.now().millisecondsSinceEpoch}.jpg';
+          
+          formData.files.add(MapEntry(
+            'files',  // Match backend field name exactly
+            await MultipartFile.fromFile(
+              file.path,
+              filename: finalFileName,
+            ),
+          ));
+        }
+      }
 
       final response = await dio.post(
         'lesson/${newLesson.sectionId}',
@@ -1427,3 +1516,4 @@ Future<CourseResponse> updateCourse({
     }
   }
 }
+

@@ -23,6 +23,26 @@ class _DiscountedCoursesCarouselState extends State<DiscountedCoursesCarousel> {
     super.initState();
   }
 
+  String? _getFirstValidImage(List<String>? images) {
+    if (images == null || images.isEmpty) return null;
+    
+    for (String image in images) {
+      if (image.isNotEmpty) {
+        return image;
+      }
+    }
+    return null;
+  }
+  
+  String _getFullImageUrl(String imagePath) {
+    if (imagePath.startsWith('/uploads/')) {
+      return 'http://192.168.1.3:3000$imagePath';
+    } else if (!imagePath.startsWith('http')) {
+      return 'http://192.168.1.3:3000$imagePath';
+    }
+    return imagePath;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DiscountedCoursesCubit, DiscountedCoursesState>(
@@ -196,9 +216,9 @@ class _DiscountedCoursesCarouselState extends State<DiscountedCoursesCarousel> {
             fit: StackFit.expand,
             children: [
               // Course Image
-              course.courseImage != null && course.courseImage!.isNotEmpty
+              _getFirstValidImage(course.courseImages) != null
                   ? Image.network(
-                      course.courseImage!,
+                      _getFullImageUrl(_getFirstValidImage(course.courseImages)!),
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Image.asset(

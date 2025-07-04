@@ -183,14 +183,17 @@ class _CourseDetailsState extends State<CourseDetails> {
                                       "No description available",
                                 ),
 
-                                const SizedBox(height: 15),
+                                // Content Section (only for online courses)
+                                if (course.availability?.toLowerCase() != "offline") ...[
+                                  const SizedBox(height: 15),
+                                  CourseContentSection(
+                                    courseId: courseId,
+                                    isCourseEnded: isCourseEnded,
+                                    onEndCourse: _showEndCourseDialog,
+                                  ),
+                                ],
 
-                                // Content Section (only for instructors)
-                                CourseContentSection(
-                                  courseId: courseId,
-                                  isCourseEnded: isCourseEnded,
-                                  onEndCourse: _showEndCourseDialog,
-                                ),
+                                const SizedBox(height: 15),
 
                                 // Reviews Section
                                 CourseReviewsSection(courseId: courseId),

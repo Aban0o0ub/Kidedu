@@ -25,10 +25,43 @@ Widget buildCourseBox({
               topLeft: Radius.circular(10),
               topRight: Radius.circular(10),
             ),
-            child: Image.asset(
-              imagePath,
-              fit: BoxFit.cover,
-            ),
+            child: imagePath.startsWith('assets/') 
+                ? Image.asset(
+                    imagePath,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.image_not_supported),
+                      );
+                    },
+                  )
+                : imagePath.startsWith('/uploads/') || imagePath.startsWith('http')
+                    ? Image.network(
+                        imagePath.startsWith('/uploads/') 
+                            ? 'http://192.168.1.3:3000$imagePath'
+                            : imagePath,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/CourseDefaultPhoto.jpeg',
+                            fit: BoxFit.cover,
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        'assets/images/CourseDefaultPhoto.jpeg',
+                        fit: BoxFit.cover,
+                      ),
           ),
         ),
         // Description at the bottom

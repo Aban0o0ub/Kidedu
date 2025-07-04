@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -32,6 +33,9 @@ class _AddCoursePageState extends State<AddCoursePage> {
   final TextEditingController startcontroller = TextEditingController();
   final TextEditingController endcontroller = TextEditingController();
 
+  List<File> _selectedImages = [];
+  List<String>? _editingCourseImages;
+
   final List<String> courseitems = ['Beginner', 'Intermediate', 'Advanced'];
   final List<String> availabilityitems = ['Online', 'Offline'];
   final List<String> offeritems = ['10%', '20%', '30%', '50%'];
@@ -65,6 +69,9 @@ class _AddCoursePageState extends State<AddCoursePage> {
           course.endDate?.toIso8601String().split('T').first ?? '';
       selectedAges =
           course.suitableAges?.map((e) => e.toString()).toList() ?? [];
+      
+      // Set existing course images for editing
+      _editingCourseImages = course.courseImages;
     }
   }
 
@@ -156,7 +163,14 @@ class _AddCoursePageState extends State<AddCoursePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const HeaderImage(),
+                    HeaderImage(
+                      onImagesSelected: (images) {
+                        setState(() {
+                          _selectedImages = images;
+                        });
+                      },
+                      initialImages: _editingCourseImages,
+                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24.0),
                       child: Column(
@@ -165,10 +179,10 @@ class _AddCoursePageState extends State<AddCoursePage> {
                           const SizedBox(height: 15),
                           CustomTextField(
                             controller: addcourseController,
-                            label: 'Course Name:-',
+                            label: 'Course Name:',
                             hintText: 'Add course name',
                             keyboardType: TextInputType.name,
-                            contentPadding: const EdgeInsets.only(left: 20),
+                            width: double.infinity,
                           ),
                           const SizedBox(height: 15),
                           CustomDropdownField(
@@ -179,103 +193,133 @@ class _AddCoursePageState extends State<AddCoursePage> {
                             width: double.infinity,
                           ),
                           const SizedBox(height: 15),
-                          Row(
+                          CustomDropdownField(
+                            label: "Availability:",
+                            hintText: 'Select',
+                            controller: availabilitycontroller,
+                            items: availabilityitems,
+                            width: double.infinity,
+                            onChanged: (value) {
+                              setState(() {
+                                availabilitycontroller.text = value ?? '';
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 15),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: CustomDropdownField(
-                                  label: "Availability:",
-                                  hintText: 'Select',
-                                  controller: availabilitycontroller,
-                                  items: availabilityitems,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      availabilitycontroller.text = value ?? '';
-                                    });
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                              RichText(
+                                text: const TextSpan(
+                                  text: 'Age:',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF02457A),
+                                  ),
                                   children: [
-                                    const Text(
-                                      'Age:',
+                                    TextSpan(
+                                      text: ' *',
                                       style: TextStyle(
+                                        color: Colors.red,
                                         fontSize: 24,
                                         fontWeight: FontWeight.w600,
-                                        color: Color(0xFF02457A),
-                                      ),
-                                    ),
-                                    MultiSelectDialogField(
-                                      items: ageitems
-                                          .map((e) =>
-                                              MultiSelectItem<String>(e, e))
-                                          .toList(),
-                                      title: const Text("Select Ages"),
-                                      selectedColor: const Color(0xFF02457A),
-                                      buttonText: const Text("Select age(s)"),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: const Color(0xFF02457A),
-                                          width: 1.5,
-                                        ),
-                                      ),
-                                      onConfirm: (results) {
-                                        setState(() {
-                                          selectedAges = results.cast<String>();
-                                        });
-                                      },
-                                      chipDisplay: MultiSelectChipDisplay(
-                                        onTap: (value) {
-                                          setState(() {
-                                            selectedAges.remove(value);
-                                          });
-                                        },
                                       ),
                                     ),
                                   ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 56,
+                                width: double.infinity,
+                                child: MultiSelectDialogField(
+                                  items: ageitems
+                                      .map((e) =>
+                                          MultiSelectItem<String>(e, e))
+                                      .toList(),
+                                  title: const Text("Select Ages"),
+                                  selectedColor: const Color(0xFF02457A),
+                                  buttonText: const Text(
+                                    "Select age(s)",
+                                    style: TextStyle(
+                                      color: Color(0xFF9D9D9D),
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: const Color(0xFF02457A),
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  buttonIcon: const Icon(
+                                    Icons.arrow_drop_down,
+                                    color: Color(0xFF02457A),
+                                  ),
+                                  dialogHeight: 300,
+                                  dialogWidth: 300,
+                                  onConfirm: (results) {
+                                    setState(() {
+                                      selectedAges = results.cast<String>();
+                                    });
+                                  },
+                                  chipDisplay: MultiSelectChipDisplay(
+                                    onTap: (value) {
+                                      setState(() {
+                                        selectedAges.remove(value);
+                                      });
+                                    },
+                                    chipColor: const Color(0xFF02457A).withOpacity(0.1),
+                                    textStyle: const TextStyle(
+                                      color: Color(0xFF02457A),
+                                      fontSize: 12,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 15),
                           CustomTextField(
-                            label: 'Price:-',
+                            label: 'Price:',
                             hintText: 'Enter price',
                             controller: pricecontroller,
                             keyboardType: TextInputType.number,
+                            width: double.infinity,
                           ),
                           const SizedBox(height: 15),
                           Row(
                             children: [
                               Expanded(
-                                flex: 2,
+                                flex: 1,
                                 child: CustomTextField(
                                   label: 'Offer:',
                                   hintText: 'Enter percent',
                                   controller: offercontroller,
                                   keyboardType: TextInputType.number,
+                                  isRequired: false,
+                                  width: double.infinity,
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: 15),
                               Expanded(
-                                flex: 2,
+                                flex: 1,
                                 child: CustomDropdownField(
                                   label: 'Till:',
                                   hintText: 'Select',
                                   controller: tillcontroller,
                                   items: offeritems,
                                   width: double.infinity,
+                                  isRequired: false,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 15),
                           CustomDropdownField(
-                            label: 'Category',
+                            label: 'Category:',
                             hintText: 'select category',
                             controller: categorycontroller,
                             items: categoryitems,
@@ -283,28 +327,43 @@ class _AddCoursePageState extends State<AddCoursePage> {
                           ),
                           const SizedBox(height: 15),
                           CustomTextField(
-                            label: 'Description:-',
+                            label: 'Description:',
                             hintText: 'Tell us about your course ...',
                             controller: descriptioncontroller,
+                            width: double.infinity,
+                            maxLines: 4,
                           ),
                           const SizedBox(height: 15),
-                          const Text(
-                            "Schedule:-",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.normal,
-                              color: Color(0xFF02457A),
+                          RichText(
+                            text: const TextSpan(
+                              text: "Schedule:",
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF02457A),
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: ' *',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           Row(
                             children: [
                               Expanded(
-                                flex: 2,
+                                flex: 1,
                                 child: CustomTextField(
                                   label: 'Start date',
                                   hintText: 'Pick a date',
                                   controller: startcontroller,
                                   readOnly: true,
+                                  width: double.infinity,
                                   suffixIcon:
                                       const Icon(Icons.date_range_outlined),
                                   onTap: () async {
@@ -323,14 +382,15 @@ class _AddCoursePageState extends State<AddCoursePage> {
                                   },
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: 15),
                               Expanded(
-                                flex: 2,
+                                flex: 1,
                                 child: CustomTextField(
                                   label: 'End date',
                                   hintText: 'Pick a date',
                                   controller: endcontroller,
                                   readOnly: true,
+                                  width: double.infinity,
                                   suffixIcon:
                                       const Icon(Icons.date_range_outlined),
                                   onTap: () async {
@@ -379,6 +439,9 @@ class _AddCoursePageState extends State<AddCoursePage> {
                                   startDate: startDate,
                                   endDate: endDate,
                                   suitableAges: suitableAgesParsed,
+                                  courseImages: _selectedImages.isNotEmpty 
+                                      ? _selectedImages.map((file) => file.path).toList()
+                                      : _editingCourseImages,
                                 );
 
                                 final cubit =

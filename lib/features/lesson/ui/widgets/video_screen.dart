@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import '../../data/models/lesson.dart';
 
 // ignore: must_be_immutable
 class VideoLesson extends StatefulWidget {
@@ -8,11 +9,13 @@ class VideoLesson extends StatefulWidget {
     required this.videoLink,
     this.lessonName,
     this.description,
+    this.lesson, // Add lesson parameter for images
   });
 
   final String videoLink;
   final String? lessonName;
   final String? description;
+  final LessonModel? lesson;
 
   @override
   State<VideoLesson> createState() => _VideoLessonState();
@@ -24,6 +27,10 @@ class _VideoLessonState extends State<VideoLesson>
   late AnimationController _sparkleController;
   late Animation<double> _sparkleAnimation;
   bool _showReward = false;
+  
+  // For image carousel
+  PageController _imagePageController = PageController();
+  int _currentImageIndex = 0;
 
   @override
   void initState() {
@@ -179,9 +186,256 @@ class _VideoLessonState extends State<VideoLesson>
     );
   }
 
+  Widget _buildImageCarousel() {
+    final images = widget.lesson!.images!
+        .where((img) => img.isNotEmpty)
+        .toList();
+
+    return Container(
+      margin: EdgeInsets.all(16),
+      child: Column(
+        children: [
+          // Image carousel with nice frame
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.grey.withOpacity(0.8),
+                  Color(0xff02457A).withOpacity(0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 15,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            padding: EdgeInsets.all(12),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 3,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(13),
+                    child: Stack(
+                      children: [
+                        // Image PageView
+                        PageView.builder(
+                          controller: _imagePageController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentImageIndex = index;
+                            });
+                          },
+                          itemCount: images.length,
+                          itemBuilder: (context, index) {
+                            return _buildImage(images[index]);
+                          },
+                        ),
+                        
+                        // Navigation arrows (only show if more than 1 image)
+                        if (images.length > 1) ...[
+                          // Left arrow
+                          Positioned(
+                            left: 16,
+                            top: 0,
+                            bottom: 0,
+                            child: Center(
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (_currentImageIndex > 0) {
+                                    _imagePageController.previousPage(
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.5),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.arrow_back_ios,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          
+                          // Right arrow
+                          Positioned(
+                            right: 16,
+                            top: 0,
+                            bottom: 0,
+                            child: Center(
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (_currentImageIndex < images.length - 1) {
+                                    _imagePageController.nextPage(
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.5),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        
+                        // Dots indicator (only show if more than 1 image)
+                        if (images.length > 1)
+                          Positioned(
+                            bottom: 16,
+                            left: 0,
+                            right: 0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(
+                                images.length,
+                                (index) => Container(
+                                  width: 8,
+                                  height: 8,
+                                  margin: EdgeInsets.symmetric(horizontal: 4),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: _currentImageIndex == index 
+                                        ? Colors.white
+                                        : Colors.white.withOpacity(0.4),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImage(String imagePath) {
+    if (imagePath.isEmpty) {
+      return Container(
+        color: Colors.grey[300],
+        child: Center(
+          child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+        ),
+      );
+    }
+
+    // Handle network images
+    if (imagePath.startsWith('/uploads/')) {
+      final fullUrl = 'http://192.168.1.3:3000$imagePath';
+      return Image.network(
+        fullUrl,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[300],
+            child: Center(
+              child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+            ),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            color: Colors.grey[200],
+            child: Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            ),
+          );
+        },
+      );
+    } else if (imagePath.startsWith('http')) {
+      return Image.network(
+        imagePath,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[300],
+            child: Center(
+              child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+            ),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            color: Colors.grey[200],
+            child: Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      // Handle asset images
+      return Image.asset(
+        imagePath,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[300],
+            child: Center(
+              child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+            ),
+          );
+        },
+      );
+    }
+  }
+
   @override
   void dispose() {
     _sparkleController.dispose();
+    _imagePageController.dispose(); // Dispose image page controller
 
     if (_controller != null) {
       try {
@@ -196,112 +450,128 @@ class _VideoLessonState extends State<VideoLesson>
 
   @override
   Widget build(BuildContext context) {
-    return _controller != null
-        ? YoutubePlayerBuilder(
-            player: YoutubePlayer(
-              controller: _controller!,
-              showVideoProgressIndicator: true,
-              progressIndicatorColor: Colors.deepPurple,
-              onReady: () {
-                debugPrint("Player is ready.");
-              },
-            ),
-            builder: (context, player) {
-              return Container(
-                margin: EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    // Video player with nice frame
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.grey.withOpacity(0.8),
-                            Color(0xff02457A).withOpacity(0.8),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 15,
-                            offset: Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      padding: EdgeInsets.all(12),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 3,
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(13),
-                              child: player,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          )
-        : Container(
+    // Check if we have a valid YouTube video
+    bool hasVideo = _controller != null && widget.videoLink.isNotEmpty;
+    
+    // Check if we have lesson images
+    bool hasImages = widget.lesson?.images != null && 
+                    widget.lesson!.images!.isNotEmpty &&
+                    widget.lesson!.images!.any((img) => img.isNotEmpty);
+
+    if (hasVideo) {
+      // Show YouTube video
+      return YoutubePlayerBuilder(
+        player: YoutubePlayer(
+          controller: _controller!,
+          showVideoProgressIndicator: true,
+          progressIndicatorColor: Colors.deepPurple,
+          onReady: () {
+            debugPrint("Player is ready.");
+          },
+        ),
+        builder: (context, player) {
+          return Container(
             margin: EdgeInsets.all(16),
-            padding: EdgeInsets.all(40),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.blue.shade200),
-            ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Video player with nice frame
                 Container(
-                  width: 60,
-                  height: 60,
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade100,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.grey.withOpacity(0.8),
+                        Color(0xff02457A).withOpacity(0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 15,
+                        offset: Offset(0, 8),
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Loading your lesson...',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blue.shade700,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Get ready for fun learning!',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.blue.shade500,
+                  padding: EdgeInsets.all(12),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 3,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(13),
+                          child: player,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
           );
+        },
+      );
+    } else if (hasImages) {
+      // Show image carousel
+      return _buildImageCarousel();
+    } else {
+      // Show no content message
+      return Container(
+        margin: EdgeInsets.all(16),
+        padding: EdgeInsets.all(40),
+        decoration: BoxDecoration(
+          color: Colors.orange.shade50,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.orange.shade200),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.orange.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.info_outline,
+                  color: Colors.orange.shade600,
+                  size: 30,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'No Media Available',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.orange.shade700,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'This lesson doesn\'t have video or images yet',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.orange.shade500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
   }
 }

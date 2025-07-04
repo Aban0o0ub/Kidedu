@@ -253,6 +253,7 @@ class SearchPageState extends State<SearchPage> {
       ],
       child: Scaffold(
         backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: true, // Allow content to resize but navigation bar stays fixed
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -269,6 +270,7 @@ class SearchPageState extends State<SearchPage> {
             child: TextField(
               controller: searchController,
               focusNode: searchFocusNode,
+              textInputAction: TextInputAction.search,
               onSubmitted: (value) {
                 searchFocusNode.unfocus();
                 _performSearch(value);
@@ -300,16 +302,23 @@ class SearchPageState extends State<SearchPage> {
             ),
           ],
         ),
-        body: BlocListener<CourseCategoryCubit, CourseCategoryState>(
-          listener: (context, state) {
-            if (state is GetAllCourseSuccess) {
-              setState(() {
-                allCourses = state.allCourses;
-                displayedCourses = [];
-              });
+        body: GestureDetector(
+          onTap: () {
+            // Hide keyboard when tapping outside search field
+            if (searchFocusNode.hasFocus) {
+              searchFocusNode.unfocus();
             }
           },
-          child: BlocBuilder<CourseCategoryCubit, CourseCategoryState>(
+          child: BlocListener<CourseCategoryCubit, CourseCategoryState>(
+            listener: (context, state) {
+              if (state is GetAllCourseSuccess) {
+                setState(() {
+                  allCourses = state.allCourses;
+                  displayedCourses = [];
+                });
+              }
+            },
+            child: BlocBuilder<CourseCategoryCubit, CourseCategoryState>(
             builder: (context, state) {
               if (state is AllCoursesLoading) {
                 return Center(child: CircularProgressIndicator());
@@ -371,9 +380,9 @@ class SearchPageState extends State<SearchPage> {
                                   }
                                 },
                                 child: CourseCard(
-                                  courseImage:
-                                      _isValidNetworkImage(course.courseImage)
-                                          ? course.courseImage!
+                                  courseImages: course.courseImages != null && 
+                                      course.courseImages!.isNotEmpty
+                                          ? course.courseImages!
                                           : null,
                                   courseName: course.courseName ?? '',
                                   instructor: course.instructor?['Name'] ?? '',
@@ -389,6 +398,7 @@ class SearchPageState extends State<SearchPage> {
               return Center(child: Text('Start searching for courses...'));
             },
           ),
+        ),
         ),
       ),
     );

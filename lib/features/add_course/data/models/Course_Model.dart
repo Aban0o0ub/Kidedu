@@ -13,7 +13,7 @@ class CourseRequest {
   num? priceAfterDiscount;
   DateTime? startDate;
   DateTime? endDate;
-  String? courseImage;
+  List<String>? courseImages;
   String? firstSection;
   int? ratingQuantity;
   List<String>? lessons;
@@ -31,7 +31,7 @@ class CourseRequest {
       this.priceAfterDiscount,
       this.startDate,
       this.endDate,
-      this.courseImage,
+      this.courseImages,
       this.firstSection,
       this.ratingQuantity,
       this.lessons,
@@ -53,7 +53,11 @@ class CourseRequest {
           : null,
       endDate:
           json['end_date'] != null ? DateTime.parse(json['end_date']) : null,
-      courseImage: json['course_image'],
+      courseImages: json['course_image'] != null 
+          ? (json['course_image'] is List 
+              ? List<String>.from(json['course_image']) 
+              : [json['course_image'].toString()])
+          : null,
       firstSection: json['first_section'],
       ratingQuantity: json['rating_quantity'],
       lessons:
@@ -77,7 +81,7 @@ class CourseRequest {
       "price_after_discount": priceAfterDiscount,
       "start_date": startDate?.toIso8601String(),
       "end_date": endDate?.toIso8601String(),
-      "course_image": courseImage,
+      "course_image": courseImages,
       "first_section": firstSection,
       "rating_quantity": ratingQuantity,
       "lessons": lessons,
@@ -111,6 +115,17 @@ class CourseResponse {
     if (hasDataWrapper) {
       courseData =
           json['data']['new_course'] ?? json['data']['onlyCourse'] ?? {};
+      
+      // إضافة البيانات الإضافية من الـ response الجديد
+      if (json['data']['instructor'] != null) {
+        courseData['instructor'] = json['data']['instructor'];
+      }
+      if (json['data']['courses'] != null) {
+        courseData['courses'] = json['data']['courses'];
+      }
+      if (json['data']['reviews'] != null) {
+        courseData['reviews'] = json['data']['reviews'];
+      }
     } else {
       courseData = json;
     }
@@ -118,8 +133,7 @@ class CourseResponse {
       status:
           json['status'] ?? (json['success'] == true ? 'success' : 'failed'),
       data: hasDataWrapper
-          ? CourseData.fromJson(
-              json['data']['new_course'] ?? json['data']['onlyCourse'] ?? {})
+          ? CourseData.fromJson(courseData)
           : CourseData.fromJson(courseData),
       courses: json['data'] != null && json['data']['new_course'] is List
           ? List<CourseData>.from(json['data']['new_course']
@@ -178,7 +192,7 @@ class CourseData {
   String? description;
   DateTime? startDate;
   DateTime? endDate;
-  String? courseImage;
+  List<String>? courseImages;
   String? createdAt;
   String? updatedAt;
   int? v;
@@ -214,7 +228,7 @@ class CourseData {
     this.description,
     this.startDate,
     this.endDate,
-    this.courseImage,
+    this.courseImages,
     this.createdAt,
     this.updatedAt,
     this.priceAfterDiscount,
@@ -262,7 +276,11 @@ class CourseData {
         description: json['description']?.toString(),
         startDate: _parseDateTime(json['start_date']),
         endDate: _parseDateTime(json['end_date']),
-        courseImage: json['course_image']?.toString(),
+        courseImages: json['course_image'] != null 
+            ? (json['course_image'] is List 
+                ? List<String>.from(json['course_image']) 
+                : [json['course_image'].toString()])
+            : null,
         createdAt: json['createdAt']?.toString(),
         updatedAt: json['updatedAt']?.toString(),
         v: _parseInt(json['__v']),
@@ -284,10 +302,10 @@ class CourseData {
         // الحقول الموجودة مسبقاً
         instructorCourses: _parseInstructorCourses(json['courses']),
         instructorReviews: _parseInstructorReviews(json['reviews']),
-        // الحقول الجديدة
-        instructorData: json['instructor'], // حفظ بيانات المدرس
-        courses: _parseInstructorCourses(json['courses']), // نفس الـ parsing
-        reviews: _parseInstructorReviews(json['reviews']), // نفس الـ parsing
+        // الحقول الجديدة - البيانات الإضافية من الـ API الجديد
+        instructorData: json['instructor'] is Map<String, dynamic> ? json['instructor'] : null,
+        courses: _parseInstructorCourses(json['courses']),
+        reviews: _parseInstructorReviews(json['reviews']),
       );
     } catch (e) {
       print('Error parsing CourseData: $e');
@@ -412,7 +430,7 @@ class CourseData {
       'description': description,
       "start_date": startDate?.toIso8601String(),
       "end_date": endDate?.toIso8601String(),
-      'course_image': courseImage,
+      'course_image': courseImages,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       '__v': v,
@@ -436,15 +454,16 @@ class CourseData {
 
   // Helper methods للوصول للبيانات
   String? get instructorName {
-  // جرب من الـ instructor الأساسي الأول
-  if (instructor is Map<String, dynamic>) {
-    final name = instructor['Name']?.toString();
+  // جرب من instructorData أولاً (البيانات الجديدة)
+  if (instructorData is Map<String, dynamic>) {
+    final name = instructorData['Name']?.toString();
     if (name != null && name.isNotEmpty) return name;
   }
   
-  // ثم جرب من instructorData
-  if (instructorData is Map<String, dynamic>) {
-    return instructorData['Name']?.toString();
+  // ثم جرب من الـ instructor الأساسي
+  if (instructor is Map<String, dynamic>) {
+    final name = instructor['Name']?.toString();
+    if (name != null && name.isNotEmpty) return name;
   }
   
   return null;
@@ -492,9 +511,16 @@ class CourseData {
 
 
 String? get instructorId {
-  // جرب من الـ instructor الأساسي الأول
+  // جرب من instructorData أولاً (البيانات الجديدة)
+  if (instructorData is Map<String, dynamic>) {
+    final id = instructorData['_id']?.toString();
+    if (id != null && id.isNotEmpty) return id;
+  }
+  
+  // ثم جرب من الـ instructor الأساسي
   if (instructor is Map<String, dynamic>) {
-    return instructor['_id']?.toString();
+    final id = instructor['_id']?.toString();
+    if (id != null && id.isNotEmpty) return id;
   }
   
   // لو كان string، يبقى ده هو الـ ID
@@ -506,13 +532,16 @@ String? get instructorId {
 }
 
 String? get instructorPhone {
-  if (instructor is Map<String, dynamic>) {
-    final phone = instructor['PhoneNumber']?.toString();
+  // جرب من instructorData أولاً (البيانات الجديدة)
+  if (instructorData is Map<String, dynamic>) {
+    final phone = instructorData['PhoneNumber']?.toString();
     if (phone != null && phone.isNotEmpty) return phone;
   }
   
-  if (instructorData is Map<String, dynamic>) {
-    return instructorData['PhoneNumber']?.toString();
+  // ثم جرب من الـ instructor الأساسي
+  if (instructor is Map<String, dynamic>) {
+    final phone = instructor['PhoneNumber']?.toString();
+    if (phone != null && phone.isNotEmpty) return phone;
   }
   
   return null;

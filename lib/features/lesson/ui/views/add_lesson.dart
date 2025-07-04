@@ -58,7 +58,7 @@ class _AddLessonPageState extends State<AddLessonPage> {
   bool showOptions3 = false;
   bool showOptions4 = false;
 
-  File? _selectedImage;
+  List<File> _selectedImages = [];
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -102,12 +102,11 @@ class _AddLessonPageState extends State<AddLessonPage> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
+  Future<void> _pickImages() async {
+    final List<XFile> pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles.isNotEmpty) {
       setState(() {
-        _selectedImage = File(pickedFile.path);
+        _selectedImages = pickedFiles.map((xFile) => File(xFile.path)).toList();
       });
     }
   }
@@ -118,7 +117,7 @@ class _AddLessonPageState extends State<AddLessonPage> {
       lessonNameController.clear();
       captionController.clear();
       linkController.clear();
-      _selectedImage = null;
+      _selectedImages.clear();
 
       quizTitleController.clear();
       passingScoreController.clear();
@@ -230,10 +229,16 @@ class _AddLessonPageState extends State<AddLessonPage> {
     }
 
     bool hasYoutubeLink = linkController.text.trim().isNotEmpty;
-    bool hasImage = _selectedImage != null;
+    bool hasImages = _selectedImages.isNotEmpty;
 
-    if (!hasYoutubeLink && !hasImage) {
-      _showErrorMessage('Please add either a YouTube URL or upload an image');
+    // Check if both video and images are provided
+    if (hasYoutubeLink && hasImages) {
+      _showErrorMessage('Please choose either video OR images, not both');
+      return false;
+    }
+
+    if (!hasYoutubeLink && !hasImages) {
+      _showErrorMessage('Please add either a YouTube URL or upload images');
       return false;
     }
 
@@ -257,12 +262,6 @@ class _AddLessonPageState extends State<AddLessonPage> {
   }
 
   LessonCreateRequest _buildLessonRequest() {
-    List<File> files = [];
-
-    if (_selectedImage != null) {
-      files.add(_selectedImage!);
-    }
-
     return LessonCreateRequest(
       sectionId: selectedSection!,
       name: lessonNameController.text.trim(),
@@ -272,7 +271,7 @@ class _AddLessonPageState extends State<AddLessonPage> {
       youtubeVideoUrl: linkController.text.trim().isEmpty 
           ? "" 
           : linkController.text.trim(),
-      files: files,
+      files: _selectedImages,  // Use the multiple images list
     );
   }
 
@@ -298,8 +297,18 @@ class _AddLessonPageState extends State<AddLessonPage> {
     switch (option) {
       case 2:
         return PhotoOptionWidget(
-          selectedImage: _selectedImage,
-          onPickImage: _pickImage,
+          selectedImages: _selectedImages,
+          onImagesSelected: (images) {
+            if (images.isEmpty) {
+              // This means user clicked the button, trigger image picker
+              _pickImages();
+            } else {
+              // User updated the images list
+              setState(() {
+                _selectedImages = images;
+              });
+            }
+          },
         );
       case 4:
         return CaptionOptionWidget(controller: captionController);

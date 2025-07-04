@@ -5,6 +5,7 @@ import 'package:loginpage/features/instructor_profile/logic/cubit/instructor_pro
 import 'package:loginpage/features/instructor_profile/ui/widgets/course_box.dart';
 import 'package:loginpage/features/instructor_profile/ui/widgets/info_container.dart';
 import 'package:loginpage/features/instructor_profile/ui/widgets/review_card.dart';
+import 'package:loginpage/features/instructor_profile/ui/widgets/blue_section_container.dart';
 import '../../../../core/injection/injection.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../course_details/logic/cubit/course_details_cubit.dart';
@@ -14,7 +15,14 @@ import '../../logic/cubit/my_courses_cubit.dart';
 class ProfileBody extends StatefulWidget {
   final List<dynamic>? courses;
   final List<dynamic>? reviews;
-  const ProfileBody({super.key, this.courses, this.reviews});
+  final bool showEditIcons;
+  
+  const ProfileBody({
+    super.key, 
+    this.courses, 
+    this.reviews,
+    this.showEditIcons = true, 
+  });
 
   @override
   State<ProfileBody> createState() => _ProfileBodyState();
@@ -22,6 +30,26 @@ class ProfileBody extends StatefulWidget {
 
 class _ProfileBodyState extends State<ProfileBody> {
   CourseDetailsCubit courseDetailsCubit = getIt<CourseDetailsCubit>();
+
+  String? _getFirstValidImage(List<String>? images) {
+    if (images == null || images.isEmpty) return null;
+    
+    for (String image in images) {
+      if (image.isNotEmpty) {
+        return image;
+      }
+    }
+    return null;
+  }
+  
+  String _getFullImageUrl(String imagePath) {
+    if (imagePath.startsWith('/uploads/')) {
+      return 'http://192.168.1.3:3000$imagePath';
+    } else if (!imagePath.startsWith('http')) {
+      return 'http://192.168.1.3:3000$imagePath';
+    }
+    return imagePath;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +92,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                       context: context,
                       header: "Bio",
                       text: instructor.bio ?? "No bio available",
+                      showEditButton: widget.showEditIcons,
                     ),
                     const SizedBox(height: 20),
                     buildInfoContainer(
@@ -75,305 +104,209 @@ class _ProfileBodyState extends State<ProfileBody> {
                       governorate:
                           instructor.governorate ?? "No governorate available",
                       title: instructor.title ?? "Title",
+                      showEditButton: widget.showEditIcons,
                     ),
                     const SizedBox(height: 20),
                     buildInfoContainer(
                       context: context,
                       header: "Experience",
                       text: instructor.experience ?? "No experience available",
+                      showEditButton: widget.showEditIcons,
                     ),
                     const SizedBox(height: 20),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "My Courses",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF02457A),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 7),
-                    if (widget.courses != null)
-                      _buildCoursesList(widget.courses!)
-                    else
-                      BlocBuilder<MyCoursesCubit, MyCoursesState>(
-                        builder: (context, state) {
-                          if (state is MyCoursesLoading) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          } else if (state is GetMyCoursesFailure) {
-                            return Center(child: Text("Error: ${state.error}"));
-                          } else if (state is GetMyCoursesSuccess) {
-                            final courses = state.courses;
-
-                            if (courses.isEmpty) {
-                              return const Center(
-                                child: Text(
-                                  "No courses yet",
-                                  style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                              );
-                            }
-
-                            return _buildCoursesList(courses);
-                          } else {
-                            return const Center(
-                                child: Text("No courses available."));
-                          }
-                        },
-                      ),
-                    const SizedBox(height: 30),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Reviews",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF02457A),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 7),
-                    if (widget.reviews != null)
-                      _buildReviewsList(widget.reviews!)
-                    else
-                      BlocBuilder<ReviewsCubit, ReviewsState>(
-                        builder: (context, state) {
-                          if (state is GetReviewsLoading) {
-                            return const SizedBox(
-                              height: 142,
-                              child: Center(child: CircularProgressIndicator()),
-                            );
-                          } else if (state is GetReviewsFailure) {
-                            // التحقق من نوع الخطأ - 404 يعني مفيش reviews
-                            bool isNoReviews = state.error.contains('404') ||
-                                state.error.toLowerCase().contains('not found');
-
-                            if (isNoReviews) {
-                              // عرض رسالة "لا توجد مراجعات" بدل error
-                              return const SizedBox(
-                                height: 142,
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.rate_review_outlined,
-                                        color: Color(0xFF02457A),
-                                        size: 32,
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        "No reviews yet",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Color(0xFF02457A),
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        "Be the first to review this course!",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }
-
-                            bool isNetworkError =
-                                state.error.toLowerCase().contains('network') ||
-                                    state.error
-                                        .toLowerCase()
-                                        .contains('connection') ||
-                                    state.error.toLowerCase().contains('timeout');
-
-                            return SizedBox(
-                              height: 142,
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      isNetworkError
-                                          ? Icons.wifi_off
-                                          : Icons.error_outline,
-                                      color: Colors.red,
-                                      size: 32,
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      isNetworkError
-                                          ? "Check your internet connection"
-                                          : "Failed to load reviews",
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.red,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    GestureDetector(
-                                      onTap: () {
-                                        context
-                                            .read<ReviewsCubit>()
-                                            .emitGetReviewsByInstructor();
-                                      },
-                                      child: const Text(
-                                        "Tap to retry",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Color(0xFF02457A),
-                                          decoration: TextDecoration.underline,
-                                        ),
+                    BlueSectionContainer(
+                      title: "My Courses",
+                      content: widget.courses != null
+                          ? _buildCoursesListWithWhiteStyle(widget.courses!)
+                          : BlocBuilder<MyCoursesCubit, MyCoursesState>(
+                              builder: (context, state) {
+                                if (state is MyCoursesLoading) {
+                                  return const SizedBox(
+                                    height: 165,
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          } else if (state is GetReviewsSuccess) {
-                            final reviews = state.reviews;
-                            if (reviews.isEmpty) {
-                              return const SizedBox(
-                                height: 142,
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.rate_review_outlined,
-                                        color: Color(0xFF02457A),
-                                        size: 32,
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        "No reviews yet",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Color(0xFF02457A),
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        "Be the first to review this course!",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }
-                            return _buildReviewsList(reviews);
-                          } else {
-                            return const SizedBox(
-                              height: 142,
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.rate_review_outlined,
-                                      color: Color(0xFF02457A),
-                                      size: 32,
-                                    ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      "No reviews available",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Color(0xFF02457A),
+                                  );
+                                } else if (state is GetMyCoursesFailure) {
+                                  return SizedBox(
+                                    height: 165,
+                                    child: Center(
+                                      child: Text(
+                                        "Error: ${state.error}",
+                                        style: const TextStyle(color: Colors.white),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    const SizedBox(height: 30),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Social Links",
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF02457A),
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.edit,
-                                      color: Color(0xFF02457A)),
-                                ),
-                              ],
+                                  );
+                                } else if (state is GetMyCoursesSuccess) {
+                                  final courses = state.courses;
+
+                                  if (courses.isEmpty) {
+                                    return const SizedBox(
+                                      height: 165,
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.school_outlined,
+                                              color: Colors.white,
+                                              size: 32,
+                                            ),
+                                            SizedBox(height: 8),
+                                            Text(
+                                              "No courses yet",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  return _buildCoursesListWithWhiteStyle(courses);
+                                } else {
+                                  return const SizedBox(
+                                    height: 165,
+                                    child: Center(
+                                      child: Text(
+                                        "No courses available.",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
                             ),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/images/whatsapp.jpeg',
-                                    width: 50,
-                                    height: 50,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/images/facebook.jpeg',
-                                    width: 50,
-                                    height: 50,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/images/behance.jpeg',
-                                    width: 50,
-                                    height: 50,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/images/linkedin.jpeg',
-                                    width: 50,
-                                    height: 50,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/images/github.jpeg',
-                                    width: 50,
-                                    height: 50,
-                                  ),
-                                ),
-                              ],
+                    ),
+                    const SizedBox(height: 30),
+                    BlueSectionContainer(
+                      title: "Reviews",
+                      content: widget.reviews != null
+                          ? _buildReviewsList(widget.reviews!)
+                          : BlocBuilder<ReviewsCubit, ReviewsState>(
+                              builder: (context, state) {
+                                if (state is GetReviewsLoading) {
+                                  return const SizedBox(
+                                    height: 142,
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  );
+                                } else if (state is GetReviewsFailure) {
+                                  // التحقق من نوع الخطأ - 404 يعني مفيش reviews
+                                  bool isNoReviews = state.error.contains('404') ||
+                                      state.error.toLowerCase().contains('not found');
+
+                                  if (isNoReviews) {
+                                    // عرض رسالة "لا توجد مراجعات" بدل error
+                                    return const SizedBox(
+                                      height: 142,
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.rate_review_outlined,
+                                              color: Colors.white,
+                                              size: 32,
+                                            ),
+                                            SizedBox(height: 8),
+                                            Text(
+                                              "No reviews yet",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            SizedBox(height: 4),
+                                            Text(
+                                              "Be the first to review!",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.white70,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  return SizedBox(
+                                    height: 142,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.error_outline,
+                                            color: Colors.white,
+                                            size: 32,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            "Failed to load reviews",
+                                            style: const TextStyle(
+                                              fontSize: 14, 
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                } else if (state is GetReviewsSuccess) {
+                                  final reviews = state.reviews;
+
+                                  if (reviews.isEmpty) {
+                                    return const SizedBox(
+                                      height: 142,
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.rate_review_outlined,
+                                              color: Colors.white,
+                                              size: 32,
+                                            ),
+                                            SizedBox(height: 8),
+                                            Text(
+                                              "No reviews yet",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  return _buildReviewsList(reviews);
+                                } else {
+                                  return const SizedBox(
+                                    height: 142,
+                                    child: Center(
+                                      child: Text(
+                                        "No reviews available.",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
                             ),
-                          ]),
-                    )
+                    ),
+                    const SizedBox(height: 30),
                   ]);
             } else if (state is InstructorProfileFailure) {
               return Center(
@@ -413,12 +346,41 @@ class _ProfileBodyState extends State<ProfileBody> {
               }
             },
             child: buildCourseBox(
-              imagePath: (courses[index].courseImage != null &&
-                          courses[index]
-                              .courseImage!
-                              .isNotEmpty)
-                      ? "assets/images/${courses[index].courseImage}"
-                      : "assets/images/CourseDefaultPhoto.jpeg",
+              imagePath: _getFirstValidImage(courses[index].courseImages) != null 
+                          ? _getFullImageUrl(_getFirstValidImage(courses[index].courseImages)!)
+                          : "assets/images/CourseDefaultPhoto.jpeg",
+              courseName: courses[index].courseName ?? 'No Course Name',
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCoursesListWithWhiteStyle(List<dynamic> courses) {
+    return SizedBox(
+      height: 165,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: courses.length,
+        itemBuilder: (context, index) {
+          final course = courses[index];
+          return GestureDetector(
+            onTap: () {
+              if (course.id != null && course.id!.isNotEmpty) {
+                context.push(
+                  Routes.courseDetails,
+                  extra: {
+                    '_id': course.id,
+                    'courseDetailsCubit': courseDetailsCubit,
+                  },
+                );
+              }
+            },
+            child: buildCourseBox(
+              imagePath: _getFirstValidImage(courses[index].courseImages) != null 
+                          ? _getFullImageUrl(_getFirstValidImage(courses[index].courseImages)!)
+                          : "assets/images/CourseDefaultPhoto.jpeg",
               courseName: courses[index].courseName ?? 'No Course Name',
             ),
           );
@@ -449,4 +411,4 @@ class _ProfileBodyState extends State<ProfileBody> {
       ),
     );
   }
-}
+} 

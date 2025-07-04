@@ -73,6 +73,26 @@ class _HomeState extends State<Home> {
     reviewsCubit.emitGetRecentReviews();
   }
 
+  String? _getFirstValidImage(List<String>? images) {
+    if (images == null || images.isEmpty) return null;
+    
+    for (String image in images) {
+      if (image.isNotEmpty) {
+        return image;
+      }
+    }
+    return null;
+  }
+  
+  String _getFullImageUrl(String imagePath) {
+    if (imagePath.startsWith('/uploads/')) {
+      return 'http://192.168.1.3:3000$imagePath';
+    } else if (!imagePath.startsWith('http')) {
+      return 'http://192.168.1.3:3000$imagePath';
+    }
+    return imagePath;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -177,12 +197,9 @@ class _HomeState extends State<Home> {
                                   child: buildCourseBox(
                                     courseName:
                                         course.courseName ?? "Unknown Course",
-                                    imagePath: (course.courseImage == null ||
-                                            course.courseImage!.isEmpty ||
-                                            !course.courseImage!
-                                                .startsWith("assets/"))
-                                        ? "assets/images/CourseDefaultPhoto.jpeg"
-                                        : course.courseImage!,
+                                    imagePath: _getFirstValidImage(course.courseImages) != null 
+                                        ? _getFullImageUrl(_getFirstValidImage(course.courseImages)!)
+                                        : "assets/images/CourseDefaultPhoto.jpeg",
                                   ),
                                 );
                               },
@@ -490,6 +507,7 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
+
       ),
     );
   }

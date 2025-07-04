@@ -118,6 +118,26 @@ class KidCourses extends StatelessWidget {
   final List<CourseData> courses;
   const KidCourses({super.key, required this.courses});
 
+  String? _getFirstValidImage(List<String>? images) {
+    if (images == null || images.isEmpty) return null;
+    
+    for (String image in images) {
+      if (image.isNotEmpty) {
+        return image;
+      }
+    }
+    return null;
+  }
+  
+  String _getFullImageUrl(String imagePath) {
+    if (imagePath.startsWith('/uploads/')) {
+      return 'http://192.168.1.3:3000$imagePath';
+    } else if (!imagePath.startsWith('http')) {
+      return 'http://192.168.1.3:3000$imagePath';
+    }
+    return imagePath;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -160,10 +180,9 @@ class KidCourses extends StatelessWidget {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: (course.courseImage != null &&
-                                  course.courseImage!.isNotEmpty)
+                          child: _getFirstValidImage(course.courseImages) != null
                               ? Image.network(
-                                  course.courseImage!,
+                                  _getFullImageUrl(_getFirstValidImage(course.courseImages)!),
                                   width: 100,
                                   height: 100,
                                   fit: BoxFit.cover,

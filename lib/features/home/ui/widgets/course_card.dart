@@ -6,7 +6,7 @@ import '../views/home_page.dart';
 
 // ignore: must_be_immutable
 class CourseCard extends StatefulWidget {
-  String? courseImage;
+  List<String>? courseImages;
   final String courseName;
   String? instructor;
   final String description;
@@ -19,7 +19,7 @@ class CourseCard extends StatefulWidget {
 
   CourseCard({
     super.key,
-    this.courseImage,
+    this.courseImages,
     required this.courseName,
     this.instructor,
     required this.description,
@@ -43,22 +43,53 @@ class _CourseCardState extends State<CourseCard> {
     if (imagePath == null || imagePath.isEmpty) {
       return false;
     }
-    return imagePath.startsWith('http://') || imagePath.startsWith('https://');
+    return imagePath.startsWith('http://') || 
+           imagePath.startsWith('https://') || 
+           imagePath.startsWith('/uploads/');
+  }
+  
+  String _getFullImageUrl(String imagePath) {
+    if (imagePath.startsWith('/uploads/')) {
+      return 'http://192.168.1.3:3000$imagePath';
+    } else if (!imagePath.startsWith('http')) {
+      return 'http://192.168.1.3:3000$imagePath';
+    }
+    return imagePath;
   }
 
   Widget _buildCourseImage() {
-    if (widget.courseImage == null || widget.courseImage!.isEmpty) {
+    // Get the first valid image from the list, or use default if no images
+    String? imageUrl;
+    if (widget.courseImages != null && widget.courseImages!.isNotEmpty) {
+      // Find the first non-empty image URL
+      for (String url in widget.courseImages!) {
+        if (url.isNotEmpty) {
+          imageUrl = url;
+          break;
+        }
+      }
+    }
+    
+    if (imageUrl == null || imageUrl.isEmpty) {
       return Image.asset(
         "assets/images/CourseDefaultPhoto.jpeg",
         width: 80,
         height: 80,
         fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: 80,
+            height: 80,
+            color: Colors.grey[300],
+            child: const Icon(Icons.image_not_supported, size: 30),
+          );
+        },
       );
     }
 
-    if (_isValidNetworkImage(widget.courseImage)) {
+    if (_isValidNetworkImage(imageUrl)) {
       return Image.network(
-        widget.courseImage!,
+        _getFullImageUrl(imageUrl),
         width: 80,
         height: 80,
         fit: BoxFit.cover,
@@ -89,7 +120,7 @@ class _CourseCardState extends State<CourseCard> {
     } else {
       // Handle local file paths
       return Image.file(
-        File(widget.courseImage!),
+        File(imageUrl),
         width: 80,
         height: 80,
         fit: BoxFit.cover,
@@ -143,7 +174,7 @@ class _CourseCardState extends State<CourseCard> {
                           if (widget.onBookmark != null) {
                             widget.onBookmark!({
                               'id': widget.id,
-                              'courseImage': widget.courseImage,
+                              'courseImages': widget.courseImages,
                               'courseName': widget.courseName,
                               'instructor': widget.instructor,
                               'description': widget.description,

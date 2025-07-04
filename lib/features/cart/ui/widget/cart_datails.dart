@@ -46,9 +46,9 @@ class CartDetails extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16.0, vertical: 8),
                         child: CourseCard(
-                          courseImage: course.course is String
-                              ? ''
-                              : course.course.courseImage,
+                          courseImages: course.course is String
+                              ? null
+                              : course.course.courseImages,
                           courseName: course.course is String
                               ? 'Course Name'
                               : (course.course.courseName ?? ""),

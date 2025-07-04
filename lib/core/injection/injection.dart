@@ -33,6 +33,7 @@ import '../../features/home/logic/cubit/discounted_courses_cubit.dart';
 import '../../features/instructor_profile/logic/cubit/my_courses_cubit.dart';
 import '../../features/payment/data/repo/payment_repo.dart';
 import '../../features/payment/logic/cubit/payment_cubit.dart';
+import '../notifications/notification_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -96,6 +97,9 @@ void initGetIt() {
       () => DiscountedCoursesCubit(getIt<CourseCategoryRepo>()));
   getIt.registerFactory<AchievmentCubit>(
       () => AchievmentCubit(getIt<AchievmentRepo>()));
+  
+  // Notification Cubit as singleton to persist across the app
+  getIt.registerLazySingleton<NotificationCubit>(() => NotificationCubit());
 }
 
 Dio createAndSetupDio() {

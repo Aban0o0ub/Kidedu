@@ -91,7 +91,7 @@ class _SportsCategoryState extends State<SportsCategory> {
                           }
                         },
                         child: CourseCard(
-                          courseImage: course.courseImage,
+                          courseImages: course.courseImages,
                           courseName: course.courseName ?? "Unknown Course",
                           instructor: course.instructor?['Name'],
                           description: course.description ?? "",

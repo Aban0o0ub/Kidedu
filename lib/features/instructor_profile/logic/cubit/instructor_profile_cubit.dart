@@ -60,10 +60,22 @@ class InstructorProfileCubit extends Cubit<InstructorProfileState> {
       final updatedInstructor =
           await instructorProfileRepo.updateInstructorProfile(dataToUpdate);
 
+      print('DEBUG: updatedInstructor received: ${updatedInstructor.data}');
+      
+      // Emit success only once
       emit(UpdateInstructorSuccess(updatedInstructor));
-
-      emit(InstructorProfileSuccess(updatedInstructor.data!.instructor!));
+      
+      // Refresh profile in background (don't emit - just call the repo)
+      Future.delayed(Duration(milliseconds: 100), () async {
+        try {
+          final refreshedInstructor = await instructorProfileRepo.getInstructorProfile();
+          emit(InstructorProfileSuccess(refreshedInstructor));
+        } catch (e) {
+          // Silent fail - we already have updated data
+        }
+      });
     } catch (e) {
+      print('DEBUG: Error in emitUpdateInstructorProfile: $e');
       emit(UpdateInstructorFailure(e.toString()));
     }
   }

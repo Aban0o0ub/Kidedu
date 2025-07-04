@@ -59,7 +59,7 @@ class _BookmarkedCoursesPageState extends State<BookmarkedCoursesPage> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: CourseCard(
                       key: ValueKey(course['id']),
-                      courseImage: course['courseImage'],
+                      courseImages: course['courseImages'],
                       courseName: course['courseName'],
                       instructor: course['instructor'],
                       description: course['description'],
