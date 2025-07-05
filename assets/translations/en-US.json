@@ -265,5 +265,11 @@
   "Phone": "Phone",
   "Email": "Email",
   "Governorate": "Governorate",
-  "Title": "Title"
+  "Title": "Title",
+  "Edit Social Links": "Edit Social Links",
+  "Could not open link": "Could not open link",
+  "Social Links": "Social Links",
+  "Important Notice": "Important Notice",
+  "Don't forget to end the course after completing your content to make it visible to children.": "Don't forget to end the course after completing your content to make it visible to children.",
+  "I understand": "I understand"
 }

@@ -189,8 +189,8 @@ class CourseContentSection extends StatelessWidget {
                                     Text(
                                       "No sections available",
                                       style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white,
+                                        fontSize: 20,
+                                        color:  Color(0xFF02457A),
                                       ),
                                     ),
                                   ],

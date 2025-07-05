@@ -13,6 +13,7 @@ class CourseRequest {
   num? priceAfterDiscount;
   DateTime? startDate;
   DateTime? endDate;
+  DateTime? tillDate;
   List<String>? courseImages;
   String? firstSection;
   int? ratingQuantity;
@@ -31,6 +32,7 @@ class CourseRequest {
       this.priceAfterDiscount,
       this.startDate,
       this.endDate,
+      this.tillDate,
       this.courseImages,
       this.firstSection,
       this.ratingQuantity,
@@ -53,6 +55,7 @@ class CourseRequest {
           : null,
       endDate:
           json['end_date'] != null ? DateTime.parse(json['end_date']) : null,
+      tillDate: json['till_date'] != null ? DateTime.parse(json['till_date']) : null,
       courseImages: json['course_image'] != null 
           ? (json['course_image'] is List 
               ? List<String>.from(json['course_image']) 
@@ -81,6 +84,7 @@ class CourseRequest {
       "price_after_discount": priceAfterDiscount,
       "start_date": startDate?.toIso8601String(),
       "end_date": endDate?.toIso8601String(),
+      "till_date": tillDate?.toIso8601String(),
       "course_image": courseImages,
       "first_section": firstSection,
       "rating_quantity": ratingQuantity,

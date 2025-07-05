@@ -61,9 +61,7 @@ class LessonModel {
       }
     }
     
-    if (youtubeUrl == null) {
-      print('❌ DEBUG: No YouTube URL found in any field');
-    }
+    
 
     return LessonModel(
       id: json['_id']?.toString() ?? json['id']?.toString() ?? '',

@@ -135,7 +135,7 @@ class CourseReviewsSection extends StatelessWidget {
                             "No reviews yet",
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.white,
+                              color:  Color(0xFF02457A),
                             ),
                           ),
                         ),
@@ -168,7 +168,7 @@ class CourseReviewsSection extends StatelessWidget {
                     if (isNoReviews) {
                       // عرض رسالة "لا توجد مراجعات" بدل error
                       return const SizedBox(
-                        height: 142,
+                        height: 135,
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -176,14 +176,14 @@ class CourseReviewsSection extends StatelessWidget {
                               Icon(
                                 Icons.rate_review_outlined,
                                 color: Colors.white,
-                                size: 32,
+                                size: 35,
                               ),
                               SizedBox(height: 8),
                               Text(
                                 "No reviews yet",
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
+                                  fontSize: 20,
+                                  color:  Color(0xFF02457A),
                                 ),
                               ),
                               SizedBox(height: 4),

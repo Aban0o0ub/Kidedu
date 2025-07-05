@@ -106,7 +106,7 @@ class _CourseActionButtonsState extends State<CourseActionButtons> {
                       elevation: 3,
                     ),
                     child: const Text(
-                      "Delete Course",
+                      "Delete",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,

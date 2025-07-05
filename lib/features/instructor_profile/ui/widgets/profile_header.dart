@@ -310,7 +310,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                         context.push(Routes.earningsScreen);
                       },
                       icon: const Icon(Icons.monetization_on),
-                      color: Color(0xFF02457A),
+                      color: Color(0xFF1977F3),
                     ),
                   ),
                 ],

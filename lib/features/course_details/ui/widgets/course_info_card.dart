@@ -9,8 +9,101 @@ class CourseInfoCard extends StatelessWidget {
     required this.course,
   });
 
+  // Helper method to format date
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'Not set';
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  // Custom widget for displaying dates with labels
+  Widget _buildDateRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.calendar_today,
+                size: 20,
+                color: Color(0xff02457A),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Start Date',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xff02457A),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      _formatDate(course.startDate),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff02457A),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.event,
+                size: 20,
+                color: Color(0xff02457A),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'End Date',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xff02457A),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      _formatDate(course.endDate),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff02457A),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Check if course is offline and has dates
+    bool isOffline = course.availability?.toLowerCase() == 'offline';
+    bool hasDates = course.startDate != null || course.endDate != null;
+    
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -55,6 +148,11 @@ class CourseInfoCard extends StatelessWidget {
             icon2: Icons.discount,
             text2: (course.offer ?? "20%").toString(),
           ),
+          
+          // Show start and end dates only for offline courses
+          if (isOffline && hasDates) ...[
+            _buildDateRow(),
+          ],
         ],
       ),
     );

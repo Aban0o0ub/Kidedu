@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart'; // Add this import
 import 'package:loginpage/core/injection/injection.dart';
+import 'package:loginpage/core/helper/auth_service.dart';
+import 'package:loginpage/core/helper/warning_helper.dart';
 import 'package:loginpage/features/add_course/data/models/Course_Model.dart';
 import 'package:loginpage/features/course_details/logic/cubit/course_details_cubit.dart';
 import 'package:loginpage/features/instructor_profile/ui/widgets/info_container.dart';
@@ -52,6 +54,13 @@ class _CourseDetailsState extends State<CourseDetails> {
         courseDetailsCubit.emitGetSingleCourse(id);
         sectionCubit.emitGetSection(id);
         reviewsCubit.emitGetReviewsByCourse(courseId);
+
+        // Show warning for instructors
+        if (AuthService.getUserRole() == 'instructor') {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            WarningHelper.showCourseEndWarningIfNeeded(context);
+          });
+        }
       } else {
         throw Exception('ID NOT FOUND');
       }

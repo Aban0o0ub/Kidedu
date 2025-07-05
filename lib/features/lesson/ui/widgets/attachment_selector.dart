@@ -32,26 +32,31 @@ class AttachmentSelector extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          alignment: WrapAlignment.start,
           children: [
-          _buildOptionButton('Link', 1, Icons.youtube_searched_for, showOptions1),
-          _buildOptionButton('Photos', 2, Icons.photo, showOptions2),
-          _buildOptionButton('Quiz', 3, Icons.quiz, showOptions3),
-          _buildOptionButton('Description', 4, Icons.description, showOptions4),
-        ],
+            _buildOptionButton('Link', 1, Icons.youtube_searched_for, showOptions1),
+            _buildOptionButton('Photos', 2, Icons.photo, showOptions2),
+            _buildOptionButton('Quiz', 3, Icons.quiz, showOptions3),
+            _buildOptionButton('Caption', 4, Icons.description, showOptions4),
+          ],
         ),
       ],
     );
   }
 
   Widget _buildOptionButton(String title, int index, IconData icon, bool isActive) {
-    return ClickableContainer(
-      title: title,
-      index: index,
-      isActive: isActive,
-      onTap: () => onOptionSelected(index),
-      icon: icon,
+    return Padding(
+      padding: const EdgeInsets.only(right: 4),
+      child: ClickableContainer(
+        title: title,
+        index: index,
+        isActive: isActive,
+        onTap: () => onOptionSelected(index),
+        icon: icon,
+      ),
     );
   }
 }

@@ -145,6 +145,7 @@ class KidCourses extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: ListView.builder(
+        padding: const EdgeInsets.only(bottom: 80),
         itemCount: courses.length,
         itemBuilder: (context, index) {
           CourseData course = courses[index];
@@ -314,7 +315,7 @@ class KidCourses extends StatelessWidget {
                           if (progressValue >= 1.0)
                             Positioned(
                               right: 4,
-                              top: -8,
+                              top: -2,
                               child: Container(
                                 padding: const EdgeInsets.all(2),
                                 decoration: const BoxDecoration(
@@ -324,7 +325,7 @@ class KidCourses extends StatelessWidget {
                                 child: const Icon(
                                   Icons.check,
                                   color: Colors.white,
-                                  size: 12,
+                                  size: 6,
                                 ),
                               ),
                             ),

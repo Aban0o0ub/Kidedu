@@ -50,7 +50,7 @@ class SectionInput extends StatelessWidget {
                 'Add new section',
                 style: TextStyle(
                   fontStyle: FontStyle.italic,
-                  color: Colors.blue,
+                  color:  Color(0xFF02457A),
                 ),
               ),
             ),

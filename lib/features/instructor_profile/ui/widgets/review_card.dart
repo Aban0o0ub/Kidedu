@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../kid_profile/logic/cubit/kid_profile_cubit.dart';
-import '../../../../core/injection/injection.dart';
 
 Widget buildHorizontalReviewCard({
   required String name,
@@ -11,6 +8,14 @@ Widget buildHorizontalReviewCard({
   String? instructorName,
   String? kidImageUrl, // Keep for compatibility but unused
 }) {
+  // Function to get first two letters of name
+  String getInitials(String name) {
+    if (name.isEmpty) return 'UK';
+    String cleanName = name.trim();
+    if (cleanName.length == 1) return cleanName.toUpperCase();
+    return cleanName.substring(0, 2).toUpperCase();
+  }
+
   return Container(
     width: 312,
     padding: const EdgeInsets.all(12),
@@ -21,38 +26,18 @@ Widget buildHorizontalReviewCard({
     ),
     child: Row(
       children: [
-        // Profile picture (optional) - using KidProfileCubit for current kid image
-        BlocBuilder<KidProfileCubit, KidProfileState>(
-          builder: (context, state) {
-            print('🔥 NEW Review Card - KidProfileCubit State: $state');
-            ImageProvider kidImage;
-            if (state is KidProfileSuccess) {
-              final kid = state.kid;
-              print('🔥 NEW Review Card - Kid Image: ${kid.image}');
-              if (kid.image != null && kid.image!.isNotEmpty) {
-                if (kid.image!.startsWith('http') || kid.image!.startsWith('/uploads/')) {
-                  kidImage = NetworkImage(kid.image!.startsWith('http') 
-                      ? kid.image! 
-                      : 'http://192.168.1.3:3000${kid.image}');
-                  print('🔥 NEW Review Card - Using network image: ${kid.image}');
-                } else {
-                  kidImage = const AssetImage('assets/images/kidprofile.jpeg');
-                  print('🔥 NEW Review Card - Using default asset');
-                }
-              } else {
-                kidImage = const AssetImage('assets/images/kidprofile.jpeg');
-                print('🔥 NEW Review Card - Empty image, using default');
-              }
-            } else {
-              kidImage = const AssetImage('assets/images/kidprofile.jpeg');
-              print('🔥 NEW Review Card - Not success state, using default');
-            }
-            
-            return CircleAvatar(
-              radius: 30,
-              backgroundImage: kidImage,
-            );
-          },
+        // Profile circle with initials instead of image
+        CircleAvatar(
+          radius: 30,
+          backgroundColor: const Color(0xFF02457A), // Blue background
+          child: Text(
+            getInitials(name),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
         const SizedBox(width: 10),
         // Review text

@@ -264,6 +264,11 @@
   "Failed to load discounted courses": "فشل في تحميل الكورسات المخفضة",
   "Error:": "خطأ:",
   "Course added to cart successfully!": "تم إضافة الكورس للسلة بنجاح!",
-  "Redirecting to cart...": "جاري الانتقال للسلة..."
-  
+  "Redirecting to cart...": "جاري الانتقال للسلة...",
+  "Edit Social Links": "تعديل روابط التواصل الاجتماعي",
+  "Could not open link": "لا يمكن فتح الرابط",
+  "Social Links": "روابط التواصل الاجتماعي",
+  "Important Notice": "تنبيه هام",
+  "Don't forget to end the course after completing your content to make it visible to children.": "لا تنس إنهاء الدورة بعد اكتمال المحتوى الخاص بك لتصبح مرئية للأطفال.",
+  "I understand": "فهمت"
 }

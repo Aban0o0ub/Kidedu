@@ -7,8 +7,11 @@ import 'package:loginpage/features/instructor_profile/ui/widgets/course_box.dart
 import 'package:loginpage/features/instructor_profile/ui/widgets/info_container.dart';
 import 'package:loginpage/features/instructor_profile/ui/widgets/review_card.dart';
 import 'package:loginpage/features/instructor_profile/ui/widgets/blue_section_container.dart';
+import 'package:loginpage/features/instructor_profile/ui/widgets/social_media_edit_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/injection/injection.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/helper/social_media_helper.dart';
 import '../../../course_details/logic/cubit/course_details_cubit.dart';
 import '../../../reviews/logic/cubit/reviews_cubit.dart';
 import '../../logic/cubit/my_courses_cubit.dart';
@@ -31,6 +34,52 @@ class ProfileBody extends StatefulWidget {
 
 class _ProfileBodyState extends State<ProfileBody> {
   CourseDetailsCubit courseDetailsCubit = getIt<CourseDetailsCubit>();
+  Map<String, String?> socialMediaLinks = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSocialMediaLinks();
+  }
+
+  void _loadSocialMediaLinks() {
+    setState(() {
+      socialMediaLinks = SocialMediaHelper.getAllLinks();
+    });
+  }
+
+  void _refreshSocialMediaLinks() {
+    _loadSocialMediaLinks();
+  }
+
+  void _showSocialMediaEditDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => SocialMediaEditDialog(
+        onSave: _refreshSocialMediaLinks,
+      ),
+    );
+  }
+
+  Future<void> _launchUrl(String? url) async {
+    if (url != null && url.isNotEmpty) {
+      try {
+        final uri = Uri.parse(url);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Could not open link".tr()),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
 
   String? _getFirstValidImage(List<String>? images) {
     if (images == null || images.isEmpty) return null;
@@ -192,133 +241,37 @@ class _ProfileBodyState extends State<ProfileBody> {
                             ),
                     ),
                     const SizedBox(height: 30),
-                    BlueSectionContainer(
-                      title: "Reviews".tr(),
-                      content: widget.reviews != null
-                          ? _buildReviewsList(widget.reviews!)
-                          : BlocBuilder<ReviewsCubit, ReviewsState>(
-                              builder: (context, state) {
-                                if (state is GetReviewsLoading) {
-                                  return const SizedBox(
-                                    height: 142,
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  );
-                                } else if (state is GetReviewsFailure) {
-                                  // التحقق من نوع الخطأ - 404 يعني مفيش reviews
-                                  bool isNoReviews =
-                                      state.error.contains('404') ||
-                                          state.error
-                                              .toLowerCase()
-                                              .contains('not found');
+                    BlocBuilder<ReviewsCubit, ReviewsState>(
+                      builder: (context, state) {
+                        // إذا كان هناك مراجعات مباشرة من widget.reviews
+                        if (widget.reviews != null && widget.reviews!.isNotEmpty) {
+                          return Column(
+                            children: [
+                              BlueSectionContainer(
+                                title: "Reviews".tr(),
+                                content: _buildReviewsList(widget.reviews!),
+                              ),
+                              const SizedBox(height: 30),
+                            ],
+                          );
+                        }
 
-                                  if (isNoReviews) {
-                                    // عرض رسالة "لا توجد مراجعات" بدل error
-                                    return SizedBox(
-                                      height: 142,
-                                      child: Center(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.rate_review_outlined,
-                                              color: Colors.white,
-                                              size: 32,
-                                            ),
-                                            SizedBox(height: 8),
-                                            Text(
-                                              "No reviews yet".tr(),
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            SizedBox(height: 4),
-                                            Text(
-                                              "Be the first to review!".tr(),
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.white70,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }
+                        // إذا كان هناك مراجعات من الـ state
+                        if (state is GetReviewsSuccess && state.reviews.isNotEmpty) {
+                          return Column(
+                            children: [
+                              BlueSectionContainer(
+                                title: "Reviews".tr(),
+                                content: _buildReviewsList(state.reviews),
+                              ),
+                              const SizedBox(height: 30),
+                            ],
+                          );
+                        }
 
-                                  return SizedBox(
-                                    height: 142,
-                                    child: Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.error_outline,
-                                            color: Colors.white,
-                                            size: 32,
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            "Failed to load reviews".tr(),
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                } else if (state is GetReviewsSuccess) {
-                                  final reviews = state.reviews;
-
-                                  if (reviews.isEmpty) {
-                                    return SizedBox(
-                                      height: 142,
-                                      child: Center(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.rate_review_outlined,
-                                              color: Colors.white,
-                                              size: 32,
-                                            ),
-                                            SizedBox(height: 8),
-                                            Text(
-                                              "No reviews yet".tr(),
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }
-
-                                  return _buildReviewsList(reviews);
-                                } else {
-                                  return SizedBox(
-                                    height: 142,
-                                    child: Center(
-                                      child: Text(
-                                        "No reviews available.".tr(),
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
+                        // في حالة عدم وجود مراجعات، نرجع Container فارغ
+                        return Container();
+                      },
                     ),
                     const SizedBox(height: 30),
                     Align(
@@ -337,56 +290,37 @@ class _ProfileBodyState extends State<ProfileBody> {
                                     color: Theme.of(context).primaryColor,
                                   ),
                                 ),
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.edit,
-                                      color: Theme.of(context).primaryColor),
-                                ),
+                                if (widget.showEditIcons)
+                                  IconButton(
+                                    onPressed: _showSocialMediaEditDialog,
+                                    icon: Icon(Icons.edit,
+                                        color: Theme.of(context).primaryColor),
+                                  ),
                               ],
                             ),
                             const SizedBox(height: 10),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/images/whatsapp.jpeg',
-                                    width: 50,
-                                    height: 50,
-                                  ),
+                                _buildSocialMediaIcon(
+                                  imagePath: 'assets/images/facebook.jpeg',
+                                  url: socialMediaLinks['facebook'],
+                                  label: 'Facebook',
                                 ),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/images/facebook.jpeg',
-                                    width: 50,
-                                    height: 50,
-                                  ),
+                                _buildSocialMediaIcon(
+                                  imagePath: 'assets/images/behance.jpeg',
+                                  url: socialMediaLinks['behance'],
+                                  label: 'Behance',
                                 ),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/images/behance.jpeg',
-                                    width: 50,
-                                    height: 50,
-                                  ),
+                                _buildSocialMediaIcon(
+                                  imagePath: 'assets/images/linkedin.jpeg',
+                                  url: socialMediaLinks['linkedin'],
+                                  label: 'LinkedIn',
                                 ),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/images/linkedin.jpeg',
-                                    width: 50,
-                                    height: 50,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/images/github.jpeg',
-                                    width: 50,
-                                    height: 50,
-                                  ),
+                                _buildSocialMediaIcon(
+                                  imagePath: 'assets/images/github.jpeg',
+                                  url: socialMediaLinks['github'],
+                                  label: 'GitHub',
                                 ),
                               ],
                             ),
@@ -500,6 +434,37 @@ class _ProfileBodyState extends State<ProfileBody> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildSocialMediaIcon({
+    required String imagePath,
+    required String? url,
+    required String label,
+  }) {
+    final bool hasLink = url != null && url.isNotEmpty;
+    
+    return Tooltip(
+      message: hasLink ? "$label: $url" : "No $label link set",
+      child: InkWell(
+        onTap: hasLink ? () => _launchUrl(url) : null,
+        child: Opacity(
+          opacity: hasLink ? 1.0 : 0.5,
+          child: Container(
+            decoration: BoxDecoration(
+              border: hasLink 
+                  ? Border.all(color: const Color(0xFF02457A), width: 2)
+                  : null,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Image.asset(
+              imagePath,
+              width: 50,
+              height: 50,
+            ),
+          ),
+        ),
       ),
     );
   }

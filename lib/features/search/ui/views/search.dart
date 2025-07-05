@@ -133,7 +133,7 @@ class SearchPageState extends State<SearchPage> {
                     RangeSlider(
                       values: selectedAgeRange,
                       min: 0,
-                      max: 18,
+                      max: 15,
                       divisions: 12,
                       labels: RangeLabels(
                         selectedAgeRange.start.round().toString(),
