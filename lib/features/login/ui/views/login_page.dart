@@ -197,10 +197,12 @@ class LoginPageState extends State<LoginPage> {
                                   children: [
                                     Icon(Icons.warning, color: Colors.amber),
                                     SizedBox(width: 8),
-                                    Text(
-                                      'Login Failed',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                    Expanded(
+                                      child: Text(
+                                        'Login Failed',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -264,7 +266,14 @@ class LoginPageState extends State<LoginPage> {
                                         Icon(Icons.warning,
                                             color: Colors.amber),
                                         SizedBox(width: 8),
-                                        Text('Invalid Admin Credentials'),
+                                        Expanded(
+                                          child: Text(
+                                            'Invalid Admin Credentials',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
                                       ],
                                     ),
                                     content: const Text(

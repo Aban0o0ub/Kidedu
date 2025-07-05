@@ -58,7 +58,12 @@ void main() async {
         child: MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (_) => ThemeProvider()),
-            BlocProvider(create: (_) => RoleCubit()),
+            BlocProvider(create: (_) {
+              final roleCubit = RoleCubit();
+              // تحميل الدور المحفوظ عند بدء التطبيق
+              roleCubit.loadSavedRole();
+              return roleCubit;
+            }),
             BlocProvider<AddCourseCubit>(
               create: (context) => getIt<AddCourseCubit>(),
             ),
@@ -71,7 +76,7 @@ void main() async {
               ),
             ),
             BlocProvider<KidProfileCubit>(
-              create: (_) => getIt<KidProfileCubit>(),
+              create: (_) => getIt<KidProfileCubit>()..emitGetKidProfile(),
             ),
           ],
           child: const KidEdu(),

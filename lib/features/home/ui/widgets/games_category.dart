@@ -139,7 +139,7 @@ class _GamesCategoryState extends State<GamesCategory> {
                     );
                   }
                 }
-                return const Center(child: Text("No courses available"));
+                return Center(child: Text("No courses available".tr()));
               },
             ),
           ),

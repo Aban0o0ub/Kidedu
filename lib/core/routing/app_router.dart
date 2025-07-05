@@ -29,9 +29,56 @@ import '../../features/sign_up/ui/views/auth_kid.dart';
 import '../../features/sign_up/ui/views/role_page.dart';
 import '../widgets/privacy_policy.dart';
 import '../widgets/terms_conditions.dart';
+import '../helper/auth_service.dart';
 import 'routes.dart';
 
 final GoRouter router = GoRouter(
+  initialLocation: Routes.welcomePage,
+  redirect: (context, state) {
+    // فحص إذا كان المستخدم مسجل دخوله
+    if (AuthService.isValidSession()) {
+      final userRole = AuthService.getUserRole();
+      final currentLocation = state.matchedLocation;
+      
+      // إذا كان المستخدم في صفحة onboarding أو تسجيل دخول، وجهه للصفحة الرئيسية
+      if (currentLocation == Routes.welcomePage || 
+          currentLocation == Routes.roleSelectionPage ||
+          currentLocation == Routes.loginPage ||
+          currentLocation == Routes.authKidPage ||
+          currentLocation == Routes.authInstructorPage) {
+        return AuthService.getHomeRouteForRole(userRole);
+      }
+    } else {
+      // إذا لم يكن مسجل دخوله وحاول الوصول لصفحة محمية، وجهه للـ onboarding
+      final protectedRoutes = [
+        Routes.homePage,
+        Routes.instructorProfilePage,
+        Routes.adminEarnings,
+        Routes.kidProfilePage,
+        Routes.addCoursePage,
+        Routes.earningsScreen,
+        Routes.courseDetails,
+        Routes.paymentScreen,
+        Routes.cartPage,
+        Routes.myCourses,
+        Routes.addLessonPage,
+        Routes.notificationPage,
+        Routes.viewLesson,
+        Routes.bookmarkPage,
+        Routes.changePassword,
+        Routes.achievementPage,
+        Routes.settingsPage,
+        Routes.editProfilePage,
+      ];
+      
+      if (protectedRoutes.contains(state.matchedLocation)) {
+        return Routes.welcomePage;
+      }
+    }
+    
+    // لا يوجد تحويل مطلوب
+    return null;
+  },
   routes: [
     GoRoute(
       path: Routes.welcomePage,

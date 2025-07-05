@@ -51,7 +51,6 @@ class _HomeState extends State<Home> {
     "Arts": (category) => ArtsCategory(category: category),
   };
 
-  late KidProfileCubit kidProfileCubit;
   late CourseCategoryCubit courseCategoryCubit;
   late ReviewsCubit reviewsCubit;
   late DiscountedCoursesCubit discountedCoursesCubit;
@@ -61,16 +60,25 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     NavBarVisibilityController.showNavBar();
-    kidProfileCubit = getIt<KidProfileCubit>();
     courseCategoryCubit = getIt<CourseCategoryCubit>();
     reviewsCubit = getIt<ReviewsCubit>();
     discountedCoursesCubit = getIt<DiscountedCoursesCubit>();
     courseDetailsCubit = getIt<CourseDetailsCubit>();
 
-    kidProfileCubit.emitGetKidProfile();
     discountedCoursesCubit.emitGetDiscountedCourses();
     courseCategoryCubit.emitGetTrendingCourses();
     reviewsCubit.emitGetRecentReviews();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // تأكد من أن KidProfileCubit يحمل البيانات
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.read<KidProfileCubit>().state is KidProfileInitial) {
+        context.read<KidProfileCubit>().emitGetKidProfile();
+      }
+    });
   }
 
   String? _getFirstValidImage(List<String>? images) {
@@ -88,7 +96,9 @@ class _HomeState extends State<Home> {
     if (imagePath.startsWith('/uploads/')) {
       return 'http://192.168.1.3:3000$imagePath';
     } else if (!imagePath.startsWith('http')) {
-      return 'http://192.168.1.3:3000$imagePath';
+      // Add slash if imagePath doesn't start with one
+      String pathWithSlash = imagePath.startsWith('/') ? imagePath : '/$imagePath';
+      return 'http://192.168.1.3:3000$pathWithSlash';
     }
     return imagePath;
   }
@@ -97,7 +107,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider.value(value: kidProfileCubit),
         BlocProvider.value(value: courseCategoryCubit),
         BlocProvider.value(value: reviewsCubit),
         BlocProvider.value(value: discountedCoursesCubit),
@@ -139,7 +148,7 @@ class _HomeState extends State<Home> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF02457A),
+                            color: Theme.of(context).primaryColor,
                           ),
                         ),
                       ),
@@ -149,23 +158,23 @@ class _HomeState extends State<Home> {
                       builder: (context, state) {
                         print('🔥 Current State: $state');
                         if (state is TrendingCoursesLoading) {
-                          return const SizedBox(
+                          return SizedBox(
                             height: 180,
                             child: Center(
                               child: CircularProgressIndicator(
-                                color: Color(0xFF02457A),
+                                color: Theme.of(context).primaryColor,
                               ),
                             ),
                           );
                         } else if (state is GetTrendingCourseSuccess) {
                           if (state.courses.isEmpty) {
-                            return const SizedBox(
+                            return SizedBox(
                               height: 180,
                               child: Center(
                                 child: Text(
-                                  "No trending courses available",
+                                  "No trending courses available".tr(),
                                   style: TextStyle(
-                                    color: Color(0xFF02457A),
+                                    color: Theme.of(context).primaryColor,
                                     fontSize: 16,
                                   ),
                                 ),
@@ -196,7 +205,7 @@ class _HomeState extends State<Home> {
                                   },
                                   child: buildCourseBox(
                                     courseName:
-                                        course.courseName ?? "Unknown Course",
+                                        course.courseName ?? "Unknown Course".tr(),
                                     imagePath: _getFirstValidImage(course.courseImages) != null 
                                         ? _getFullImageUrl(_getFirstValidImage(course.courseImages)!)
                                         : "assets/images/CourseDefaultPhoto.jpeg",
@@ -212,16 +221,16 @@ class _HomeState extends State<Home> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.error_outline,
-                                    color: Colors.red,
+                                    color: Theme.of(context).colorScheme.error,
                                     size: 40,
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    "Failed to load trending courses",
+                                    "Failed to load trending courses".tr(),
                                     style: TextStyle(
-                                      color: Colors.red[700],
+                                      color: Theme.of(context).colorScheme.error,
                                       fontSize: 14,
                                     ),
                                     textAlign: TextAlign.center,
@@ -233,11 +242,7 @@ class _HomeState extends State<Home> {
                                           .read<CourseCategoryCubit>()
                                           .emitGetTrendingCourses();
                                     },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF02457A),
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    child: const Text("Retry"),
+                                    child: Text("Retry".tr()),
                                   ),
                                 ],
                               ),
@@ -246,13 +251,13 @@ class _HomeState extends State<Home> {
                         }
 
                         // Default empty state
-                        return const SizedBox(
+                        return SizedBox(
                           height: 180,
                           child: Center(
                             child: Text(
-                              "No trending courses available",
+                              "No trending courses available".tr(),
                               style: TextStyle(
-                                color: Color(0xFF02457A),
+                                color: Theme.of(context).primaryColor,
                                 fontSize: 16,
                               ),
                             ),
@@ -272,7 +277,7 @@ class _HomeState extends State<Home> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF02457A),
+                            color: Theme.of(context).primaryColor,
                           ),
                         ),
                       ),
@@ -326,7 +331,7 @@ class _HomeState extends State<Home> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF02457A),
+                            color: Theme.of(context).primaryColor,
                           ),
                         ),
                       ),
@@ -339,18 +344,18 @@ class _HomeState extends State<Home> {
                         child: BlocBuilder<ReviewsCubit, ReviewsState>(
                           builder: (context, state) {
                             if (state is GetReviewsLoading) {
-                              return const Center(
+                              return Center(
                                 child: CircularProgressIndicator(
-                                  color: Color(0xFF02457A),
+                                  color: Theme.of(context).primaryColor,
                                 ),
                               );
                             } else if (state is GetReviewsSuccess) {
                               if (state.reviews.isEmpty) {
-                                return const Center(
+                                return Center(
                                   child: Text(
                                     "No reviews available",
                                     style: TextStyle(
-                                      color: Color(0xFF02457A),
+                                      color: Theme.of(context).primaryColor,
                                       fontSize: 16,
                                     ),
                                   ),
@@ -384,7 +389,7 @@ class _HomeState extends State<Home> {
 
                               if (isNoReviews) {
                                 // عرض رسالة "لا توجد مراجعات" بدل error
-                                return const SizedBox(
+                                return SizedBox(
                                   height: 142,
                                   child: Center(
                                     child: Column(
@@ -393,7 +398,7 @@ class _HomeState extends State<Home> {
                                       children: [
                                         Icon(
                                           Icons.rate_review_outlined,
-                                          color: Color(0xFF02457A),
+                                          color: Theme.of(context).primaryColor,
                                           size: 32,
                                         ),
                                         SizedBox(height: 8),
@@ -401,7 +406,7 @@ class _HomeState extends State<Home> {
                                           "No reviews yet",
                                           style: TextStyle(
                                             fontSize: 16,
-                                            color: Color(0xFF02457A),
+                                            color: Theme.of(context).primaryColor,
                                           ),
                                         ),
                                         SizedBox(height: 4),
@@ -457,11 +462,11 @@ class _HomeState extends State<Home> {
                                               .read<ReviewsCubit>()
                                               .emitGetRecentReviews();
                                         },
-                                        child: const Text(
+                                        child: Text(
                                           "Tap to retry",
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Color(0xFF02457A),
+                                            color: Theme.of(context).primaryColor,
                                             decoration:
                                                 TextDecoration.underline,
                                           ),

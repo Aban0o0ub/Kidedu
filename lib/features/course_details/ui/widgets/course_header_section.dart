@@ -133,7 +133,7 @@ Join this amazing course now! 🚀
   }
 
   void _copyLink(dynamic course) {
-    String courseName = course?.courseName ?? 'Amazing Course';
+   // String courseName = course?.courseName ?? 'Amazing Course';
     String courseLink = 'https://kidedu.app/course/${course?.id ?? 'unknown'}';
     
     Clipboard.setData(ClipboardData(text: courseLink)).then((_) {
@@ -385,7 +385,9 @@ Join this amazing course now! 🚀
       if (imageUrl.startsWith('/uploads/')) {
         fullImageUrl = 'http://192.168.1.3:3000$imageUrl';
       } else if (!imageUrl.startsWith('http')) {
-        fullImageUrl = 'http://192.168.1.3:3000$imageUrl';
+        // Add slash if imageUrl doesn't start with one
+        String pathWithSlash = imageUrl.startsWith('/') ? imageUrl : '/$imageUrl';
+        fullImageUrl = 'http://192.168.1.3:3000$pathWithSlash';
       }
       
       return Image.network(
@@ -394,11 +396,39 @@ Join this amazing course now! 🚀
         width: double.infinity,
         height: 330,
         errorBuilder: (context, error, stackTrace) {
-          return Image.asset(
-            'assets/images/CourseDefaultPhoto.jpeg',
-            fit: BoxFit.cover,
+          // Handle 404 and other network errors by showing default image
+          print('Course header image loading failed for URL: $fullImageUrl, Error: $error');
+          return Container(
             width: double.infinity,
             height: 330,
+            color: Colors.grey[200],
+            child: Image.asset(
+              'assets/images/CourseDefaultPhoto.jpeg',
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: 330,
+              errorBuilder: (context, error, stackTrace) {
+                // Final fallback
+                return Container(
+                  width: double.infinity,
+                  height: 330,
+                  color: Colors.grey[300],
+                  child: const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.image_not_supported, size: 60, color: Colors.grey),
+                        SizedBox(height: 8),
+                        Text(
+                          'Image not available',
+                          style: TextStyle(color: Colors.grey, fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
           );
         },
         loadingBuilder: (context, child, loadingProgress) {

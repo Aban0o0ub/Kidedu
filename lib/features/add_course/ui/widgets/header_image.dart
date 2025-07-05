@@ -124,7 +124,7 @@ class _HeaderImageState extends State<HeaderImage> {
                       ),
                       SizedBox(height: 10),
                       Text(
-                        'أضف صور الكورس',
+                        'Add course image',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -132,7 +132,7 @@ class _HeaderImageState extends State<HeaderImage> {
                         ),
                       ),
                       Text(
-                        'يمكنك اختيار أكثر من صورة',
+                        'You can select multiple images',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 14,

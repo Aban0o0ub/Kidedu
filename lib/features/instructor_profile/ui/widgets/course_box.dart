@@ -40,7 +40,9 @@ Widget buildCourseBox({
                     ? Image.network(
                         imagePath.startsWith('/uploads/') 
                             ? 'http://192.168.1.3:3000$imagePath'
-                            : imagePath,
+                            : imagePath.startsWith('http')
+                                ? imagePath
+                                : 'http://192.168.1.3:3000/${imagePath.startsWith('/') ? imagePath.substring(1) : imagePath}',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Image.asset(

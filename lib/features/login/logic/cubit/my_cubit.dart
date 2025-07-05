@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loginpage/features/login/data/models/user.dart';
 import 'package:loginpage/features/login/data/repo/my_repo.dart';
+import 'package:loginpage/core/helper/auth_service.dart';
 
 import '../../../sign_up/data/models/kid.dart';
 
@@ -16,6 +17,22 @@ class LoginCubit extends Cubit<LoginState> {
   emit(LoginLoading());
   try {
     LoginResponse response = await myRepo.loginUser(user);
+    
+    // حفظ بيانات المستخدم في Cache
+    String? userName;
+    if (response.role == 'kid' && response.kid != null) {
+      userName = response.kid!.name;
+    } else if (response.role == 'instructor' && response.instructor != null) {
+      userName = response.instructor!.name;
+    }
+    
+    // حفظ جلسة المستخدم
+    await AuthService.saveUserSession(
+      role: response.role ?? '',
+      email: user.email ?? '',
+      userId: response.userId,
+      userName: userName,
+    );
     
     // ✅ تعامل مع جميع الأدوار بما في ذلك الأدمن
     if (response.role == 'kid') {
@@ -129,6 +146,20 @@ class RoleCubit extends Cubit<String?> {
 
   void clearRole() {
     emit(null);
+  }
+
+  /// تسجيل خروج المستخدم ومسح جميع البيانات المحفوظة
+  Future<void> logout() async {
+    await AuthService.clearUserSession();
+    clearRole();
+  }
+
+  /// تحديث الدور من البيانات المحفوظة
+  void loadSavedRole() {
+    final savedRole = AuthService.getUserRole();
+    if (savedRole != null) {
+      emit(savedRole);
+    }
   }
 
   // Helper method

@@ -316,19 +316,25 @@ class WebServices {
             instructorData.phoneNumber!.isNotEmpty) {
           formFields['PhoneNumber'] = instructorData.phoneNumber;
         }
+        // ✅ إضافة Bio للـ image case
+        if (instructorData.bio != null && instructorData.bio!.isNotEmpty) {
+          formFields['Bio'] = instructorData.bio;
+        }
         if (instructorData.title != null && instructorData.title!.isNotEmpty) {
-          formFields['Title'] = instructorData.title; // تأكد إن ده موجود
+          formFields['Title'] = instructorData.title;
         }
         if (instructorData.experience != null &&
             instructorData.experience!.isNotEmpty) {
-          formFields['Experience'] =
-              instructorData.experience; // تأكد إن ده موجود
+          formFields['Experience'] = instructorData.experience;
         }
 
         formFields['image'] =
             await MultipartFile.fromFile(instructorData.image!);
 
         FormData formData = FormData.fromMap(formFields);
+
+        // طباعة البيانات المرسلة للسيرفر للتأكد (مع الصورة)
+        print('DEBUG: Sending FormData to server: $formFields');
 
         final response = await dio.patch(
           'user_instructor/profile',
@@ -368,7 +374,20 @@ class WebServices {
             instructorData.phoneNumber!.isNotEmpty) {
           jsonData['PhoneNumber'] = instructorData.phoneNumber;
         }
+        // ✅ إضافة Bio, Title, Experience للـ else block
+        if (instructorData.bio != null && instructorData.bio!.isNotEmpty) {
+          jsonData['Bio'] = instructorData.bio;
+        }
+        if (instructorData.title != null && instructorData.title!.isNotEmpty) {
+          jsonData['Title'] = instructorData.title;
+        }
+        if (instructorData.experience != null && instructorData.experience!.isNotEmpty) {
+          jsonData['Experience'] = instructorData.experience;
+        }
 
+        // طباعة البيانات المرسلة للسيرفر للتأكد
+        print('DEBUG: Sending JSON data to server: $jsonData');
+        
         final response = await dio.patch(
           'user_instructor/profile',
           data: jsonData,
@@ -429,7 +448,7 @@ class WebServices {
             final File file = File(imagePath);
             if (!file.existsSync()) continue;
             
-            String fileName = imagePath.split('/').last;
+            //String fileName = imagePath.split('/').last;
             
             // Basic file validation
             if (file.lengthSync() > 5 * 1024 * 1024) continue;  // 5MB limit
@@ -880,36 +899,6 @@ class WebServices {
     }
   }
 
-  // Future<LessonListResponse> getLessonBySectionId(String sectionId) async {
-  //   try {
-  //     String? token = CacheHelper.getData(key: "token");
-  //     if (token == null) {
-  //       throw Exception('Missing token');
-  //     }
-  //     final response = await dio.get(
-  //       'lesson/$sectionId',
-  //       options: Options(
-  //         headers: {
-  //           'token': 'Bearer $token',
-  //         },
-  //       ),
-  //     );
-  //     final responseData = response.data;
-  //     return LessonListResponse.fromJson(responseData);
-  //   } on DioException catch (dioError) {
-  //     if (dioError.response?.statusCode == 403) {
-  //       // Handle enrollment error specifically
-  //       final errorMessage = dioError.response?.data['message'] ??
-  //           'You are not enrolled in this course';
-  //       throw Exception('Access denied: $errorMessage');
-  //     }
-  //     // Handle other DioExceptions
-  //     throw Exception('Network error: ${dioError.message}');
-  //   } catch (e) {
-  //     throw Exception('Error getting lessons: ${e.toString()}');
-  //   }
-  // }
-
   Future<LessonListResponse> getLessonBySectionId(String sectionId) async {
     try {
       String? token = CacheHelper.getData(key: "token");
@@ -926,6 +915,37 @@ class WebServices {
       );
 
       final responseData = response.data;
+
+      // Debug: Log the complete response
+      print('🔍 DEBUG getLessonBySectionId: Full response: $responseData');
+      print('🔍 DEBUG getLessonBySectionId: Response type: ${responseData.runtimeType}');
+      
+      // Check if data contains lessons and log their structure
+      if (responseData is Map<String, dynamic>) {
+        if (responseData['data'] != null) {
+          final data = responseData['data'];
+          print('🔍 DEBUG getLessonBySectionId: data field: $data');
+          
+          if (data['sections'] != null && data['sections'] is List) {
+            final sections = data['sections'] as List;
+            print('🔍 DEBUG getLessonBySectionId: Found ${sections.length} sections');
+            
+            for (int i = 0; i < sections.length; i++) {
+              final section = sections[i];
+              if (section['lessons'] != null && section['lessons'] is List) {
+                final lessons = section['lessons'] as List;
+                print('🔍 DEBUG getLessonBySectionId: Section $i has ${lessons.length} lessons');
+                
+                for (int j = 0; j < lessons.length; j++) {
+                  final lesson = lessons[j];
+                  print('🔍 DEBUG getLessonBySectionId: Lesson $j fields: ${lesson.keys.toList()}');
+                  print('🔍 DEBUG getLessonBySectionId: Lesson $j data: $lesson');
+                }
+              }
+            }
+          }
+        }
+      }
 
       // Log the status for debugging
       print('Response status: ${response.statusCode}');
@@ -1392,10 +1412,6 @@ class WebServices {
         'KidEdu/admin/stats',
         options: Options(headers: {'token': 'Bearer $token'}),
       );
-
-      if (response.statusCode == 500) {
-        throw Exception('Server error: Please try again later');
-      }
 
       if (response.data == null) {
         throw Exception('No data returned from API');

@@ -27,6 +27,7 @@ class LessonModel {
   });
 
   factory LessonModel.fromJson(Map<String, dynamic> json) {
+    
     // Handle images array
     List<String>? imagesList;
     if (json['images'] != null) {
@@ -40,13 +41,37 @@ class LessonModel {
       }
     }
 
+    // Handle YouTube URL with multiple possible field names
+    String? youtubeUrl;
+    List<String> possibleYouTubeFields = [
+      'youtubeVideoUrl',
+      'videoUrl', 
+      'youtube_url',
+      'video_url',
+      'youtubeUrl',
+      'videoLink',
+      'video_link'
+    ];
+    
+    for (String field in possibleYouTubeFields) {
+      if (json[field] != null && json[field].toString().isNotEmpty) {
+        youtubeUrl = json[field].toString();
+        print('🎥 DEBUG: Found YouTube URL in field "$field": $youtubeUrl');
+        break;
+      }
+    }
+    
+    if (youtubeUrl == null) {
+      print('❌ DEBUG: No YouTube URL found in any field');
+    }
+
     return LessonModel(
       id: json['_id']?.toString() ?? json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
       sectionId: json['sectionId']?.toString() ?? '',
       instructorId: json['instructorId']?.toString() ?? '',
       description: json['description']?.toString(),
-      youtubeVideoUrl: json['youtubeVideoUrl']?.toString(),
+      youtubeVideoUrl: youtubeUrl,
       images: imagesList,  // Added images handling
       quiz: json['quiz']?.toString(),
       createdAt: json['createdAt'] != null
@@ -137,11 +162,44 @@ class LessonListResponse {
   });
 
   factory LessonListResponse.fromJson(Map<String, dynamic> json) {
+    // Debug: Log the complete JSON structure
+    print('🔍 DEBUG LessonListResponse: Full JSON: $json');
+    
     final data = json['data'] ?? {};
-    final lessonsJson = data['lessons'] as List<dynamic>? ?? [];
-    final lessons = lessonsJson
-        .map((lessonJson) => LessonModel.fromJson(lessonJson))
-        .toList();
+    print('🔍 DEBUG LessonListResponse: data field: $data');
+    
+    List<LessonModel> lessons = [];
+    
+    // Check for the new structure: data.sections[].lessons[]
+    if (data['sections'] != null && data['sections'] is List) {
+      final sections = data['sections'] as List<dynamic>;
+      print('🔍 DEBUG LessonListResponse: Found ${sections.length} sections');
+      
+      // Extract lessons from all sections
+      for (final section in sections) {
+        if (section is Map<String, dynamic> && section['lessons'] != null) {
+          final sectionLessons = section['lessons'] as List<dynamic>? ?? [];
+          print('🔍 DEBUG LessonListResponse: Section has ${sectionLessons.length} lessons');
+          
+          for (final lessonJson in sectionLessons) {
+            if (lessonJson is Map<String, dynamic>) {
+              lessons.add(LessonModel.fromJson(lessonJson));
+            }
+          }
+        }
+      }
+    }
+    // Fallback: Check for the old structure: data.lessons[]
+    else if (data['lessons'] != null && data['lessons'] is List) {
+      final lessonsJson = data['lessons'] as List<dynamic>;
+      print('🔍 DEBUG LessonListResponse: Found lessons in old structure: ${lessonsJson.length}');
+      lessons = lessonsJson
+          .where((item) => item is Map<String, dynamic>)
+          .map((lessonJson) => LessonModel.fromJson(lessonJson as Map<String, dynamic>))
+          .toList();
+    }
+    
+    print('🔍 DEBUG LessonListResponse: Total lessons parsed: ${lessons.length}');
     
     return LessonListResponse(
       status: json['status'] ?? 'Success',

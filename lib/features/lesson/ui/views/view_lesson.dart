@@ -14,6 +14,7 @@ import '../widgets/video_screen.dart';
 import '../widgets/lesson_navigation.dart';
 import '../widgets/lesson_content.dart';
 import '../widgets/error_view.dart';
+import '../../../login/logic/cubit/my_cubit.dart';
 
 class ViewLesson extends StatefulWidget {
   const ViewLesson(
@@ -54,7 +55,11 @@ class _ViewLessonState extends State<ViewLesson> {
         lessonId: currentLesson.id,
       );
 
-      courseDetailsCubit.emitKidEndCourse(request);
+      // Only call kidEndCourse if the role is 'kid'
+      final currentRole = context.read<RoleCubit>().state;
+      if (currentRole == 'kid') {
+        courseDetailsCubit.emitKidEndCourse(request);
+      }
     }
 
     setState(() {
@@ -76,6 +81,7 @@ class _ViewLessonState extends State<ViewLesson> {
         BlocProvider.value(value: courseDetailsCubit),
         BlocProvider.value(value: reviewsCubit),
         BlocProvider.value(value: quizCubit),
+        BlocProvider.value(value: getIt<RoleCubit>()),
       ],
       child: MultiBlocListener(
         listeners: [
@@ -149,6 +155,8 @@ class _ViewLessonState extends State<ViewLesson> {
                             );
                           }
                           final currentLesson = lessons[selectedLessonIndex];
+                          
+                          
                           return SingleChildScrollView(
                             child: Column(
                               children: [

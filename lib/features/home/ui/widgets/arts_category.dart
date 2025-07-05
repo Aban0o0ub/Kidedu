@@ -120,9 +120,9 @@ class _ArtsCategoryState extends State<ArtsCategory> {
                   );
                 } else if (state is GetCourseByCategoryFailure) {
                   if (state.error.contains("No courses available")) {
-                    return const Center(
+                    return Center(
                       child: Text(
-                        "No courses available",
+                        "No courses available".tr(),
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey,
@@ -139,7 +139,7 @@ class _ArtsCategoryState extends State<ArtsCategory> {
                     );
                   }
                 }
-                return const Center(child: Text("No courses available"));
+                return Center(child: Text("No courses available".tr()));
               },
             ),
           ),

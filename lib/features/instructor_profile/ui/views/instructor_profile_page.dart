@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -108,7 +109,7 @@ class _InstructorProfilePage extends State<InstructorProfilePage> {
                         FocusScope.of(context).unfocus();
                       });
                     },
-                    text: "Add a new course",
+                    text: "Add a new course".tr(),
                     width: 320,
                   ),
                 ),

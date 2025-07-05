@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +6,7 @@ import '../../../../core/widgets/notification_badge.dart';
 import '../../../../core/notifications/notification_cubit.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/injection/injection.dart';
+import '../../../kid_profile/logic/cubit/kid_profile_cubit.dart';
 
 class HomeAppbar extends StatelessWidget {
   const HomeAppbar({super.key, required this.kidName});
@@ -18,7 +18,7 @@ class HomeAppbar extends StatelessWidget {
       height: 110.h,
       padding: EdgeInsets.symmetric(horizontal: 16.w), // تقليل التباعد الجانبي
       decoration: BoxDecoration(
-        color: const Color(0XFF02457A),
+        color: Theme.of(context).primaryColor,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(25.r),
           bottomRight: Radius.circular(25.r),
@@ -29,13 +29,43 @@ class HomeAppbar extends StatelessWidget {
         children: [
                    
 
-          ClipOval(
-            child: Image.asset(
-              'assets/images/kidprofile.jpeg',
-              height: 70.h, 
-              width: 70.w,
-              fit: BoxFit.cover, 
-            ),
+          BlocBuilder<KidProfileCubit, KidProfileState>(
+            builder: (context, state) {
+              ImageProvider kidImage;
+              if (state is KidProfileSuccess) {
+                final kid = state.kid;
+                if (kid.image != null && kid.image!.isNotEmpty) {
+                  if (kid.image!.startsWith('http') || kid.image!.startsWith('/uploads/')) {
+                    kidImage = NetworkImage(kid.image!.startsWith('http') 
+                        ? kid.image! 
+                        : 'http://192.168.1.3:3000${kid.image}');
+                  } else {
+                    kidImage = const AssetImage('assets/images/kidprofile.jpeg');
+                  }
+                } else {
+                  kidImage = const AssetImage('assets/images/kidprofile.jpeg');
+                }
+              } else {
+                kidImage = const AssetImage('assets/images/kidprofile.jpeg');
+              }
+              
+              return ClipOval(
+                child: Container(
+                  height: 70.h,
+                  width: 70.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: kidImage,
+                      fit: BoxFit.cover,
+                      onError: (error, stackTrace) {
+                        // Fallback to default image on error
+                      },
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
           SizedBox(width: 15.w), 
           Expanded(

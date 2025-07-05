@@ -102,6 +102,7 @@ class ReviewData {
   String? get kidIdString => kidId is String ? kidId : null;
   String get displayKidName =>
       kidObject?.name ?? kidIdString ?? 'Unknown Student';
+  String? get kidImage => kidObject?.image;
       
   ReviewInstructor? get instructorObject => instructorId is ReviewInstructor ? instructorId : null;
   String? get instructorIdString => instructorId is String ? instructorId : null;
@@ -191,13 +192,15 @@ class ReviewInstructor {
 class ReviewKid {
   final String id;
   final String name;
+  final String? image;
 
-  ReviewKid({required this.id, required this.name});
+  ReviewKid({required this.id, required this.name, this.image});
 
   factory ReviewKid.fromJson(Map<String, dynamic> json) {
     return ReviewKid(
       id: json['id'] ?? json['_id'] ?? '',
       name: json['Name'] ?? 'Unknown Student',
+      image: json['image'],
     );
   }
 
@@ -205,6 +208,7 @@ class ReviewKid {
     return {
       'id': id,
       'Name': name,
+      'image': image,
     };
   }
 }

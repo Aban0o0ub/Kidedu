@@ -2,10 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/helper/cache_helper.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/widgets/appbar.dart';
 import '../../../../core/widgets/language_settings.dart';
+import '../../../login/logic/cubit/my_cubit.dart';
 import '../widgets/theme_provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -42,6 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   // ✅ الحل الصحيح
                   themeProvider.setThemeValue(value);
                 },
+                context: context,
               ),
               _buildDivider(),
               _buildSwitchTile(
@@ -53,13 +54,14 @@ class _SettingsPageState extends State<SettingsPage> {
                     isNotificationsEnabled = val;
                   });
                 },
+                context: context,
               ),
               _buildDivider(),
-              _buildListTile(
-                Icons.payment,
-                "payment".tr(),
-              ),
-              _buildDivider(),
+              // _buildListTile(
+              //   Icons.payment,
+              //   "payment".tr(),
+              // ),
+              // _buildDivider(),
               _buildListTile(
                 Icons.language,
                 "language".tr(),
@@ -105,7 +107,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 24,
-                      color: Color(0xFF02457A)),
+                      color: Theme.of(context).primaryColor),
                 ),
               ),
               Wrap(
@@ -187,25 +189,28 @@ Widget _buildSwitchTile({
   required String text,
   required bool value,
   required Function(bool) onChanged,
+  required BuildContext context,
 }) {
   return SwitchListTile(
-    secondary: Icon(icon, color: const Color(0xFF02457A)),
+    secondary: Icon(icon, color: Theme.of(context).primaryColor),
     title: Text(text,
-        style: const TextStyle(
+        style: TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 24,
-            color: Color(0xFF02457A))),
+            color: Theme.of(context).primaryColor)),
     value: value,
     onChanged: onChanged,
-    activeColor: Colors.blue, // لون الـ switch لما يكون مفعل
+    activeColor: Theme.of(context).primaryColor, // لون الـ switch لما يكون مفعل
   );
 }
 
 Widget _buildDivider() {
-  return const Divider(
-    color: Color(0xFF02457A),
-    thickness: 2,
-    height: 20,
+  return Builder(
+    builder: (context) => Divider(
+      color: Theme.of(context).primaryColor,
+      thickness: 2,
+      height: 20,
+    ),
   );
 }
 
@@ -216,17 +221,19 @@ Widget _buildListTile(
   bool showArrow = true,
   VoidCallback? onTap,
 }) {
-  return ListTile(
-    leading: Icon(icon, color: const Color(0xFF02457A)),
-    title: Text(
-      text,
-      style: const TextStyle(
-          fontWeight: FontWeight.w500, fontSize: 24, color: Color(0xFF02457A)),
+  return Builder(
+    builder: (context) => ListTile(
+      leading: Icon(icon, color: Theme.of(context).primaryColor),
+      title: Text(
+        text,
+        style: TextStyle(
+            fontWeight: FontWeight.w500, fontSize: 24, color: Theme.of(context).primaryColor),
+      ),
+      trailing: trailingText != null
+          ? Text(trailingText, style: const TextStyle(color: Colors.grey))
+          : (showArrow ? const Icon(Icons.arrow_forward_ios, size: 16) : null),
+      onTap: onTap,
     ),
-    trailing: trailingText != null
-        ? Text(trailingText, style: const TextStyle(color: Colors.grey))
-        : (showArrow ? const Icon(Icons.arrow_forward_ios, size: 16) : null),
-    onTap: onTap,
   );
 }
 
@@ -259,7 +266,8 @@ void _showLogoutConfirmationDialog(BuildContext context) {
 
 Future<void> _performLogout(BuildContext context) async {
   try {
-    await CacheHelper.clear();
+    // استخدام RoleCubit للخروج (سيقوم بمسح AuthService أيضاً)
+    await context.read<RoleCubit>().logout();
 
     if (context.mounted) {
       showDialog(
@@ -267,15 +275,16 @@ Future<void> _performLogout(BuildContext context) async {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text("Success"),
-            content: const Text("Logout successfully"),
+            title: Text("Success".tr()),
+            content: Text("Logout successfully".tr()),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  context.go(Routes.roleSelectionPage);
+                  // العودة إلى صفحة الـ onboarding كما طلب المستخدم
+                  context.go(Routes.welcomePage);
                 },
-                child: const Text("Okay"),
+                child: Text("Okay".tr()),
               ),
             ],
           );

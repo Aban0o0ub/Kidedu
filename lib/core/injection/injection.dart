@@ -100,6 +100,9 @@ void initGetIt() {
   
   // Notification Cubit as singleton to persist across the app
   getIt.registerLazySingleton<NotificationCubit>(() => NotificationCubit());
+  
+  // Role Cubit as singleton to persist role state across the app
+  getIt.registerLazySingleton<RoleCubit>(() => RoleCubit());
 }
 
 Dio createAndSetupDio() {

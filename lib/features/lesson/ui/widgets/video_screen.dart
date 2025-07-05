@@ -36,6 +36,11 @@ class _VideoLessonState extends State<VideoLesson>
   void initState() {
     super.initState();
 
+    // Debug info
+    print('🔍 DEBUG VideoLesson: videoLink = "${widget.videoLink}"');
+    print('🔍 DEBUG VideoLesson: lesson.youtubeVideoUrl = "${widget.lesson?.youtubeVideoUrl}"');
+    print('🔍 DEBUG VideoLesson: lesson.images = ${widget.lesson?.images}');
+
     // Simple sparkle animation
     _sparkleController = AnimationController(
       duration: Duration(seconds: 2),
@@ -52,29 +57,37 @@ class _VideoLessonState extends State<VideoLesson>
     _sparkleController.repeat(reverse: true);
 
     // YouTube setup
-    final videoId = YoutubePlayer.convertUrlToId(widget.videoLink);
-    if (videoId != null) {
-      _controller = YoutubePlayerController(
-        initialVideoId: videoId,
-        flags: const YoutubePlayerFlags(
-          autoPlay: true,
-          mute: false,
-          enableCaption: true,
-          isLive: false,
-          forceHD: true,
-        ),
-      );
+    if (widget.videoLink.isNotEmpty) {
+      final videoId = YoutubePlayer.convertUrlToId(widget.videoLink);
+      print('🎥 DEBUG: YouTube Video ID extracted: $videoId');
+      
+      if (videoId != null) {
+        _controller = YoutubePlayerController(
+          initialVideoId: videoId,
+          flags: const YoutubePlayerFlags(
+            autoPlay: true,
+            mute: false,
+            enableCaption: true,
+            isLive: false,
+            forceHD: true,
+          ),
+        );
 
-      // Listen for video end to show reward
-      _controller!.addListener(() {
-        if (_controller!.value.playerState == PlayerState.ended &&
-            !_showReward) {
-          setState(() {
-            _showReward = true;
-          });
-          _showCompletionReward();
-        }
-      });
+        // Listen for video end to show reward
+        _controller!.addListener(() {
+          if (_controller!.value.playerState == PlayerState.ended &&
+              !_showReward) {
+            setState(() {
+              _showReward = true;
+            });
+            _showCompletionReward();
+          }
+        });
+      } else {
+        print('❌ DEBUG: Failed to extract video ID from URL: ${widget.videoLink}');
+      }
+    } else {
+      print('❌ DEBUG: videoLink is empty');
     }
   }
 
@@ -524,7 +537,16 @@ class _VideoLessonState extends State<VideoLesson>
       // Show image carousel
       return _buildImageCarousel();
     } else {
-      // Show no content message
+      // Show no content message with debug info
+      String debugInfo = '';
+      if (widget.videoLink.isEmpty && (widget.lesson?.images?.isEmpty ?? true)) {
+        debugInfo = 'Both video URL and images are empty';
+      } else if (widget.videoLink.isEmpty) {
+        debugInfo = 'Video URL is empty but images: ${widget.lesson?.images?.length ?? 0}';
+      } else if (widget.lesson?.images?.isEmpty ?? true) {
+        debugInfo = 'Images are empty but video URL: "${widget.videoLink}"';
+      }
+      
       return Container(
         margin: EdgeInsets.all(16),
         padding: EdgeInsets.all(40),
@@ -562,12 +584,52 @@ class _VideoLessonState extends State<VideoLesson>
             ),
             SizedBox(height: 8),
             Text(
-              'This lesson doesn\'t have video or images yet',
+              widget.videoLink.isEmpty 
+                  ? 'No YouTube video URL was provided for this lesson'
+                  : 'Video URL provided but couldn\'t load: "${widget.videoLink}"',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.orange.shade500,
               ),
               textAlign: TextAlign.center,
+            ),
+            if (widget.lesson?.images?.isEmpty ?? true) ...[
+              SizedBox(height: 8),
+              Text(
+                'No images available either',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.orange.shade400,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+            if (debugInfo.isNotEmpty) ...[
+              SizedBox(height: 12),
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Debug: $debugInfo',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                    fontFamily: 'monospace',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+            SizedBox(height: 16),
+            Text(
+              'Check console logs for more details',
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.grey.shade400,
+              ),
             ),
           ],
         ),

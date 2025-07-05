@@ -49,9 +49,9 @@ class CategoriesItem extends StatelessWidget {
                     child: Text(
                       title,
                       textAlign: TextAlign.end,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18, 
-                        color: Color(0xFF02457A),
+                        color: Theme.of(context).primaryColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

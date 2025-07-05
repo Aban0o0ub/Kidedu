@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loginpage/features/cart/logic/cubit/cart_cubit.dart';
 import '../views/home_page.dart';
+import 'nav_bar_visibility_controller.dart';
 
 // ignore: must_be_immutable
 class CourseCard extends StatefulWidget {
@@ -52,7 +55,9 @@ class _CourseCardState extends State<CourseCard> {
     if (imagePath.startsWith('/uploads/')) {
       return 'http://192.168.1.3:3000$imagePath';
     } else if (!imagePath.startsWith('http')) {
-      return 'http://192.168.1.3:3000$imagePath';
+      // Add slash if imagePath doesn't start with one
+      String pathWithSlash = imagePath.startsWith('/') ? imagePath : '/$imagePath';
+      return 'http://192.168.1.3:3000$pathWithSlash';
     }
     return imagePath;
   }
@@ -94,11 +99,30 @@ class _CourseCardState extends State<CourseCard> {
         height: 80,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          return Image.asset(
-            "assets/images/CourseDefaultPhoto.jpeg",
+          // Handle 404 and other network errors by showing default image
+          print('Image loading failed for URL: ${_getFullImageUrl(imageUrl ?? '')}, Error: $error');
+          return Container(
             width: 80,
             height: 80,
-            fit: BoxFit.cover,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey[200],
+            ),
+            child: Image.asset(
+              "assets/images/CourseDefaultPhoto.jpeg",
+              width: 80,
+              height: 80,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                // Fallback to icon if default image also fails
+                return Container(
+                  width: 80,
+                  height: 80,
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.school, size: 30, color: Colors.grey),
+                );
+              },
+            ),
           );
         },
         loadingBuilder: (context, child, loadingProgress) {
@@ -279,8 +303,8 @@ class _CourseCardState extends State<CourseCard> {
                       if (state is AddCartFailure && 
                           state.error.contains('already')) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Course already in cart or purchased'),
+                          SnackBar(
+                            content: Text('Course already in cart or purchased'.tr()),
                             backgroundColor: Colors.orange,
                             duration: Duration(seconds: 2),
                           ),
@@ -312,6 +336,9 @@ class _CourseCardState extends State<CourseCard> {
                               : () async {
                                   if (isAddedToCart) {
                                     // الانتقال للسلة
+                                    NavBarVisibilityController.showNavBar();
+                                    // delay بسيط للتأكد من إن التغيير يتم بشكل صحيح
+                                    await Future.delayed(const Duration(milliseconds: 100));
                                     TabControllerHelper.selectedIndexNotifier.value = 4;
                                     WidgetsBinding.instance.addPostFrameCallback((_) {
                                       if (Navigator.canPop(context)) {

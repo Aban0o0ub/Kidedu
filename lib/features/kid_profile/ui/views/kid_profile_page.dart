@@ -89,35 +89,35 @@ class _KidProfilePageState extends State<KidProfilePage> {
                               KidData? kid = state.kid;
           
                               if (kid.name == null || kid.name!.isEmpty) {
-                                return const Text(
+                                return Text(
                                   "Kid name not available",
                                   style: TextStyle(
                                     fontSize: 35,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF02457A),
+                                    color: Theme.of(context).primaryColor,
                                   ),
                                 );
                               }
                               return Text(
                                 kid.name!,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 35,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF02457A),
+                                  color: Theme.of(context).primaryColor,
                                 ),
                               );
                             } else if (state is KidProfileFailure) {
                               return Text(
                                 "There is an error: ${state.error}",
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 20,
-                                  color: Colors.red,
+                                  color: Theme.of(context).colorScheme.error,
                                 ),
                               );
                             }
-                            return const Center(
+                            return Center(
                               child: CircularProgressIndicator(
-                                color: Color(0xFF02457A),
+                                color: Theme.of(context).primaryColor,
                               ),
                             );
                           },
@@ -162,7 +162,7 @@ class _KidProfilePageState extends State<KidProfilePage> {
                       );
                     },
                   ),
-                  const Divider(color: Color(0xFF02457A)),
+                  Divider(color: Theme.of(context).primaryColor),
                   profileitem(
                     image: 'assets/images/notifications.jpeg',
                     title: 'Notifications',
@@ -171,7 +171,7 @@ class _KidProfilePageState extends State<KidProfilePage> {
                       context.push(Routes.notificationPage);
                     },
                   ),
-                  const Divider(color: Color(0xFF02457A)),
+                  Divider(color: Theme.of(context).primaryColor),
                   profileitem(
                     image: 'assets/images/achievements.jpeg',
                     title: 'Achievements',
@@ -180,13 +180,13 @@ class _KidProfilePageState extends State<KidProfilePage> {
                       context.push(Routes.achievementPage);
                     },
                   ),
-                  const Divider(color: Color(0xFF02457A)),
+                  Divider(color: Theme.of(context).primaryColor),
                   profileitem(
                     image: 'assets/images/courses.jpeg',
                     title: 'My courses',
                     onTap: () {},
                   ),
-                  const Divider(color: Color(0xFF02457A)),
+                  Divider(color: Theme.of(context).primaryColor),
                   // profileitem(
                   //   image: 'assets/images/evaluation.jpeg',
                   //   title: 'Evaluation',
@@ -201,7 +201,7 @@ class _KidProfilePageState extends State<KidProfilePage> {
                       context.push(Routes.bookmarkPage);
                     },
                   ),
-                  const Divider(color: Color(0xFF02457A)),
+                  Divider(color: Theme.of(context).primaryColor),
                   profileitem(
                     image: 'assets/images/settings.jpeg',
                     title: 'Settings',

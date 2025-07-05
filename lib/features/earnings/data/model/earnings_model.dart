@@ -78,11 +78,13 @@ class AdminStatsData {
   final num totalProfit;
   final int totalPayments;
   final DateTime lastUpdated;
+  final UsersData users;
 
   AdminStatsData({
     required this.totalProfit,
     required this.totalPayments,
     required this.lastUpdated,
+    required this.users,
   });
 
   factory AdminStatsData.fromJson(Map<String, dynamic> json) {
@@ -90,6 +92,26 @@ class AdminStatsData {
       totalProfit: json['totalProfit'],
       totalPayments: json['totalPayments'],
       lastUpdated: DateTime.parse(json['lastUpdated']),
+      users: json['users'] != null 
+          ? UsersData.fromJson(json['users'])
+          : UsersData(kids: 0, instructors: 0),
+    );
+  }
+}
+
+class UsersData {
+  final int kids;
+  final int instructors;
+
+  UsersData({
+    required this.kids,
+    required this.instructors,
+  });
+
+  factory UsersData.fromJson(Map<String, dynamic> json) {
+    return UsersData(
+      kids: json['kids'] ?? 0,
+      instructors: json['instructors'] ?? 0,
     );
   }
 }

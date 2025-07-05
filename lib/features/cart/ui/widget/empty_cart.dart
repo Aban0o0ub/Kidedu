@@ -20,7 +20,7 @@ class EmptyCart extends StatelessWidget {
             style: TextStyle(
               fontSize: 40,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF02457A),
+              color: Theme.of(context).primaryColor,
             ),
           ),
           SizedBox(height: 180),

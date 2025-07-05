@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -16,12 +17,12 @@ class ProfileBody extends StatefulWidget {
   final List<dynamic>? courses;
   final List<dynamic>? reviews;
   final bool showEditIcons;
-  
+
   const ProfileBody({
-    super.key, 
-    this.courses, 
+    super.key,
+    this.courses,
     this.reviews,
-    this.showEditIcons = true, 
+    this.showEditIcons = true,
   });
 
   @override
@@ -33,7 +34,7 @@ class _ProfileBodyState extends State<ProfileBody> {
 
   String? _getFirstValidImage(List<String>? images) {
     if (images == null || images.isEmpty) return null;
-    
+
     for (String image in images) {
       if (image.isNotEmpty) {
         return image;
@@ -41,12 +42,14 @@ class _ProfileBodyState extends State<ProfileBody> {
     }
     return null;
   }
-  
+
   String _getFullImageUrl(String imagePath) {
     if (imagePath.startsWith('/uploads/')) {
       return 'http://192.168.1.3:3000$imagePath';
     } else if (!imagePath.startsWith('http')) {
-      return 'http://192.168.1.3:3000$imagePath';
+      // Add slash if imagePath doesn't start with one
+      String pathWithSlash = imagePath.startsWith('/') ? imagePath : '/$imagePath';
+      return 'http://192.168.1.3:3000$pathWithSlash';
     }
     return imagePath;
   }
@@ -72,50 +75,52 @@ class _ProfileBodyState extends State<ProfileBody> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      instructor.name ?? "Instructor Name",
-                      style: const TextStyle(
+                      instructor.name ?? "Instructor Name".tr(),
+                      style: TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF02457A),
+                        color: Theme.of(context).primaryColor,
                       ),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      instructor.title ?? "Title",
-                      style: const TextStyle(
+                      instructor.title ?? "Title".tr(),
+                      style: TextStyle(
                         fontSize: 24,
-                        color: Color(0xFF02457A),
+                        color: Theme.of(context).primaryColor,
                       ),
                     ),
                     const SizedBox(height: 30),
                     buildInfoContainer(
                       context: context,
-                      header: "Bio",
-                      text: instructor.bio ?? "No bio available",
+                      header: "Bio".tr(),
+                      text: instructor.bio ?? "No bio available".tr(),
                       showEditButton: widget.showEditIcons,
                     ),
                     const SizedBox(height: 20),
                     buildInfoContainer(
                       context: context,
-                      header: "Personal Information",
-                      name: instructor.name ?? "Instructor Name",
-                      phone: instructor.phoneNumber ?? "No phone available",
-                      email: instructor.email ?? "No email available",
-                      governorate:
-                          instructor.governorate ?? "No governorate available",
-                      title: instructor.title ?? "Title",
+                      header: "Personal Information".tr(),
+                      name: instructor.name ?? "Instructor Name".tr(),
+                      phone:
+                          instructor.phoneNumber ?? "No phone available".tr(),
+                      email: instructor.email ?? "No email available".tr(),
+                      governorate: instructor.governorate ??
+                          "No governorate available".tr(),
+                      title: instructor.title ?? "Title".tr(),
                       showEditButton: widget.showEditIcons,
                     ),
                     const SizedBox(height: 20),
                     buildInfoContainer(
                       context: context,
-                      header: "Experience",
-                      text: instructor.experience ?? "No experience available",
+                      header: "Experience".tr(),
+                      text: instructor.experience ??
+                          "No experience available".tr(),
                       showEditButton: widget.showEditIcons,
                     ),
                     const SizedBox(height: 20),
                     BlueSectionContainer(
-                      title: "My Courses",
+                      title: "My Courses".tr(),
                       content: widget.courses != null
                           ? _buildCoursesListWithWhiteStyle(widget.courses!)
                           : BlocBuilder<MyCoursesCubit, MyCoursesState>(
@@ -135,7 +140,8 @@ class _ProfileBodyState extends State<ProfileBody> {
                                     child: Center(
                                       child: Text(
                                         "Error: ${state.error}",
-                                        style: const TextStyle(color: Colors.white),
+                                        style: const TextStyle(
+                                            color: Colors.white),
                                       ),
                                     ),
                                   );
@@ -143,11 +149,12 @@ class _ProfileBodyState extends State<ProfileBody> {
                                   final courses = state.courses;
 
                                   if (courses.isEmpty) {
-                                    return const SizedBox(
+                                    return SizedBox(
                                       height: 165,
                                       child: Center(
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             Icon(
                                               Icons.school_outlined,
@@ -156,7 +163,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                                             ),
                                             SizedBox(height: 8),
                                             Text(
-                                              "No courses yet",
+                                              "No courses yet".tr(),
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: Colors.white,
@@ -168,7 +175,8 @@ class _ProfileBodyState extends State<ProfileBody> {
                                     );
                                   }
 
-                                  return _buildCoursesListWithWhiteStyle(courses);
+                                  return _buildCoursesListWithWhiteStyle(
+                                      courses);
                                 } else {
                                   return const SizedBox(
                                     height: 165,
@@ -185,7 +193,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                     ),
                     const SizedBox(height: 30),
                     BlueSectionContainer(
-                      title: "Reviews",
+                      title: "Reviews".tr(),
                       content: widget.reviews != null
                           ? _buildReviewsList(widget.reviews!)
                           : BlocBuilder<ReviewsCubit, ReviewsState>(
@@ -201,16 +209,20 @@ class _ProfileBodyState extends State<ProfileBody> {
                                   );
                                 } else if (state is GetReviewsFailure) {
                                   // التحقق من نوع الخطأ - 404 يعني مفيش reviews
-                                  bool isNoReviews = state.error.contains('404') ||
-                                      state.error.toLowerCase().contains('not found');
+                                  bool isNoReviews =
+                                      state.error.contains('404') ||
+                                          state.error
+                                              .toLowerCase()
+                                              .contains('not found');
 
                                   if (isNoReviews) {
                                     // عرض رسالة "لا توجد مراجعات" بدل error
-                                    return const SizedBox(
+                                    return SizedBox(
                                       height: 142,
                                       child: Center(
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             Icon(
                                               Icons.rate_review_outlined,
@@ -219,7 +231,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                                             ),
                                             SizedBox(height: 8),
                                             Text(
-                                              "No reviews yet",
+                                              "No reviews yet".tr(),
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: Colors.white,
@@ -227,7 +239,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                                             ),
                                             SizedBox(height: 4),
                                             Text(
-                                              "Be the first to review!",
+                                              "Be the first to review!".tr(),
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Colors.white70,
@@ -243,7 +255,8 @@ class _ProfileBodyState extends State<ProfileBody> {
                                     height: 142,
                                     child: Center(
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           const Icon(
                                             Icons.error_outline,
@@ -252,9 +265,9 @@ class _ProfileBodyState extends State<ProfileBody> {
                                           ),
                                           const SizedBox(height: 8),
                                           Text(
-                                            "Failed to load reviews",
+                                            "Failed to load reviews".tr(),
                                             style: const TextStyle(
-                                              fontSize: 14, 
+                                              fontSize: 14,
                                               color: Colors.white,
                                             ),
                                           ),
@@ -266,11 +279,12 @@ class _ProfileBodyState extends State<ProfileBody> {
                                   final reviews = state.reviews;
 
                                   if (reviews.isEmpty) {
-                                    return const SizedBox(
+                                    return SizedBox(
                                       height: 142,
                                       child: Center(
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             Icon(
                                               Icons.rate_review_outlined,
@@ -279,7 +293,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                                             ),
                                             SizedBox(height: 8),
                                             Text(
-                                              "No reviews yet",
+                                              "No reviews yet".tr(),
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: Colors.white,
@@ -293,11 +307,11 @@ class _ProfileBodyState extends State<ProfileBody> {
 
                                   return _buildReviewsList(reviews);
                                 } else {
-                                  return const SizedBox(
+                                  return SizedBox(
                                     height: 142,
                                     child: Center(
                                       child: Text(
-                                        "No reviews available.",
+                                        "No reviews available.".tr(),
                                         style: TextStyle(color: Colors.white),
                                       ),
                                     ),
@@ -307,17 +321,91 @@ class _ProfileBodyState extends State<ProfileBody> {
                             ),
                     ),
                     const SizedBox(height: 30),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Social Links".tr(),
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(Icons.edit,
+                                      color: Theme.of(context).primaryColor),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                InkWell(
+                                  onTap: () {},
+                                  child: Image.asset(
+                                    'assets/images/whatsapp.jpeg',
+                                    width: 50,
+                                    height: 50,
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {},
+                                  child: Image.asset(
+                                    'assets/images/facebook.jpeg',
+                                    width: 50,
+                                    height: 50,
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {},
+                                  child: Image.asset(
+                                    'assets/images/behance.jpeg',
+                                    width: 50,
+                                    height: 50,
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {},
+                                  child: Image.asset(
+                                    'assets/images/linkedin.jpeg',
+                                    width: 50,
+                                    height: 50,
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {},
+                                  child: Image.asset(
+                                    'assets/images/github.jpeg',
+                                    width: 50,
+                                    height: 50,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ]),
+                    ),
+                    const SizedBox(height: 30),
                   ]);
             } else if (state is InstructorProfileFailure) {
               return Center(
                 child: Text(
-                  "There is an error: ${state.error}",
-                  style: const TextStyle(fontSize: 20, color: Colors.red),
+                  "${"There is an error:".tr()} ${state.error}",
+                  style: TextStyle(
+                      fontSize: 20, color: Theme.of(context).colorScheme.error),
                 ),
               );
             }
-            return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF02457A)),
+            return Center(
+              child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor),
             );
           },
         ),
@@ -325,37 +413,39 @@ class _ProfileBodyState extends State<ProfileBody> {
     );
   }
 
-  Widget _buildCoursesList(List<dynamic> courses) {
-    return SizedBox(
-      height: 165,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: courses.length,
-        itemBuilder: (context, index) {
-          final course = courses[index];
-          return GestureDetector(
-            onTap: () {
-              if (course.id != null && course.id!.isNotEmpty) {
-                context.push(
-                  Routes.courseDetails,
-                  extra: {
-                    '_id': course.id,
-                    'courseDetailsCubit': courseDetailsCubit,
-                  },
-                );
-              }
-            },
-            child: buildCourseBox(
-              imagePath: _getFirstValidImage(courses[index].courseImages) != null 
-                          ? _getFullImageUrl(_getFirstValidImage(courses[index].courseImages)!)
-                          : "assets/images/CourseDefaultPhoto.jpeg",
-              courseName: courses[index].courseName ?? 'No Course Name',
-            ),
-          );
-        },
-      ),
-    );
-  }
+  // Widget _buildCoursesList(List<dynamic> courses) {
+  //   return SizedBox(
+  //     height: 165,
+  //     child: ListView.builder(
+  //       scrollDirection: Axis.horizontal,
+  //       itemCount: courses.length,
+  //       itemBuilder: (context, index) {
+  //         final course = courses[index];
+  //         return GestureDetector(
+  //           onTap: () {
+  //             if (course.id != null && course.id!.isNotEmpty) {
+  //               context.push(
+  //                 Routes.courseDetails,
+  //                 extra: {
+  //                   '_id': course.id,
+  //                   'courseDetailsCubit': courseDetailsCubit,
+  //                 },
+  //               );
+  //             }
+  //           },
+  //           child: buildCourseBox(
+  //             imagePath:
+  //                 _getFirstValidImage(courses[index].courseImages) != null
+  //                     ? _getFullImageUrl(
+  //                         _getFirstValidImage(courses[index].courseImages)!)
+  //                     : "assets/images/CourseDefaultPhoto.jpeg",
+  //             courseName: courses[index].courseName ?? 'No Course Name'.tr(),
+  //           ),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
 
   Widget _buildCoursesListWithWhiteStyle(List<dynamic> courses) {
     return SizedBox(
@@ -378,10 +468,12 @@ class _ProfileBodyState extends State<ProfileBody> {
               }
             },
             child: buildCourseBox(
-              imagePath: _getFirstValidImage(courses[index].courseImages) != null 
-                          ? _getFullImageUrl(_getFirstValidImage(courses[index].courseImages)!)
-                          : "assets/images/CourseDefaultPhoto.jpeg",
-              courseName: courses[index].courseName ?? 'No Course Name',
+              imagePath:
+                  _getFirstValidImage(courses[index].courseImages) != null
+                      ? _getFullImageUrl(
+                          _getFirstValidImage(courses[index].courseImages)!)
+                      : "assets/images/CourseDefaultPhoto.jpeg",
+              courseName: courses[index].courseName ?? 'No Course Name'.tr(),
             ),
           );
         },
@@ -398,8 +490,8 @@ class _ProfileBodyState extends State<ProfileBody> {
         itemBuilder: (context, index) {
           final review = reviews[index];
           return Padding(
-            padding: EdgeInsets.only(
-                right: index < reviews.length - 1 ? 10 : 0),
+            padding:
+                EdgeInsets.only(right: index < reviews.length - 1 ? 10 : 0),
             child: buildHorizontalReviewCard(
               name: review.displayKidName,
               review: review.reviewText,
@@ -411,4 +503,4 @@ class _ProfileBodyState extends State<ProfileBody> {
       ),
     );
   }
-} 
+}

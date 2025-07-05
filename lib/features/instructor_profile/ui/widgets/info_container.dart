@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../logic/cubit/instructor_profile_cubit.dart';
@@ -19,7 +20,7 @@ Widget buildInfoContainer({
     widgetList.add(
       Text(
         text,
-        style: const TextStyle(fontSize: 16, color: Color(0xFF02457A)),
+        style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
       ),
     );
   }
@@ -27,21 +28,21 @@ Widget buildInfoContainer({
   if (name != null && name.isNotEmpty) {
     widgetList.add(
       Text("Name: $name",
-          style: const TextStyle(fontSize: 16, color: Color(0xFF02457A))),
+          style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
     );
   }
 
   if (phone != null && phone.isNotEmpty) {
     widgetList.add(
       Text("Phone: $phone",
-          style: const TextStyle(fontSize: 16, color: Color(0xFF02457A))),
+          style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
     );
   }
 
   if (email != null && email.isNotEmpty) {
     widgetList.add(
       Text("Email: $email",
-          style: const TextStyle(fontSize: 16, color: Color(0xFF02457A))),
+          style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
     );
   }
 
@@ -49,14 +50,14 @@ Widget buildInfoContainer({
   if (governorate != null && governorate.isNotEmpty) {
     widgetList.add(
       Text("Governorate: $governorate",
-          style: const TextStyle(fontSize: 16, color: Color(0xFF02457A))),
+          style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
     );
   }
 
   if (title != null && title.isNotEmpty) {
     widgetList.add(
       Text("Title: $title",
-          style: const TextStyle(fontSize: 16, color: Color(0xFF02457A))),
+          style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
     );
   }
 
@@ -65,7 +66,7 @@ Widget buildInfoContainer({
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: const Color(0xFF02457A), width: 1),
+      border: Border.all(color: Theme.of(context).primaryColor, width: 1),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,10 +76,10 @@ Widget buildInfoContainer({
           children: [
             Text(
               header,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF02457A),
+                color: Theme.of(context).primaryColor,
               ),
             ),
             // أخفي إيقون التعديل لو showEditButton هو false
@@ -96,7 +97,7 @@ Widget buildInfoContainer({
                     title: title,
                   );
                 },
-                icon: const Icon(Icons.edit, color: Color(0xFF02457A)),
+                icon: Icon(Icons.edit, color: Theme.of(context).primaryColor),
               ),
           ],
         ),
@@ -153,36 +154,36 @@ void _showBioEditDialog(BuildContext context, String currentBio) {
               // تحديث البيانات في الـ UI
              // context.read<InstructorProfileCubit>().emitGetInstructorProfile();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Bio updated successfully!"),
+                SnackBar(
+                  content: Text("Bio updated successfully!".tr()),
                   backgroundColor: Colors.green,
                 ),
               );
             } else if (state is UpdateInstructorFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text("Error: ${state.error}"),
+                  content: Text("${"Error:".tr()} ${state.error}"),
                   backgroundColor: Colors.red,
                 ),
               );
             }
           },
           child: AlertDialog(
-            title: const Text(
-              "Edit Bio",
+            title: Text(
+              "Edit Bio".tr(),
               style: TextStyle(
-                  color: Color(0xFF02457A), fontWeight: FontWeight.bold),
+                  color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
             ),
             content: SizedBox(
               width: double.maxFinite,
               child: TextField(
                 controller: bioController,
                 maxLines: 5,
-                decoration: const InputDecoration(
-                  hintText: "Enter your bio...",
+                decoration: InputDecoration(
+                  hintText: "Enter your bio...".tr(),
                   border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF02457A)),
+                    borderSide: BorderSide(color: Theme.of(context).primaryColor),
                   ),
                 ),
               ),
@@ -207,11 +208,7 @@ void _showBioEditDialog(BuildContext context, String currentBio) {
                             bio: bioController.text.trim(),
                           );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF02457A),
-                    ),
-                    child: const Text("Save",
-                        style: TextStyle(color: Colors.white)),
+                    child: Text("Save".tr()),
                   );
                 },
               ),
@@ -242,8 +239,8 @@ void _showExperienceEditDialog(BuildContext context, String currentExperience) {
               Navigator.of(dialogContext).pop();
              // context.read<InstructorProfileCubit>().emitGetInstructorProfile();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Experience updated successfully!"),
+                SnackBar(
+                  content: Text("Experience updated successfully!".tr()),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -257,10 +254,10 @@ void _showExperienceEditDialog(BuildContext context, String currentExperience) {
             }
           },
           child: AlertDialog(
-            title: const Text(
-              "Edit Experience",
+            title: Text(
+              "Edit Experience".tr(),
               style: TextStyle(
-                  color: Color(0xFF02457A), fontWeight: FontWeight.bold),
+                  color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
             ),
             content: SizedBox(
               width: double.maxFinite,
@@ -346,15 +343,15 @@ void _showPersonalInfoEditDialog({
               // تحديث البيانات في الـ UI
              // context.read<InstructorProfileCubit>().emitGetInstructorProfile();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Personal information updated successfully!"),
+                SnackBar(
+                  content: Text("Personal information updated successfully!".tr()),
                   backgroundColor: Colors.green,
                 ),
               );
             } else if (state is UpdateInstructorFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text("Error: ${state.error}"),
+                  content: Text("${"Error:".tr()} ${state.error}"),
                   backgroundColor: Colors.red,
                 ),
               );

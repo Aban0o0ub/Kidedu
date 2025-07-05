@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../kid_profile/logic/cubit/kid_profile_cubit.dart';
+import '../../../../core/injection/injection.dart';
 
 Widget buildHorizontalReviewCard({
   required String name,
@@ -6,6 +9,7 @@ Widget buildHorizontalReviewCard({
   required int rating,
   String? courseName,
   String? instructorName,
+  String? kidImageUrl, // Keep for compatibility but unused
 }) {
   return Container(
     width: 312,
@@ -17,10 +21,38 @@ Widget buildHorizontalReviewCard({
     ),
     child: Row(
       children: [
-        // Profile picture (optional)
-        const CircleAvatar(
-          radius: 30,
-          backgroundImage: AssetImage("assets/images/kidprofile.jpeg"),
+        // Profile picture (optional) - using KidProfileCubit for current kid image
+        BlocBuilder<KidProfileCubit, KidProfileState>(
+          builder: (context, state) {
+            print('🔥 NEW Review Card - KidProfileCubit State: $state');
+            ImageProvider kidImage;
+            if (state is KidProfileSuccess) {
+              final kid = state.kid;
+              print('🔥 NEW Review Card - Kid Image: ${kid.image}');
+              if (kid.image != null && kid.image!.isNotEmpty) {
+                if (kid.image!.startsWith('http') || kid.image!.startsWith('/uploads/')) {
+                  kidImage = NetworkImage(kid.image!.startsWith('http') 
+                      ? kid.image! 
+                      : 'http://192.168.1.3:3000${kid.image}');
+                  print('🔥 NEW Review Card - Using network image: ${kid.image}');
+                } else {
+                  kidImage = const AssetImage('assets/images/kidprofile.jpeg');
+                  print('🔥 NEW Review Card - Using default asset');
+                }
+              } else {
+                kidImage = const AssetImage('assets/images/kidprofile.jpeg');
+                print('🔥 NEW Review Card - Empty image, using default');
+              }
+            } else {
+              kidImage = const AssetImage('assets/images/kidprofile.jpeg');
+              print('🔥 NEW Review Card - Not success state, using default');
+            }
+            
+            return CircleAvatar(
+              radius: 30,
+              backgroundImage: kidImage,
+            );
+          },
         ),
         const SizedBox(width: 10),
         // Review text

@@ -45,6 +45,11 @@ class HomePage extends StatefulWidget {
 
 class TabControllerHelper {
   static ValueNotifier<int> selectedIndexNotifier = ValueNotifier<int>(2);
+  
+  // للتأكد من أن التطبيق دائماً يرجع للـ Home tab عند بداية أي navigation
+  static void resetToHomeTab() {
+    selectedIndexNotifier.value = 2;
+  }
 }
 
 class _HomePageState extends State<HomePage> {
@@ -70,6 +75,13 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _showWelcomeNotificationOnLogin();
+    
+    // تعيين قيمة default للـ tab لو مفيش قيمة محددة
+    if (TabControllerHelper.selectedIndexNotifier.value == 2) {
+      // لو القيمة الحالية هي الـ default (2)، خليها زي ما هي
+      // لكن لو مختلفة، سيبها
+    }
+    
     _screens = [
       KidProfilePage(kid: KidData()),
       SearchPage(),
@@ -102,7 +114,7 @@ class _HomePageState extends State<HomePage> {
     final tabParam = GoRouterState.of(context).uri.queryParameters['tab'];
     if (tabParam != null) {
       final tabIndex = int.tryParse(tabParam);
-      if (tabIndex != null) {
+      if (tabIndex != null && tabIndex != TabControllerHelper.selectedIndexNotifier.value) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             TabControllerHelper.selectedIndexNotifier.value = tabIndex;
@@ -114,15 +126,23 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false, // Keep navigation bar fixed when keyboard appears
-      body: Stack(
-        children: [
-          IndexedStack(
-            index: selectedIndex,
-            children: _screens,
-          ),
+    return PopScope(
+      canPop: selectedIndex == 2, // يمكن الخروج فقط لو كان في الـ Home tab
+      onPopInvoked: (didPop) {
+        if (!didPop && selectedIndex != 2) {
+          // لو مش في الـ Home tab، ارجع للـ Home tab
+          TabControllerHelper.selectedIndexNotifier.value = 2;
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false, // Keep navigation bar fixed when keyboard appears
+        body: Stack(
+          children: [
+            IndexedStack(
+              index: selectedIndex,
+              children: _screens,
+            ),
           ValueListenableBuilder<bool>(
             valueListenable: NavBarVisibilityController.isNavBarVisible,
             builder: (context, isVisible, child) {
@@ -160,6 +180,7 @@ class _HomePageState extends State<HomePage> {
             },
           )
         ],
+      ),
       ),
     );
   }

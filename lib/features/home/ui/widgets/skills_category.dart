@@ -140,7 +140,7 @@ class _SkillsCategoryState extends State<SkillsCategory> {
                     );
                   }
                 }
-                return const Center(child: Text("No courses available"));
+                return Center(child: Text("No courses available".tr()));
               },
             ),
           ),

@@ -7,6 +7,7 @@ import '../../../../core/injection/injection.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../course_details/logic/cubit/course_details_cubit.dart';
 import '../../../home/logic/cubit/course_category_cubit.dart';
+import '../../../home/ui/views/home_page.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -45,13 +46,13 @@ class SearchPageState extends State<SearchPage> {
     super.dispose();
   }
 
-  bool _isValidNetworkImage(String? imagePath) {
-    if (imagePath == null || imagePath.isEmpty) {
-      return false;
-    }
+  // bool _isValidNetworkImage(String? imagePath) {
+  //   if (imagePath == null || imagePath.isEmpty) {
+  //     return false;
+  //   }
 
-    return imagePath.startsWith('http://') || imagePath.startsWith('https://');
-  }
+  //   return imagePath.startsWith('http://') || imagePath.startsWith('https://');
+  // }
 
   void _performSearch(String query) {
     final results = allCourses.where((course) {
@@ -107,7 +108,7 @@ class SearchPageState extends State<SearchPage> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF02457A),
+                        color: Theme.of(context).primaryColor,
                       ),
                     ),
                     SizedBox(height: 16),
@@ -217,21 +218,12 @@ class SearchPageState extends State<SearchPage> {
                     Align(
                       alignment: Alignment.center,
                       child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF02457A),
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 17),
-                        ),
                         onPressed: () {
                           setState(() {}); // Update main state
                           _performSearch(searchController.text);
                           Navigator.pop(context);
                         },
-                        child: Text(
-                          'Apply',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        child: Text('Apply'),
                       ),
                     ),
                   ],
@@ -258,7 +250,8 @@ class SearchPageState extends State<SearchPage> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
-              Navigator.pop(context);
+              // ارجع للـ Home tab بدلاً من Navigator.pop
+              TabControllerHelper.selectedIndexNotifier.value = 2;
             },
           ),
           title: Container(
@@ -294,7 +287,7 @@ class SearchPageState extends State<SearchPage> {
               ),
             ),
           ),
-          backgroundColor: const Color(0xFF02457A),
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           actions: [
             IconButton(
               icon: Icon(Icons.tune, color: Colors.white),
