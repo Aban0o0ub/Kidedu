@@ -113,28 +113,23 @@ class _InstructorAuthBodyState extends State<InstructorAuthBody> {
               children: [
                 const CustomTitle(text: 'Sign Up'),
                 SizedBox(height: 11.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomTextField(
-                      label: 'Name',
-                      hintText: 'Enter your name',
-                      controller: widget.nameController,
-                      icon: Icons.person,
-                      width: 170.w,
-                      validator: validateName,
-                    ),
-                    SizedBox(width: 8.w),
-                    CustomDropdownField(
-                      label: 'Government',
-                      hintText: 'Select item',
-                      controller: widget.governmentController,
-                      items: widget.egyptianGovernorates,
-                      icon: Icons.location_city,
-                      width: 150.w,
-                      validator: validateGovernorate,
-                    ),
-                  ],
+                CustomTextField(
+                  label: 'Name',
+                  hintText: 'Enter your name',
+                  controller: widget.nameController,
+                  icon: Icons.person,
+                  width: double.infinity.w,
+                  validator: validateName,
+                ),
+                SizedBox(height: 7.h),
+                CustomDropdownField(
+                  label: 'Governorate',
+                  hintText: 'Select item',
+                  controller: widget.governmentController,
+                  items: widget.egyptianGovernorates,
+                  icon: Icons.location_city,
+                  width: double.infinity.w,
+                  validator: validateGovernorate,
                 ),
                 SizedBox(height: 7.h),
                 CustomTextField(

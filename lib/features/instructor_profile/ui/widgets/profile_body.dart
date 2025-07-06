@@ -199,7 +199,7 @@ class _ProfileBodyState extends State<ProfileBody> {
 
                                   if (courses.isEmpty) {
                                     return SizedBox(
-                                      height: 165,
+                                      height: 95,
                                       child: Center(
                                         child: Column(
                                           mainAxisAlignment:
@@ -208,14 +208,14 @@ class _ProfileBodyState extends State<ProfileBody> {
                                             Icon(
                                               Icons.school_outlined,
                                               color: Colors.white,
-                                              size: 32,
+                                              size: 38,
                                             ),
                                             SizedBox(height: 8),
                                             Text(
                                               "No courses yet".tr(),
                                               style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.white,
+                                                fontSize: 20,
+                                                color: Color(0xFF02457A),
                                               ),
                                             ),
                                           ],

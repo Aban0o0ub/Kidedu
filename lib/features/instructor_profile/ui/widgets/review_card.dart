@@ -25,16 +25,17 @@ Widget buildHorizontalReviewCard({
       border: Border.all(color: const Color(0xFF02457A), width: 1),
     ),
     child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Profile circle with initials instead of image
         CircleAvatar(
-          radius: 30,
+          radius: 25,
           backgroundColor: const Color(0xFF02457A), // Blue background
           child: Text(
             getInitials(name),
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -43,29 +44,32 @@ Widget buildHorizontalReviewCard({
         // Review text
         Expanded(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 name,
                 style: const TextStyle(
-                  fontSize: 20,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF02457A),
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               if (courseName != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    courseName,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF02457A),
-                      fontWeight: FontWeight.w500,
-                    ),
+                Text(
+                  courseName,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF02457A),
+                    fontWeight: FontWeight.w500,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+              const SizedBox(height: 4),
               // Rating stars
               Row(
                 children: List.generate(
@@ -73,17 +77,19 @@ Widget buildHorizontalReviewCard({
                   (index) => const Icon(
                     Icons.star,
                     color: Colors.yellow,
-                    size: 15,
+                    size: 14,
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               Text(
                 review,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   color: Color(0xFF02457A),
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

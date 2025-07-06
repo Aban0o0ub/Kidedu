@@ -1,43 +1,44 @@
+import 'auth_service.dart';
 import 'cache_helper.dart';
 
 class SocialMediaHelper {
-  static const String _facebookKey = 'facebook_link';
-  static const String _behanceKey = 'behance_link';
-  static const String _linkedinKey = 'linkedin_link';
-  static const String _githubKey = 'github_link';
+  static String _getUserSpecificKey(String baseKey) {
+    final userId = AuthService.getUserId();
+    return userId != null ? '${userId}_$baseKey' : baseKey;
+  }
 
   // Save social media links to cache
   static Future<void> saveFacebookLink(String link) async {
-    await CacheHelper.setData(key: _facebookKey, value: link);
+    await CacheHelper.setData(key: _getUserSpecificKey('facebook_link'), value: link);
   }
 
   static Future<void> saveBehanceLink(String link) async {
-    await CacheHelper.setData(key: _behanceKey, value: link);
+    await CacheHelper.setData(key: _getUserSpecificKey('behance_link'), value: link);
   }
 
   static Future<void> saveLinkedInLink(String link) async {
-    await CacheHelper.setData(key: _linkedinKey, value: link);
+    await CacheHelper.setData(key: _getUserSpecificKey('linkedin_link'), value: link);
   }
 
   static Future<void> saveGitHubLink(String link) async {
-    await CacheHelper.setData(key: _githubKey, value: link);
+    await CacheHelper.setData(key: _getUserSpecificKey('github_link'), value: link);
   }
 
   // Get social media links from cache
   static String? getFacebookLink() {
-    return CacheHelper.getData(key: _facebookKey);
+    return CacheHelper.getData(key: _getUserSpecificKey('facebook_link'));
   }
 
   static String? getBehanceLink() {
-    return CacheHelper.getData(key: _behanceKey);
+    return CacheHelper.getData(key: _getUserSpecificKey('behance_link'));
   }
 
   static String? getLinkedInLink() {
-    return CacheHelper.getData(key: _linkedinKey);
+    return CacheHelper.getData(key: _getUserSpecificKey('linkedin_link'));
   }
 
   static String? getGitHubLink() {
-    return CacheHelper.getData(key: _githubKey);
+    return CacheHelper.getData(key: _getUserSpecificKey('github_link'));
   }
 
   // Get all social media links
@@ -60,9 +61,9 @@ class SocialMediaHelper {
 
   // Clear all social media links
   static Future<void> clearAllLinks() async {
-    await CacheHelper.removeData(key: _facebookKey);
-    await CacheHelper.removeData(key: _behanceKey);
-    await CacheHelper.removeData(key: _linkedinKey);
-    await CacheHelper.removeData(key: _githubKey);
+    await CacheHelper.removeData(key: _getUserSpecificKey('facebook_link'));
+    await CacheHelper.removeData(key: _getUserSpecificKey('behance_link'));
+    await CacheHelper.removeData(key: _getUserSpecificKey('linkedin_link'));
+    await CacheHelper.removeData(key: _getUserSpecificKey('github_link'));
   }
 } 

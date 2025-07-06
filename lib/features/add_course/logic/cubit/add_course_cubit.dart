@@ -61,7 +61,7 @@ class AddCourseCubit extends Cubit<AddCourseState> {
       if (isClosed) return;
       emit(AddCourseSuccess(courseResponse));
 
-      // ❌ شيل التنقل من هنا برضو
+      context.go(Routes.instructorProfilePage);
     } catch (e) {
       if (isClosed) return;
       emit(AddCourseFailure(e.toString()));

@@ -340,7 +340,7 @@ class _HomeState extends State<Home> {
                     Padding(
                       padding: const EdgeInsets.only(left: 15.0),
                       child: SizedBox(
-                        height: 150,
+                        height: 135,
                         child: BlocBuilder<ReviewsCubit, ReviewsState>(
                           builder: (context, state) {
                             if (state is GetReviewsLoading) {

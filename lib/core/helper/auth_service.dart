@@ -102,4 +102,27 @@ class AuthService {
   static bool isValidSession() {
     return isLoggedIn() && getUserRole() != null && getUserEmail() != null;
   }
+
+  /// تسجيل الخروج وحذف كل البيانات المتعلقة بالمستخدم
+  static Future<void> logout() async {
+    // Clear user session data
+    await CacheHelper.removeData(key: _isLoggedInKey);
+    await CacheHelper.removeData(key: _userRoleKey);
+    await CacheHelper.removeData(key: _userEmailKey);
+    await CacheHelper.removeData(key: _userIdKey);
+    await CacheHelper.removeData(key: _userNameKey);
+
+    // Clear notifications
+    await CacheHelper.removeData(key: 'notifications');
+    await CacheHelper.removeData(key: 'notifications_cleared');
+
+    // Clear social media links for the user
+    final userId = getUserId();
+    if (userId != null) {
+      await CacheHelper.removeData(key: '${userId}_facebook_link');
+      await CacheHelper.removeData(key: '${userId}_behance_link');
+      await CacheHelper.removeData(key: '${userId}_linkedin_link');
+      await CacheHelper.removeData(key: '${userId}_github_link');
+    }
+  }
 } 

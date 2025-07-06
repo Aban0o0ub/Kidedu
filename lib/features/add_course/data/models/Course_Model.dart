@@ -72,7 +72,7 @@ class CourseRequest {
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    final Map<String, dynamic> data = {
       "course_name": courseName,
       "instructor": instructor,
       "level": level,
@@ -84,13 +84,12 @@ class CourseRequest {
       "price_after_discount": priceAfterDiscount,
       "start_date": startDate?.toIso8601String(),
       "end_date": endDate?.toIso8601String(),
-      "till_date": tillDate?.toIso8601String(),
       "course_image": courseImages,
-      "first_section": firstSection,
-      "rating_quantity": ratingQuantity,
-      "lessons": lessons,
       "suitableAges": suitableAges ?? [],
     };
+
+    data.removeWhere((key, value) => value == null);
+    return data;
   }
 }
 
@@ -117,10 +116,12 @@ class CourseResponse {
     bool hasDataWrapper = json['data'] != null;
     Map<String, dynamic> courseData;
     if (hasDataWrapper) {
-      courseData =
-          json['data']['new_course'] ?? json['data']['onlyCourse'] ?? {};
+      courseData = json['data']['new_course'] ?? 
+                  json['data']['onlyCourse'] ?? 
+                  json['data']['courseUpdated'] ?? 
+                  {};
       
-      // إضافة البيانات الإضافية من الـ response الجديد
+      // Add additional data from response
       if (json['data']['instructor'] != null) {
         courseData['instructor'] = json['data']['instructor'];
       }
@@ -133,9 +134,9 @@ class CourseResponse {
     } else {
       courseData = json;
     }
+
     return CourseResponse(
-      status:
-          json['status'] ?? (json['success'] == true ? 'success' : 'failed'),
+      status: json['status'] ?? (json['success'] == true ? 'success' : 'failed'),
       data: hasDataWrapper
           ? CourseData.fromJson(courseData)
           : CourseData.fromJson(courseData),

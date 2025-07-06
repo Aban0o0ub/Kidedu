@@ -195,6 +195,12 @@ class _AddCoursePageState extends State<AddCoursePage> {
                               controller: levelcontroller,
                               items: courseitems,
                               width: double.infinity,
+                              onChanged: (value) {
+                                print('DEBUG: Level changed to: $value');
+                                setState(() {
+                                  levelcontroller.text = value ?? '';
+                                });
+                              },
                             ),
                             const SizedBox(height: 15),
                             CustomDropdownField(
@@ -594,14 +600,18 @@ class _AddCoursePageState extends State<AddCoursePage> {
                                         : _editingCourseImages,
                                   );
 
+                                  print('DEBUG: Course request data: ${courseRequest.toJson()}');
+
                                   final cubit =
                                       BlocProvider.of<AddCourseCubit>(context);
                                   if (widget.courseToEdit != null) {
+                                    final updateData = courseRequest.toJson()
+                                      ..removeWhere((k, v) => v == null);
+                                    
                                     cubit.emitUpdateCourse(
                                       context,
                                       widget.courseToEdit!.id!,
-                                      courseRequest.toJson()
-                                        ..removeWhere((k, v) => v == null),
+                                      updateData,
                                     );
                                   } else {
                                     cubit.emitAddCourse(context, courseRequest);

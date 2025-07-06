@@ -187,8 +187,14 @@ class AuthInstructorState extends State<AuthInstructor> {
 
                     if (state is CreateNewInstructorSuccess) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Account created successfully"),
+                        SnackBar(
+                          content: const Text(
+                            "Account created successfully",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.all(10),
                         ),
                       );
                     }

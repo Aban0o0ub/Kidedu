@@ -366,16 +366,16 @@ class _AchievmentPageState extends State<AchievmentPage> {
                               state.response.pointsBreakdown.givenReviews,
                               Icons.rate_review,
                             ),
-                            _buildBreakdownItem(
-                              'Watched Videos',
-                              state.response.pointsBreakdown.watchedVideos,
-                              Icons.play_circle,
-                            ),
-                            _buildBreakdownItem(
-                              'Other Activities',
-                              state.response.pointsBreakdown.otherActivities,
-                              Icons.star,
-                            ),
+                            // _buildBreakdownItem(
+                            //   'Watched Videos',
+                            //   state.response.pointsBreakdown.watchedVideos,
+                            //   Icons.play_circle,
+                            // ),
+                            // _buildBreakdownItem(
+                            //   'Other Activities',
+                            //   state.response.pointsBreakdown.otherActivities,
+                            //   Icons.star,
+                            // ),
                           ],
                         ),
                       ),
@@ -415,8 +415,8 @@ class _AchievmentPageState extends State<AchievmentPage> {
                             Colors.blue,
                           ),
                           _buildPointsRule(
-                            '👥 Attend 10 offline sessions',
-                            '50 points',
+                            '👥 Attend 5 offline sessions',
+                            '250 points',
                             Colors.green,
                           ),
                           _buildPointsRule(
@@ -429,11 +429,11 @@ class _AchievmentPageState extends State<AchievmentPage> {
                             '25 points',
                             Colors.purple,
                           ),
-                          _buildPointsRule(
-                            '📺 Watch videos daily for a week',
-                            '250 points',
-                            Colors.red,
-                          ),
+                          // _buildPointsRule(
+                          //   '📺 Watch videos daily for a week',
+                          //   '250 points',
+                          //   Colors.red,
+                          // ),
                         ],
                       ),
                     ),

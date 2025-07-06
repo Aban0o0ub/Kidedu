@@ -144,15 +144,14 @@ void _showBioEditDialog(BuildContext context, String currentBio) {
 
   showDialog(
     context: context,
+    barrierDismissible: false,
     builder: (BuildContext dialogContext) {
       return BlocProvider.value(
-        value: instructorProfileCubit, // مرر الـ Cubit للـ Dialog
+        value: instructorProfileCubit,
         child: BlocListener<InstructorProfileCubit, InstructorProfileState>(
           listener: (context, state) {
             if (state is UpdateInstructorSuccess) {
               Navigator.of(dialogContext).pop();
-              // تحديث البيانات في الـ UI
-             // context.read<InstructorProfileCubit>().emitGetInstructorProfile();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text("Bio updated successfully!".tr()),
@@ -201,7 +200,6 @@ void _showBioEditDialog(BuildContext context, String currentBio) {
                   }
                   return ElevatedButton(
                     onPressed: () {
-                      // استدعاء الـ update method
                       context
                           .read<InstructorProfileCubit>()
                           .emitUpdateInstructorProfile(
@@ -225,19 +223,18 @@ void _showExperienceEditDialog(BuildContext context, String currentExperience) {
   final TextEditingController experienceController =
       TextEditingController(text: currentExperience);
 
-  // احصل على الـ Cubit من الـ context الحالي
   final instructorProfileCubit = context.read<InstructorProfileCubit>();
 
   showDialog(
     context: context,
+    barrierDismissible: false,
     builder: (BuildContext dialogContext) {
       return BlocProvider.value(
-        value: instructorProfileCubit, // مرر الـ Cubit للـ Dialog
+        value: instructorProfileCubit,
         child: BlocListener<InstructorProfileCubit, InstructorProfileState>(
           listener: (context, state) {
             if (state is UpdateInstructorSuccess) {
               Navigator.of(dialogContext).pop();
-             // context.read<InstructorProfileCubit>().emitGetInstructorProfile();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text("Experience updated successfully!".tr()),
@@ -264,11 +261,11 @@ void _showExperienceEditDialog(BuildContext context, String currentExperience) {
               child: TextField(
                 controller: experienceController,
                 maxLines: 5,
-                decoration: const InputDecoration(
-                  hintText: "Enter your experience...",
+                decoration: InputDecoration(
+                  hintText: "Enter your experience...".tr(),
                   border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF02457A)),
+                    borderSide: BorderSide(color: Theme.of(context).primaryColor),
                   ),
                 ),
               ),
@@ -292,11 +289,7 @@ void _showExperienceEditDialog(BuildContext context, String currentExperience) {
                             experience: experienceController.text.trim(),
                           );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF02457A),
-                    ),
-                    child: const Text("Save",
-                        style: TextStyle(color: Colors.white)),
+                    child: Text("Save".tr()),
                   );
                 },
               ),
@@ -308,7 +301,7 @@ void _showExperienceEditDialog(BuildContext context, String currentExperience) {
   );
 }
 
-// Personal Information Edit Dialog
+// Personal Info Edit Dialog
 void _showPersonalInfoEditDialog({
   required BuildContext context,
   required String name,
@@ -317,31 +310,24 @@ void _showPersonalInfoEditDialog({
   required String governorate,
   required String title,
 }) {
-  final TextEditingController nameController =
-      TextEditingController(text: name);
-  final TextEditingController phoneController =
-      TextEditingController(text: phone);
-  final TextEditingController emailController =
-      TextEditingController(text: email);
-  final TextEditingController governorateController =
-      TextEditingController(text: governorate);
-  final TextEditingController titleController =
-      TextEditingController(text: title);
+  final TextEditingController nameController = TextEditingController(text: name);
+  final TextEditingController phoneController = TextEditingController(text: phone);
+  final TextEditingController emailController = TextEditingController(text: email);
+  final TextEditingController governorateController = TextEditingController(text: governorate);
+  final TextEditingController titleController = TextEditingController(text: title);
 
-  // احصل على الـ Cubit من الـ context الحالي
   final instructorProfileCubit = context.read<InstructorProfileCubit>();
 
   showDialog(
     context: context,
+    barrierDismissible: false,
     builder: (BuildContext dialogContext) {
       return BlocProvider.value(
-        value: instructorProfileCubit, // مرر الـ Cubit للـ Dialog
+        value: instructorProfileCubit,
         child: BlocListener<InstructorProfileCubit, InstructorProfileState>(
           listener: (context, state) {
             if (state is UpdateInstructorSuccess) {
               Navigator.of(dialogContext).pop();
-              // تحديث البيانات في الـ UI
-             // context.read<InstructorProfileCubit>().emitGetInstructorProfile();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text("Personal information updated successfully!".tr()),
@@ -351,87 +337,62 @@ void _showPersonalInfoEditDialog({
             } else if (state is UpdateInstructorFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text("${"Error:".tr()} ${state.error}"),
+                  content: Text("Error: ${state.error}"),
                   backgroundColor: Colors.red,
                 ),
               );
             }
           },
           child: AlertDialog(
-            title: const Text(
-              "Edit Personal Information",
+            title: Text(
+              "Edit Personal Information".tr(),
               style: TextStyle(
-                  color: Color(0xFF02457A), fontWeight: FontWeight.bold),
+                  color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
             ),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: "Name",
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Color(0xFF02457A)),
-                        ),
-                        labelStyle: TextStyle(color: Color(0xFF02457A)),
-                      ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: "Name".tr(),
+                      border: OutlineInputBorder(),
                     ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: phoneController,
-                      decoration: const InputDecoration(
-                        labelText: "Phone",
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Color(0xFF02457A)),
-                        ),
-                        labelStyle: TextStyle(color: Color(0xFF02457A)),
-                      ),
-                      keyboardType: TextInputType.phone,
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: phoneController,
+                    decoration: InputDecoration(
+                      labelText: "Phone".tr(),
+                      border: OutlineInputBorder(),
                     ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: emailController,
-                      decoration: const InputDecoration(
-                        labelText: "Email",
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Color(0xFF02457A)),
-                        ),
-                        labelStyle: TextStyle(color: Color(0xFF02457A)),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      labelText: "Email".tr(),
+                      border: OutlineInputBorder(),
                     ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: governorateController,
-                      decoration: const InputDecoration(
-                        labelText: "Governorate",
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Color(0xFF02457A)),
-                        ),
-                        labelStyle: TextStyle(color: Color(0xFF02457A)),
-                      ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: governorateController,
+                    decoration: InputDecoration(
+                      labelText: "Governorate".tr(),
+                      border: OutlineInputBorder(),
                     ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: titleController,
-                      decoration: const InputDecoration(
-                        labelText: "Title",
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Color(0xFF02457A)),
-                        ),
-                        labelStyle: TextStyle(color: Color(0xFF02457A)),
-                      ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: titleController,
+                    decoration: InputDecoration(
+                      labelText: "Title".tr(),
+                      border: OutlineInputBorder(),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             actions: [
@@ -457,11 +418,7 @@ void _showPersonalInfoEditDialog({
                             title: titleController.text.trim(),
                           );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF02457A),
-                    ),
-                    child: const Text("Save",
-                        style: TextStyle(color: Colors.white)),
+                    child: Text("Save".tr()),
                   );
                 },
               ),

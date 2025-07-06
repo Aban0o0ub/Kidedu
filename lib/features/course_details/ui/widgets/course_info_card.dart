@@ -15,6 +15,13 @@ class CourseInfoCard extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 
+  // Helper method to format age range
+  String _formatAgeRange(List<dynamic>? ages) {
+    if (ages == null || ages.isEmpty) return 'All ages';
+    ages.sort();
+    return '${ages.first} - ${ages.last} years';
+  }
+
   // Custom widget for displaying dates with labels
   Widget _buildDateRow() {
     return Row(
@@ -127,8 +134,8 @@ class CourseInfoCard extends StatelessWidget {
           BuildPairPage(
             icon1: Icons.stairs,
             text1: course.level ?? "course level",
-            icon2: Icons.access_time,
-            text2: "duration",
+            icon2: Icons.child_care,
+            text2: _formatAgeRange(course.suitableAges),
           ),
           BuildPairPage(
             icon1: Icons.category,

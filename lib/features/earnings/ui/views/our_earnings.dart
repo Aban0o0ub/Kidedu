@@ -134,7 +134,7 @@ class _AdminEarningsScreenState extends State<AdminEarningsScreen> {
           top: 20,
           right: 20,
           child: CircleAvatar(
-            backgroundColor: Color(0xFF02457A),
+            backgroundColor: Colors.red,
             child: IconButton(
               onPressed: () {
                 _showLogoutConfirmationDialog(context);

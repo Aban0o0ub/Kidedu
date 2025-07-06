@@ -162,8 +162,15 @@ String? validateName(String? value) {
 
                     if (state is CreateNewKidSuccess) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text("Account created successfully")),
+                        SnackBar(
+                          content: const Text(
+                            "Account created successfully",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.all(10),
+                        ),
                       );
                     }
                   },

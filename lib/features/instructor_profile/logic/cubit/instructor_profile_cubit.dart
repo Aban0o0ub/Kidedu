@@ -31,6 +31,7 @@ class InstructorProfileCubit extends Cubit<InstructorProfileState> {
     String? email,
     String? governorate,
     String? title,
+    String? image,
   }) async {
     emit(UpdateInstructorLoading());
     try {
@@ -47,27 +48,33 @@ class InstructorProfileCubit extends Cubit<InstructorProfileState> {
         }
 
         dataToUpdate = InstructorData(
-          name: name ?? currentData?.name ?? '',
-          phoneNumber: phoneNumber ?? currentData?.phoneNumber ?? '',
-          email: email ?? currentData?.email ?? '',
-          governorate: governorate ?? currentData?.governorate ?? '',
-          title: title ?? currentData?.title ?? '',
-          bio: bio ?? currentData?.bio ?? '',
-          experience: experience ?? currentData?.experience ?? '',
+          id: currentData?.id,
+          name: name ?? currentData?.name,
+          phoneNumber: phoneNumber ?? currentData?.phoneNumber,
+          email: email ?? currentData?.email,
+          governorate: governorate ?? currentData?.governorate,
+          title: title ?? currentData?.title,
+          bio: bio ?? currentData?.bio,
+          experience: experience ?? currentData?.experience,
+          image: image ?? currentData?.image,
+          earnings: currentData?.earnings,
+          createdAt: currentData?.createdAt,
+          updatedAt: currentData?.updatedAt,
+          v: currentData?.v,
         );
       }
 
-      final updatedInstructor =
-          await instructorProfileRepo.updateInstructorProfile(dataToUpdate);
-
-      print('DEBUG: updatedInstructor received: ${updatedInstructor.data}');
+      final updatedInstructor = await instructorProfileRepo.updateInstructorProfile(dataToUpdate);
+      print('DEBUG: updatedInstructor received: ${updatedInstructor.data?.instructor?.toJson()}');
       
-      // Emit success with updated data
-      emit(UpdateInstructorSuccess(updatedInstructor));
-      
-      // استخدم البيانات المحدثة من الـ response مباشرة
       if (updatedInstructor.data?.instructor != null) {
+        // First emit the update success
+        emit(UpdateInstructorSuccess(updatedInstructor));
+        
+        // Then immediately update the profile state with the new data
         emit(InstructorProfileSuccess(updatedInstructor.data!.instructor!));
+      } else {
+        throw Exception("Updated instructor data is null");
       }
     } catch (e) {
       print('DEBUG: Error in emitUpdateInstructorProfile: $e');

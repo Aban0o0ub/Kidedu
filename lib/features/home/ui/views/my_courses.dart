@@ -9,7 +9,6 @@ import '../../../add_course/data/models/Course_Model.dart';
 import '../../../course_details/logic/cubit/course_details_cubit.dart';
 import '../../logic/cubit/course_category_cubit.dart';
 import '../widgets/nav_bar_visibility_controller.dart';
-import 'home_page.dart';
 
 class MyCourses extends StatefulWidget {
   const MyCourses({super.key});
@@ -84,30 +83,12 @@ class EmptyCourses extends StatelessWidget {
             "You haven't joined a course yet",
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 40,
+                fontSize: 35,
                 fontWeight: FontWeight.w700,
                 color: Color(0xFF02457A)),
           ),
           const SizedBox(height: 120),
-          TextButton(
-            onPressed: () {
-              FocusScope.of(context).unfocus();
-              context.push(Routes.homePage, extra: {
-                'courseTitles': HomePage.courseTitles,
-                'backgroundImages': HomePage.backgroundImages,
-                'iconImages': HomePage.iconImages,
-              });
-            },
-            child: const Text(
-              "Explore now",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
+         
         ],
       ),
     );

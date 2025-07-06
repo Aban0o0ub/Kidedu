@@ -118,38 +118,34 @@ class KidAuthBodyState extends State<KidAuthBody> {
               children: [
                 const CustomTitle(text: 'Sign Up'),
                 const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomTextField(
-                      label: 'Name',
-                      hintText: 'Enter your name',
-                      controller: widget.nameController,
-                      icon: Icons.person,
-                      width: 180,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your name';
-                        }
-                        return null;
-                      },
-                    ),
-                    CustomDropdownField(
-                      label: 'Government',
-                      hintText: 'Select item',
-                      controller: widget.governmentController,
-                      items: egyptianGovernorates,
-                      icon: Icons.location_city,
-                      width: 180,
-                      height: 48,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please select a governorate';
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
+                CustomTextField(
+                  label: 'Name',
+                  hintText: 'Enter your name',
+                  controller: widget.nameController,
+                  icon: Icons.person,
+                  width: double.infinity,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 8),
+                CustomDropdownField(
+                  label: 'Governorate',
+                  hintText: 'Select item',
+                  controller: widget.governmentController,
+                  items: egyptianGovernorates,
+                  icon: Icons.location_city,
+                  width: double.infinity,
+                  height: 48,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select a governorate';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 8),
                 CustomTextField(

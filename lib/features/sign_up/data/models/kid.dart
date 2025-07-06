@@ -249,6 +249,7 @@ class InstructorData {
     if (image != null) data['Image'] = image;
     if (title != null) data['Title'] = title;
     if (experience != null) data['Experience'] = experience;
+    if (earnings != null) data['earnings'] = earnings;
 
     return data;
   }

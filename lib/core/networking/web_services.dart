@@ -307,7 +307,6 @@ class WebServices {
         if (instructorData.email != null && instructorData.email!.isNotEmpty) {
           formFields['Email'] = instructorData.email;
         }
-
         if (instructorData.governorate != null &&
             instructorData.governorate!.isNotEmpty) {
           formFields['Governorate'] = instructorData.governorate;
@@ -316,24 +315,19 @@ class WebServices {
             instructorData.phoneNumber!.isNotEmpty) {
           formFields['PhoneNumber'] = instructorData.phoneNumber;
         }
-        // ✅ إضافة Bio للـ image case
-        if (instructorData.bio != null && instructorData.bio!.isNotEmpty) {
+        if (instructorData.bio != null) {
           formFields['Bio'] = instructorData.bio;
         }
-        if (instructorData.title != null && instructorData.title!.isNotEmpty) {
+        if (instructorData.title != null) {
           formFields['Title'] = instructorData.title;
         }
-        if (instructorData.experience != null &&
-            instructorData.experience!.isNotEmpty) {
+        if (instructorData.experience != null) {
           formFields['Experience'] = instructorData.experience;
         }
 
-        formFields['image'] =
-            await MultipartFile.fromFile(instructorData.image!);
-
+        formFields['image'] = await MultipartFile.fromFile(instructorData.image!);
         FormData formData = FormData.fromMap(formFields);
 
-        // طباعة البيانات المرسلة للسيرفر للتأكد (مع الصورة)
         print('DEBUG: Sending FormData to server: $formFields');
 
         final response = await dio.patch(
@@ -347,12 +341,8 @@ class WebServices {
 
         if (response.statusCode == 200) {
           print('DEBUG: Raw response data: ${response.data}');
-          
-          // الـ model بيدعم الـ response structure بالفعل
           final instructorResponse = InstructorResponse.fromJson(response.data);
-          
           print('DEBUG: Parsed instructor response: ${instructorResponse.data?.instructor?.name}');
-          
           return instructorResponse;
         } else {
           throw Exception("Update failed: ${response.statusMessage}");
@@ -374,18 +364,16 @@ class WebServices {
             instructorData.phoneNumber!.isNotEmpty) {
           jsonData['PhoneNumber'] = instructorData.phoneNumber;
         }
-        // ✅ إضافة Bio, Title, Experience للـ else block
-        if (instructorData.bio != null && instructorData.bio!.isNotEmpty) {
+        if (instructorData.bio != null) {
           jsonData['Bio'] = instructorData.bio;
         }
-        if (instructorData.title != null && instructorData.title!.isNotEmpty) {
+        if (instructorData.title != null) {
           jsonData['Title'] = instructorData.title;
         }
-        if (instructorData.experience != null && instructorData.experience!.isNotEmpty) {
+        if (instructorData.experience != null) {
           jsonData['Experience'] = instructorData.experience;
         }
 
-        // طباعة البيانات المرسلة للسيرفر للتأكد
         print('DEBUG: Sending JSON data to server: $jsonData');
         
         final response = await dio.patch(
@@ -394,7 +382,7 @@ class WebServices {
           options: Options(
             headers: {
               'token': 'Bearer $token',
-              // 'content-type': 'application/json',
+              'content-type': 'application/json',
             },
             validateStatus: (status) => status! < 500,
           ),
@@ -402,17 +390,15 @@ class WebServices {
 
         if (response.statusCode == 200) {
           print('DEBUG: Raw response data (no image): ${response.data}');
-          
           final instructorResponse = InstructorResponse.fromJson(response.data);
-          
           print('DEBUG: Parsed instructor response (no image): ${instructorResponse.data?.instructor?.name}');
-          
           return instructorResponse;
         } else {
           throw Exception("Update failed: ${response.statusMessage}");
         }
       }
     } catch (e) {
+      print('DEBUG: Error updating instructor profile: ${e.toString()}');
       throw Exception("Error updating instructor profile: ${e.toString()}");
     }
   }
@@ -1463,22 +1449,28 @@ class WebServices {
     );
   }
 
-Future<CourseResponse> updateCourse({
+  Future<CourseResponse> updateCourse({
     required String courseId,
     required Map<String, dynamic> data,
   }) async {
-    String? token = await CacheHelper.getData(key: "token");
-    final response = await dio.patch(
-      '/course/$courseId',
-      data: data,
-      options: Options(
-        headers: {
-          'token': 'Bearer $token',
-        },
-      ),
-    );
+    try {
+      String? token = await CacheHelper.getData(key: "token");
+      if (token == null) throw Exception('Missing token');
 
-    return CourseResponse.fromJson(response.data);
+      Response response = await dio.patch(
+        '/courses/$courseId',
+        data: data,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      return CourseResponse.fromJson(response.data);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<List<CourseData>> getCoursesByInstructorId(String instructorId) async {

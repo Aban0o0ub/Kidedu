@@ -19,16 +19,7 @@ class AddCourseRepo {
   return await webServices.addNewCourse(newCourse);
 }
 
-  Future<CourseResponse> updateCourse(
-    String courseId,
-    Map<String, dynamic> data,
-  ) async {
-    String? token = await CacheHelper.getData(key: "token");
-
-    if (token == null) {
-      throw Exception('Token is missing');
-    }
-
+  Future<CourseResponse> updateCourse(String courseId, Map<String, dynamic> data) async {
     return await webServices.updateCourse(
       courseId: courseId,
       data: data,

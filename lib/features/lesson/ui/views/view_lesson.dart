@@ -49,7 +49,8 @@ class _ViewLessonState extends State<ViewLesson> {
   }
 
   void _handleLessonNavigation(int newIndex, LessonModel currentLesson) {
-    if (widget.courseId != null) {
+    // Only proceed if we have both courseId and lessonId
+    if (widget.courseId != null && widget.courseId!.isNotEmpty && currentLesson.id != null) {
       final request = EndCourseRequest(
         courseId: widget.courseId!,
         lessonId: currentLesson.id,

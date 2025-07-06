@@ -150,7 +150,7 @@ class RoleCubit extends Cubit<String?> {
 
   /// تسجيل خروج المستخدم ومسح جميع البيانات المحفوظة
   Future<void> logout() async {
-    await AuthService.clearUserSession();
+    await AuthService.logout();
     clearRole();
   }
 
