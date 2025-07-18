@@ -372,7 +372,7 @@ class _VideoLessonState extends State<VideoLesson>
 
     // Handle network images
     if (imagePath.startsWith('/uploads/')) {
-      final fullUrl = 'http://192.168.1.3:3000$imagePath';
+      final fullUrl = 'http://192.168.43.204:3000$imagePath';
       return Image.network(
         fullUrl,
         fit: BoxFit.cover,

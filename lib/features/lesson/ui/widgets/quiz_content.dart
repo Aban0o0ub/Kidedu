@@ -78,7 +78,6 @@ class _QuizContentState extends State<QuizContent> {
             return _buildLoading();
           }
           if (state is GetQuizzesFailure) {
-            // بدلاً من إظهار رسالة خطأ، نظهر رسالة عدم وجود كويز
             return _buildNoQuizForCourseMessage();
           }
           if (state is GetQuizzesSuccess) {
@@ -213,7 +212,6 @@ class _QuizContentState extends State<QuizContent> {
           ),
           const SizedBox(height: 20),
 
-          // Quiz info cards
           Row(
             children: [
               Expanded(

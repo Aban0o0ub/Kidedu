@@ -32,7 +32,7 @@ class LinkOptionWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          keyboardType: TextInputType.url, // إضافة نوع لوحة المفاتيح للروابط
+          keyboardType: TextInputType.url, 
         ),
       ],
     );

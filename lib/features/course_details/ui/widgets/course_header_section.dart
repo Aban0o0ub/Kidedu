@@ -383,11 +383,11 @@ Join this amazing course now! 🚀
       // Convert relative path to full URL
       String fullImageUrl = imageUrl;
       if (imageUrl.startsWith('/uploads/')) {
-        fullImageUrl = 'http://192.168.1.3:3000$imageUrl';
+        fullImageUrl = 'http://192.168.43.204:3000$imageUrl';
       } else if (!imageUrl.startsWith('http')) {
         // Add slash if imageUrl doesn't start with one
         String pathWithSlash = imageUrl.startsWith('/') ? imageUrl : '/$imageUrl';
-        fullImageUrl = 'http://192.168.1.3:3000$pathWithSlash';
+        fullImageUrl = 'http://192.168.43.204:3000$pathWithSlash';
       }
       
       return Image.network(

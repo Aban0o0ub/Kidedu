@@ -97,19 +97,15 @@ void initGetIt() {
       () => DiscountedCoursesCubit(getIt<CourseCategoryRepo>()));
   getIt.registerFactory<AchievmentCubit>(
       () => AchievmentCubit(getIt<AchievmentRepo>()));
-  
-  // Notification Cubit as singleton to persist across the app
-  getIt.registerLazySingleton<NotificationCubit>(() => NotificationCubit());
-  
-  // Role Cubit as singleton to persist role state across the app
-  getIt.registerLazySingleton<RoleCubit>(() => RoleCubit());
+    getIt.registerLazySingleton<NotificationCubit>(() => NotificationCubit());
+   // getIt.registerLazySingleton<RoleCubit>(() => RoleCubit());
 }
 
 Dio createAndSetupDio() {
   Dio dio = Dio();
 
   dio.options = BaseOptions(
-    baseUrl: 'http://192.168.1.3:3000/api/',
+    baseUrl: 'http://192.168.43.204:3000/api/',
     connectTimeout: const Duration(seconds: 30),
     receiveTimeout: const Duration(seconds: 30),
   );

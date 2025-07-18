@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:loginpage/features/cart/logic/cubit/cart_cubit.dart';
 import '../views/home_page.dart';
 import 'nav_bar_visibility_controller.dart';
@@ -53,11 +52,11 @@ class _CourseCardState extends State<CourseCard> {
   
   String _getFullImageUrl(String imagePath) {
     if (imagePath.startsWith('/uploads/')) {
-      return 'http://192.168.1.3:3000$imagePath';
+      return 'http://192.168.43.204:3000$imagePath';
     } else if (!imagePath.startsWith('http')) {
       // Add slash if imagePath doesn't start with one
       String pathWithSlash = imagePath.startsWith('/') ? imagePath : '/$imagePath';
-      return 'http://192.168.1.3:3000$pathWithSlash';
+      return 'http://192.168.43.204:3000$pathWithSlash';
     }
     return imagePath;
   }

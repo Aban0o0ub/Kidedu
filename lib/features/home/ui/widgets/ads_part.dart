@@ -37,11 +37,11 @@ class _DiscountedCoursesCarouselState extends State<DiscountedCoursesCarousel> {
   
   String _getFullImageUrl(String imagePath) {
     if (imagePath.startsWith('/uploads/')) {
-      return 'http://192.168.1.3:3000$imagePath';
+      return 'http://192.168.43.204:3000$imagePath';
     } else if (!imagePath.startsWith('http')) {
       // Add slash if imagePath doesn't start with one
       String pathWithSlash = imagePath.startsWith('/') ? imagePath : '/$imagePath';
-      return 'http://192.168.1.3:3000$pathWithSlash';
+      return 'http://192.168.43.204:3000$pathWithSlash';
     }
     return imagePath;
   }

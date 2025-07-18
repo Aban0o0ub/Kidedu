@@ -1,14 +1,12 @@
 import 'package:loginpage/core/helper/cache_helper.dart';
 
 class AuthService {
-  // Constants for cache keys
   static const String _isLoggedInKey = 'isLoggedIn';
   static const String _userRoleKey = 'userRole';
   static const String _userEmailKey = 'userEmail';
   static const String _userIdKey = 'userId';
   static const String _userNameKey = 'userName';
 
-  /// حفظ بيانات المستخدم بعد تسجيل الدخول الناجح
   static Future<bool> saveUserSession({
     required String role,
     required String email,
@@ -34,32 +32,26 @@ class AuthService {
     }
   }
 
-  /// فحص إذا كان المستخدم مسجل دخوله
   static bool isLoggedIn() {
     return CacheHelper.getData(key: _isLoggedInKey) ?? false;
   }
 
-  /// الحصول على دور المستخدم المحفوظ
   static String? getUserRole() {
     return CacheHelper.getData(key: _userRoleKey);
   }
 
-  /// الحصول على إيميل المستخدم المحفوظ
   static String? getUserEmail() {
     return CacheHelper.getData(key: _userEmailKey);
   }
 
-  /// الحصول على معرف المستخدم المحفوظ
   static String? getUserId() {
     return CacheHelper.getData(key: _userIdKey);
   }
 
-  /// الحصول على اسم المستخدم المحفوظ
   static String? getUserName() {
     return CacheHelper.getData(key: _userNameKey);
   }
 
-  /// الحصول على جميع بيانات المستخدم المحفوظة
   static Map<String, dynamic> getUserData() {
     return {
       'isLoggedIn': isLoggedIn(),
@@ -70,7 +62,6 @@ class AuthService {
     };
   }
 
-  /// مسح جلسة المستخدم (logout)
   static Future<bool> clearUserSession() async {
     try {
       await CacheHelper.removeData(key: _isLoggedInKey);
@@ -84,28 +75,24 @@ class AuthService {
     }
   }
 
-  /// الحصول على المسار المناسب حسب دور المستخدم
   static String getHomeRouteForRole(String? role) {
     switch (role) {
       case 'kid':
         return '/home';
       case 'instructor':
-        return '/instructorProfile';  // ✅ تم تصحيح المسار
+        return '/instructorProfile';  
       case 'admin':
-        return '/adminEarnings';     // ✅ تم تصحيح المسار أيضاً
+        return '/adminEarnings';    
       default:
-        return '/';  // العودة للـ welcome page
+        return '/'; 
     }
   }
 
-  /// فحص صحة جلسة المستخدم
   static bool isValidSession() {
     return isLoggedIn() && getUserRole() != null && getUserEmail() != null;
   }
 
-  /// تسجيل الخروج وحذف كل البيانات المتعلقة بالمستخدم
   static Future<void> logout() async {
-    // Clear user session data
     await CacheHelper.removeData(key: _isLoggedInKey);
     await CacheHelper.removeData(key: _userRoleKey);
     await CacheHelper.removeData(key: _userEmailKey);
@@ -116,7 +103,6 @@ class AuthService {
     await CacheHelper.removeData(key: 'notifications');
     await CacheHelper.removeData(key: 'notifications_cleared');
 
-    // Clear social media links for the user
     final userId = getUserId();
     if (userId != null) {
       await CacheHelper.removeData(key: '${userId}_facebook_link');

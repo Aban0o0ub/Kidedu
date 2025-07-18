@@ -153,7 +153,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
               : NetworkImage(
                   currentImageUrl!.startsWith('http') 
                       ? currentImageUrl 
-                      : 'http://192.168.1.3:3000$currentImageUrl'
+                      : 'http://192.168.43.204:3000$currentImageUrl'
                 ) as ImageProvider,
           height: 330,
           width: double.infinity,

@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:quickalert/quickalert.dart';
 import '../../../kid_profile/ui/widgets/notification_helper.dart';
 import '../../../sign_up/ui/widgets/custom_button.dart';
-import '../../../home/ui/views/home_page.dart';
 import '../../../home/ui/widgets/nav_bar_visibility_controller.dart';
 import '../../logic/cubit/payment_cubit.dart';
 import 'custom_credit_card.dart';

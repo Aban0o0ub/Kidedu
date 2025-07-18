@@ -13,6 +13,7 @@ import '../../../../core/injection/injection.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/helper/social_media_helper.dart';
 import '../../../course_details/logic/cubit/course_details_cubit.dart';
+import '../../../kid_profile/ui/widgets/notification_helper.dart';
 import '../../../reviews/logic/cubit/reviews_cubit.dart';
 import '../../logic/cubit/my_courses_cubit.dart';
 
@@ -94,11 +95,11 @@ class _ProfileBodyState extends State<ProfileBody> {
 
   String _getFullImageUrl(String imagePath) {
     if (imagePath.startsWith('/uploads/')) {
-      return 'http://192.168.1.3:3000$imagePath';
+      return 'http://192.168.43.204:3000$imagePath';
     } else if (!imagePath.startsWith('http')) {
       // Add slash if imagePath doesn't start with one
       String pathWithSlash = imagePath.startsWith('/') ? imagePath : '/$imagePath';
-      return 'http://192.168.1.3:3000$pathWithSlash';
+      return 'http://192.168.43.204:3000$pathWithSlash';
     }
     return imagePath;
   }
@@ -119,6 +120,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         child: BlocBuilder<InstructorProfileCubit, InstructorProfileState>(
           builder: (context, state) {
             if (state is InstructorProfileSuccess) {
+                NotificationHelper.showWelcomeNotification();
               var instructor = state.instructor;
               return Column(
                   crossAxisAlignment: CrossAxisAlignment.center,

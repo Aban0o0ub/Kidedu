@@ -59,7 +59,7 @@ class _KidProfilePageState extends State<KidProfilePage> {
                                         ? (kid.image!.startsWith('http') || kid.image!.startsWith('/uploads/'))
                                             ? NetworkImage(kid.image!.startsWith('http') 
                                                 ? kid.image! 
-                                                : 'http://192.168.1.3:3000${kid.image}')
+                                                : 'http://192.168.43.204:3000${kid.image}')
                                             : AssetImage('assets/images/kidprofile.jpeg')
                                         : const AssetImage('assets/images/kidprofile.jpeg') as ImageProvider,
                                   );
